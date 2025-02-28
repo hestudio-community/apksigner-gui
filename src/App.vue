@@ -16,13 +16,14 @@
               <el-drawer
                 v-model="opensetting"
                 title="设置"
+                class="settings"
               >
                 <SettingPage />
               </el-drawer>
             </div>
           </div>
         </el-header>
-        <el-main style="background-color: #ffffff">Main</el-main>
+        <el-main style="background-color: #ffffff" class="main">Main</el-main>
       </el-container>
     </el-container>
   </div>
@@ -55,6 +56,15 @@ body {
   justify-content: space-between;
   align-items: center;
   background-color: #f2f3f5;
+}
+
+.main {
+  border-radius: 15px;
+}
+
+.settings {
+  border-top-left-radius: 15px;
+  border-bottom-left-radius: 15px;
 }
 </style>
 
