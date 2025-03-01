@@ -73,7 +73,7 @@ body {
 }
 
 .el-overlay {
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(6.18px);
 }
 </style>
 
