@@ -1,5 +1,5 @@
 <template>
-  <div style="max-height: calc(100vh - 20px)">
+  <div style="max-height: calc(100vh)">
     <el-container>
       <el-aside class="aside">
         <div class="buttonbox">
@@ -15,8 +15,11 @@
               <el-icon @click="opensetting = true"><Setting /></el-icon>
               <el-drawer
                 v-model="opensetting"
-                title="设置"
                 class="settings"
+                :show-close="false"
+                destroy-on-close
+                :with-header="false"
+                size="350"
               >
                 <SettingPage />
               </el-drawer>
@@ -32,6 +35,7 @@
 <style>
 body {
   background-color: #f2f3f5;
+  color: #303133;
 }
 
 .aside {
@@ -60,25 +64,30 @@ body {
 
 .main {
   border-radius: 15px;
+  margin-right: 3px;
 }
 
 .settings {
   border-top-left-radius: 15px;
   border-bottom-left-radius: 15px;
 }
+
+.el-overlay {
+  backdrop-filter: blur(5px);
+}
 </style>
 
 <script setup>
 import { Plus, Minus, Setting } from "@element-plus/icons-vue";
-import SettingPage from "./components/Settings.vue"
+import SettingPage from "./components/Settings.vue";
 </script>
 
 <script>
 export default {
   data() {
     return {
-      opensetting: false
-    }
-  }
-}
+      opensetting: false,
+    };
+  },
+};
 </script>
