@@ -3,8 +3,12 @@
     <el-container>
       <el-aside class="aside">
         <div class="buttonbox">
-          <el-icon class="icon" @click="openaddkey = true"><Plus /></el-icon>
-          <el-icon class="icon"><Minus /></el-icon>
+          <el-button text style="height: 32px; width: 32px"
+            ><el-icon class="icon" @click="openaddkey = true"><Plus /></el-icon
+          ></el-button>
+          <el-button text style="height: 32px; width: 32px"
+            ><el-icon class="icon"><Minus /></el-icon>
+          </el-button>
           <div>
             <el-drawer
               v-model="openaddkey"
@@ -25,7 +29,10 @@
           <text>标题</text>
           <div>
             <div>
-              <el-icon @click="opensetting = true"><Setting /></el-icon>
+              <el-button text style="height: 32px; width: 32px" @click="opensetting = true">
+                <el-icon ><Setting /></el-icon>
+              </el-button>
+
               <el-drawer
                 v-model="opensetting"
                 class="settings"

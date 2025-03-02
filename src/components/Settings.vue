@@ -1,5 +1,16 @@
 <template>
-  <h1>设置</h1>
+  <h1 style="display: flex; justify-content: space-between">
+    <text>设置</text>
+    <div >
+      <el-button
+        text
+        style="height: 24px; width: 24px"
+        @click="open_devtools"
+        ><Icon icon="fluent:window-dev-tools-20-regular" width="20" height="20"
+      /></el-button>
+    </div>
+  </h1>
+
   <el-card>
     <div>
       <text>apksigner 位置</text>
@@ -23,7 +34,7 @@
       </el-input>
     </div>
     <br />
-    <div style="justify-self: end;">
+    <div style="justify-self: end">
       <el-button text bg type="primary" @click="save_filepath">保存</el-button>
     </div>
   </el-card>
@@ -53,7 +64,8 @@
 
 <script setup>
 import { FolderOpened } from "@element-plus/icons-vue";
-import { ElMessage } from 'element-plus'
+import { ElMessage } from "element-plus";
+import { Icon } from "@iconify/vue";
 </script>
 
 <script>
@@ -65,6 +77,9 @@ export default {
     };
   },
   methods: {
+    open_devtools() {
+      window.electronAPI.openDevtools();
+    },
     open_apksinger() {
       window.electronAPI.openFile().then((result) => {
         this.apksigner = result;
@@ -76,14 +91,14 @@ export default {
       });
     },
     save_filepath() {
-      localStorage.setItem("apksigner", this.apksigner)
-      localStorage.setItem("zipalign", this.zipalign)
-      ElMessage.success("保存成功")
-    }
+      localStorage.setItem("apksigner", this.apksigner);
+      localStorage.setItem("zipalign", this.zipalign);
+      ElMessage.success("保存成功");
+    },
   },
   mounted() {
-    this.apksigner = localStorage.getItem("apksigner")
-    this.zipalign = localStorage.getItem("zipalign")
-  }
+    this.apksigner = localStorage.getItem("apksigner");
+    this.zipalign = localStorage.getItem("zipalign");
+  },
 };
 </script>

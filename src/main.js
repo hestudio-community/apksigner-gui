@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, Menu } from "electron";
 import path from "node:path";
 import started from "electron-squirrel-startup";
 
@@ -17,6 +17,7 @@ async function handleFileOpen() {
 // ---
 
 const createWindow = () => {
+  Menu.setApplicationMenu(null);
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 800,
@@ -25,15 +26,21 @@ const createWindow = () => {
       preload: path.join(__dirname, "preload.js"),
     },
     // 添加图标配置
-    icon: path.join(__dirname, '../build/logo.png'),
+    icon: path.join(__dirname, "../build/logo.png"),
+  });
+
+  ipcMain.handle("devtools:open", async () => {
+    mainWindow.webContents.openDevTools();
   });
 
   // 为Mac设置Dock图标
-  if (process.platform === 'darwin') {
-    const { nativeImage } = require('electron');
-    const image = nativeImage.createFromPath(path.join(__dirname, '../build/icon.icns'));
+  if (process.platform === "darwin") {
+    const { nativeImage } = require("electron");
+    const image = nativeImage.createFromPath(
+      path.join(__dirname, "../build/icon.icns")
+    );
     app.dock.setIcon(image);
-    console.log(path.join(__dirname, '../build/icon.icns'))
+    console.log(path.join(__dirname, "../build/icon.icns"));
   }
 
   // and load the index.html of the app.
@@ -50,7 +57,7 @@ const createWindow = () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  ipcMain.handle('dialog:openFile', handleFileOpen)
+  ipcMain.handle("dialog:openFile", handleFileOpen);
   createWindow();
 
   // On OS X it's common to re-create a window in the app when the
