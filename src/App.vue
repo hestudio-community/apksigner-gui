@@ -3,8 +3,21 @@
     <el-container>
       <el-aside class="aside">
         <div class="buttonbox">
-          <el-icon class="icon"><Plus /></el-icon>
+          <el-icon class="icon" @click="openaddkey = true"><Plus /></el-icon>
           <el-icon class="icon"><Minus /></el-icon>
+          <div>
+            <el-drawer
+              v-model="openaddkey"
+              class="addkey"
+              :show-close="false"
+              destroy-on-close
+              :with-header="false"
+              size="350"
+              direction="ltr"
+            >
+              <AddKey />
+            </el-drawer>
+          </div>
         </div>
       </el-aside>
       <el-container>
@@ -72,6 +85,11 @@ body {
   border-bottom-left-radius: 15px;
 }
 
+.addkey {
+  border-top-right-radius: 15px;
+  border-bottom-right-radius: 15px;
+}
+
 .el-overlay {
   backdrop-filter: blur(6.18px);
 }
@@ -80,6 +98,7 @@ body {
 <script setup>
 import { Plus, Minus, Setting } from "@element-plus/icons-vue";
 import SettingPage from "./components/Settings.vue";
+import AddKey from "./components/AddKey.vue";
 </script>
 
 <script>
@@ -87,6 +106,7 @@ export default {
   data() {
     return {
       opensetting: false,
+      openaddkey: false,
     };
   },
 };
