@@ -1,6 +1,6 @@
 {
-  "name": "apksigner-gui",
-  "productName": "apksigner-gui",
+  "name": "com.hestudio.apksinger",
+  "productName": "APKSinger",
   "version": "1.0.0",
   "description": "My Electron application description",
   "main": ".vite/build/main.js",
@@ -37,5 +37,11 @@
     "element-plus": "^2.9.5",
     "@vitejs/plugin-vue": "^5.2.1",
     "vue": "^3.5.13"
+  },
+  "build": {
+    "appId": "com.example.apksigner-gui",
+    "mac": {
+      "icon": "build/icon.icns"
+    }
   }
 }

@@ -1,6 +1,5 @@
 <template>
   <h1>设置</h1>
-
   <el-card>
     <div>
       <text>apksigner 位置</text>

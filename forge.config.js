@@ -4,6 +4,8 @@ const { FuseV1Options, FuseVersion } = require('@electron/fuses');
 module.exports = {
   packagerConfig: {
     asar: true,
+    icon: './icons/icon',
+    appBundleId: "com.hestudio.apksinger"
   },
   rebuildConfig: {},
   makers: [

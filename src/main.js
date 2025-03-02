@@ -24,7 +24,17 @@ const createWindow = () => {
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
+    // 添加图标配置
+    icon: path.join(__dirname, '../build/logo.png'),
   });
+
+  // 为Mac设置Dock图标
+  if (process.platform === 'darwin') {
+    const { nativeImage } = require('electron');
+    const image = nativeImage.createFromPath(path.join(__dirname, '../build/icon.icns'));
+    app.dock.setIcon(image);
+    console.log(path.join(__dirname, '../build/icon.icns'))
+  }
 
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
