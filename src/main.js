@@ -27,6 +27,8 @@ const createWindow = () => {
     },
     // 添加图标配置
     icon: path.join(__dirname, "../build/logo.png"),
+    titleBarStyle: "hidden",
+    frame: false,
   });
 
   ipcMain.handle("devtools:open", async () => {
@@ -42,6 +44,26 @@ const createWindow = () => {
     app.dock.setIcon(image);
     console.log(path.join(__dirname, "../build/icon.icns"));
   }
+
+  // windows controls
+  ipcMain.handle("windows:close", async () => {
+    app.quit();
+  });
+  ipcMain.handle("windows:minimize", async () => {
+    mainWindow.minimize();
+  });
+  ipcMain.handle("windows:maximize", async () => {
+    if (mainWindow.isMaximized()) {
+      mainWindow.unmaximize();
+    } else {
+      mainWindow.maximize();
+    }
+  });
+  
+  // 添加获取窗口状态的处理程序
+  ipcMain.handle("windows:isMaximized", async () => {
+    return mainWindow.isMaximized();
+  });
 
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
