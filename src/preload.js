@@ -9,4 +9,5 @@ contextBridge.exposeInMainWorld("electronAPI", {
   WindowsMaximize: () => ipcRenderer.invoke("windows:maximize"),
   WindowsMinimize: () => ipcRenderer.invoke("windows:minimize"),
   WindowsIsMaximized: () => ipcRenderer.invoke("windows:isMaximized"),
+  SystemPlatfrom: () => ipcRenderer.invoke("system:platfrom")
 });

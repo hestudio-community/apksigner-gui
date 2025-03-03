@@ -7,19 +7,21 @@ if (started) {
   app.quit();
 }
 
-// ---
+// 将所有IPC处理程序移到这里
 async function handleFileOpen() {
   const { canceled, filePaths } = await dialog.showOpenDialog({});
   if (!canceled) {
     return filePaths[0];
   }
 }
-// ---
+
+// 保存mainWindow的引用以便在IPC处理程序中使用
+let mainWindow = null;
 
 const createWindow = () => {
   Menu.setApplicationMenu(null);
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
@@ -31,10 +33,6 @@ const createWindow = () => {
     frame: false,
   });
 
-  ipcMain.handle("devtools:open", async () => {
-    mainWindow.webContents.openDevTools();
-  });
-
   // 为Mac设置Dock图标
   if (process.platform === "darwin") {
     const { nativeImage } = require("electron");
@@ -44,26 +42,6 @@ const createWindow = () => {
     app.dock.setIcon(image);
     console.log(path.join(__dirname, "../build/icon.icns"));
   }
-
-  // windows controls
-  ipcMain.handle("windows:close", async () => {
-    app.quit();
-  });
-  ipcMain.handle("windows:minimize", async () => {
-    mainWindow.minimize();
-  });
-  ipcMain.handle("windows:maximize", async () => {
-    if (mainWindow.isMaximized()) {
-      mainWindow.unmaximize();
-    } else {
-      mainWindow.maximize();
-    }
-  });
-  
-  // 添加获取窗口状态的处理程序
-  ipcMain.handle("windows:isMaximized", async () => {
-    return mainWindow.isMaximized();
-  });
 
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
@@ -77,13 +55,43 @@ const createWindow = () => {
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
+  // 将所有IPC处理程序注册放在这里，确保只注册一次
   ipcMain.handle("dialog:openFile", handleFileOpen);
+  ipcMain.handle("system:platfrom", async () => {
+    return process.platform;
+  });
+  
+  // 开发工具处理程序
+  ipcMain.handle("devtools:open", async () => {
+    if (mainWindow) mainWindow.webContents.openDevTools();
+  });
+  
+  // Windows控制处理程序
+  if (process.platform != "darwin") {
+    ipcMain.handle("windows:close", async () => {
+      app.quit();
+    });
+    ipcMain.handle("windows:minimize", async () => {
+      if (mainWindow) mainWindow.minimize();
+    });
+    ipcMain.handle("windows:maximize", async () => {
+      if (!mainWindow) return;
+      if (mainWindow.isMaximized()) {
+        mainWindow.unmaximize();
+      } else {
+        mainWindow.maximize();
+      }
+    });
+  }
+  
+  // 窗口状态处理程序
+  ipcMain.handle("windows:isMaximized", async () => {
+    return mainWindow ? mainWindow.isMaximized() : false;
+  });
+  
   createWindow();
 
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
@@ -91,14 +99,9 @@ app.whenReady().then(() => {
   });
 });
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
+// 其余代码保持不变
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
   }
 });
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.

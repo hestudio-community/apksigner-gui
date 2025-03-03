@@ -1,15 +1,15 @@
 <template>
-  <h1 style="display: flex; justify-content: space-between">
+  <h2 style="display: flex; justify-content: space-between">
     <text>设置</text>
     <div >
       <el-button
         text
-        style="height: 24px; width: 24px"
+        style="height: 32px; width: 32px"
         @click="open_devtools"
         ><Icon icon="fluent:window-dev-tools-20-regular" width="20" height="20"
       /></el-button>
     </div>
-  </h1>
+  </h2>
 
   <el-card>
     <div>

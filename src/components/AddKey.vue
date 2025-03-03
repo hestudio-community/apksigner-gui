@@ -1,3 +1,3 @@
 <template>
-  <h1>添加密钥</h1>
+  <h2>添加密钥</h2>
 </template>

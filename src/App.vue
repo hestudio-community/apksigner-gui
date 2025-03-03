@@ -7,10 +7,10 @@
             text
             style="height: 32px; width: 32px"
             @click="openaddkey = true"
-            ><el-icon class="icon"><Plus /></el-icon
+            ><el-icon><Plus /></el-icon
           ></el-button>
           <el-button text style="height: 32px; width: 32px"
-            ><el-icon class="icon"><Minus /></el-icon>
+            ><el-icon><Minus /></el-icon>
           </el-button>
           <div>
             <el-drawer
@@ -31,60 +31,67 @@
         <el-header class="header">
           <text>标题</text>
           <div class="headerbutton">
-            <el-button
-              text
-              style="height: 32px; width: 32px"
-              @click="opensetting = true"
-            >
-              <el-icon><Setting /></el-icon>
-            </el-button>
-            <el-button
-              text
-              style="height: 32px; width: 32px"
-              @click="WindowsMinimize"
-            >
-              <el-icon
-                ><Icon
-                  icon="qlementine-icons:windows-minimize-16"
-                  width="16"
-                  height="16"
-              /></el-icon>
-            </el-button>
-            <el-button
-              text
-              style="height: 32px; width: 32px"
-              @click="WindowsMaximize"
-              v-if="windows.isMaxmaximize"
-            >
-              <el-icon
-                ><Icon
-                  icon="qlementine-icons:windows-unmaximize-16"
-                  width="16"
-                  height="16"
-              /></el-icon>
-            </el-button>
-            <el-button
-              text
-              style="height: 32px; width: 32px"
-              @click="WindowsMaximize"
-              v-else
-            >
-              <el-icon
-                ><Icon
-                  icon="qlementine-icons:windows-maximize-16"
-                  width="16"
-                  height="16"
-              /></el-icon>
-            </el-button>
-            <el-button
-              text
-              style="height: 32px; width: 32px"
-              @click="WindowsClose"
-            >
-              <el-icon
-                ><Icon icon="qlementine-icons:close-16" width="16" height="16"
-              /></el-icon>
-            </el-button>
+            <div>
+              <el-button
+                text
+                style="height: 32px; width: 32px"
+                @click="opensetting = true"
+              >
+                <el-icon><Setting /></el-icon>
+              </el-button>
+            </div>
+            <div v-show="!darwin.isDarwin">
+              <el-button
+                text
+                style="height: 32px; width: 32px"
+                @click="WindowsMinimize"
+              >
+                <el-icon
+                  ><Icon
+                    icon="qlementine-icons:windows-minimize-16"
+                    width="16"
+                    height="16"
+                /></el-icon>
+              </el-button>
+              <el-button
+                text
+                style="height: 32px; width: 32px"
+                @click="WindowsMaximize"
+                v-if="windows.isMaxmaximize"
+              >
+                <el-icon
+                  ><Icon
+                    icon="qlementine-icons:windows-unmaximize-16"
+                    width="16"
+                    height="16"
+                /></el-icon>
+              </el-button>
+              <el-button
+                text
+                style="height: 32px; width: 32px"
+                @click="WindowsMaximize"
+                v-else
+              >
+                <el-icon
+                  ><Icon
+                    icon="qlementine-icons:windows-maximize-16"
+                    width="16"
+                    height="16"
+                /></el-icon>
+              </el-button>
+              <el-button
+                text
+                style="height: 32px; width: 32px"
+                @click="WindowsClose"
+              >
+                <el-icon
+                  ><Icon
+                    icon="qlementine-icons:close-16"
+                    width="16"
+                    height="16"
+                /></el-icon>
+              </el-button>
+            </div>
           </div>
           <el-drawer
             v-model="opensetting"
@@ -114,13 +121,11 @@ body {
   max-width: 200px;
   min-width: 50px;
   height: calc(100vh - 20px);
-  .buttonbox {
-    display: flex;
-    flex-direction: row;
-    .icon {
-      margin: 5px;
-    }
-  }
+}
+
+.buttonbox {
+  display: flex;
+  flex-direction: row;
 }
 
 .header {
@@ -136,6 +141,8 @@ body {
 
 .headerbutton {
   -webkit-app-region: no-drag;
+  display: flex;
+  flex-direction: row;
 }
 
 .main {
@@ -174,6 +181,9 @@ export default {
       windows: {
         isMaxmaximize: false,
       },
+      darwin: {
+        isDarwin: false,
+      },
     };
   },
   methods: {
@@ -188,10 +198,17 @@ export default {
     },
   },
   mounted() {
-    setInterval(async () => {
-      this.windows.isMaxmaximize =
-        await window.electronAPI.WindowsIsMaximized();
-    }, 100);
+    window.electronAPI.SystemPlatfrom().then(async (result) => {
+      if (result == "darwin") {
+        this.darwin.isDarwin = true;
+        document.querySelector(".buttonbox").style.marginTop = "16px";
+      } else {
+        setInterval(async () => {
+          this.windows.isMaxmaximize =
+            await window.electronAPI.WindowsIsMaximized();
+        }, 100);
+      }
+    });
   },
 };
 </script>
