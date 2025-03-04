@@ -12,6 +12,9 @@
           <el-button text style="height: 32px; width: 32px"
             ><el-icon><Minus /></el-icon>
           </el-button>
+          <el-button text style="height: 32px; width: 32px" @click="RefreshKey"
+            ><el-icon><Refresh /></el-icon>
+          </el-button>
           <div>
             <el-drawer
               v-model="openaddkey"
@@ -25,6 +28,17 @@
               <AddKey />
             </el-drawer>
           </div>
+        </div>
+        <br />
+        <div
+          class="keybutton"
+          style="display: flex; flex-direction: column"
+          v-for="item in keyList"
+          :v-loading="keyLoading"
+        >
+          <el-button @click="" text bg style="width: 190px">
+            <text style="text-align: left">{{ item }}</text>
+          </el-button>
         </div>
       </el-aside>
       <el-container>
@@ -123,6 +137,12 @@
   flex-direction: row;
 }
 
+.keybutton {
+  width: 100%;
+  justify-content: start;
+  margin-bottom: 10px;
+}
+
 .header {
   justify-self: center;
   height: 40px;
@@ -179,7 +199,7 @@
 </style>
 
 <script setup>
-import { Plus, Minus, Setting } from "@element-plus/icons-vue";
+import { Plus, Minus, Setting, Refresh } from "@element-plus/icons-vue";
 import { Icon } from "@iconify/vue";
 import SettingPage from "./components/Settings.vue";
 import AddKey from "./components/AddKey.vue";
@@ -197,9 +217,21 @@ export default {
       darwin: {
         isDarwin: false,
       },
+      keyList: [],
+      keyLoading: true
     };
   },
   methods: {
+    RefreshKey() {
+      this.keyList = [];
+      const MyList = localStorage;
+      for (let i = 0; i < MyList.length; i++) {
+        if (MyList.key(i).substring(0, 4) == "key-") {
+          this.keyList.push(MyList.key(i).substring(4, MyList.key(i).length));
+        }
+      }
+      this.keyLoading = false;
+    },
     WindowsClose() {
       window.electronAPI.WindowsClose();
     },
@@ -222,6 +254,7 @@ export default {
         }, 100);
       }
     });
+    this.RefreshKey();
   },
 };
 </script>
