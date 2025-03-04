@@ -56,7 +56,6 @@
 <script setup>
 import { FolderOpened } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
-import { Icon } from "@iconify/vue";
 </script>
 
 <script>
@@ -83,20 +82,29 @@ export default {
           plain: true,
         });
       } else {
-        localStorage.setItem(
-          `key-${this.name}`,
-          JSON.stringify({
-            type: 1,
-            keystone: this.keystone,
-            keyalias: this.keyalias,
-            keypasswd: this.keypasswd,
-          })
-        );
-        ElMessage({
-          message: "保存成功",
-          type: "success",
-          plain: true,
-        });
+        if (localStorage.getItem(`key-${this.name}`)) {
+          ElMessage({
+            message: "已存在相同名称的密钥",
+            type: "error",
+            plain: true,
+          });
+          return;
+        } else {
+          localStorage.setItem(
+            `key-${this.name}`,
+            JSON.stringify({
+              type: 1,
+              keystone: this.keystone,
+              keyalias: this.keyalias,
+              keypasswd: this.keypasswd,
+            })
+          );
+          ElMessage({
+            message: "保存成功",
+            type: "success",
+            plain: true,
+          });
+        }
       }
     },
   },

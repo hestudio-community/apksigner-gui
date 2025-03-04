@@ -9,10 +9,17 @@
             @click="openaddkey = true"
             ><el-icon><Plus /></el-icon
           ></el-button>
-          <el-button text style="height: 32px; width: 32px"
+          <el-button
+            text
+            style="height: 32px; width: 32px"
+            @click="keyRemoveStatus = !keyRemoveStatus"
             ><el-icon><Minus /></el-icon>
           </el-button>
-          <el-button text style="height: 32px; width: 32px" @click="RefreshKey"
+          <el-button
+            text
+            style="height: 32px; width: 32px"
+            @click="RefreshKey"
+            class="refresh"
             ><el-icon><Refresh /></el-icon>
           </el-button>
           <div>
@@ -24,21 +31,55 @@
               :with-header="false"
               size="350"
               direction="ltr"
+              @close="RefreshKey"
             >
               <AddKey />
             </el-drawer>
           </div>
         </div>
         <br />
-        <div
-          class="keybutton"
-          style="display: flex; flex-direction: column"
-          v-for="item in keyList"
-          :v-loading="keyLoading"
-        >
-          <el-button @click="" text bg style="width: 190px">
-            <text style="text-align: left">{{ item }}</text>
-          </el-button>
+        <div v-loading="keyLoading">
+          <div
+            class="keybutton"
+            style="display: flex; flex-direction: column"
+            v-for="item in keyList"
+          >
+            <el-button
+              @click=""
+              tag="div"
+              text
+              bg
+              style="
+                width: 190px;
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+              "
+            >
+              <div>
+                <transition name="rotate-fade">
+                  <el-button
+                    text
+                    style="height: 32px; width: 32px"
+                    v-show="keyRemoveStatus"
+                    @click="RemoveKey(item)"
+                    ><el-icon><RemoveFilled /></el-icon
+                  ></el-button>
+                </transition>
+              </div>
+              <div
+                style="
+                  text-align: left;
+                  overflow: hidden;
+                  white-space: nowrap;
+                  text-overflow: ellipsis;
+                  width: 135px;
+                "
+              >
+                <text>{{ item }}</text>
+              </div>
+            </el-button>
+          </div>
         </div>
       </el-aside>
       <el-container>
@@ -139,7 +180,6 @@
 
 .keybutton {
   width: 100%;
-  justify-content: start;
   margin-bottom: 10px;
 }
 
@@ -196,13 +236,44 @@
   -webkit-backdrop-filter: blur(6.18px);
   backdrop-filter: blur(6.18px);
 }
+
+.el-message-box {
+  border-radius: 15px;
+}
+
+.rotate-fade-enter-active,
+.rotate-fade-leave-active {
+  transition: opacity 0.309s ease, transform 0.618s ease;
+}
+
+.rotate-fade-enter-from {
+  opacity: 0;
+  transform: rotate(-90deg);
+}
+
+.rotate-fade-leave-to {
+  opacity: 0;
+  transform: rotate(90deg);
+}
+
+.element-rotate {
+  transition: transform 0.618s ease;
+  transform: rotate(360deg);
+}
 </style>
 
 <script setup>
-import { Plus, Minus, Setting, Refresh } from "@element-plus/icons-vue";
+import {
+  Plus,
+  Minus,
+  Setting,
+  Refresh,
+  RemoveFilled,
+} from "@element-plus/icons-vue";
 import { Icon } from "@iconify/vue";
 import SettingPage from "./components/Settings.vue";
 import AddKey from "./components/AddKey.vue";
+import { ElMessage, ElMessageBox } from "element-plus";
 </script>
 
 <script>
@@ -218,19 +289,42 @@ export default {
         isDarwin: false,
       },
       keyList: [],
-      keyLoading: true
+      keyLoading: true,
+      keyRemoveStatus: false,
     };
   },
   methods: {
-    RefreshKey() {
+    async RefreshKey() {
+      this.keyLoading = true;
+      document.querySelector(".refresh").classList.add("element-rotate");
+      setTimeout(() => {
+        document.querySelector(".refresh").classList.remove("element-rotate");
+      }, 618);
       this.keyList = [];
       const MyList = localStorage;
       for (let i = 0; i < MyList.length; i++) {
         if (MyList.key(i).substring(0, 4) == "key-") {
-          this.keyList.push(MyList.key(i).substring(4, MyList.key(i).length));
+          await this.keyList.push(
+            MyList.key(i).substring(4, MyList.key(i).length)
+          );
         }
       }
       this.keyLoading = false;
+    },
+    RemoveKey(keyname) {
+      ElMessageBox.confirm(`确定要删除密钥 "${keyname}" 吗？`, "删除密钥", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        localStorage.removeItem(`key-${keyname}`);
+        ElMessage({
+          message: "删除成功",
+          type: "success",
+          plain: true,
+        });
+        this.RefreshKey();
+      });
     },
     WindowsClose() {
       window.electronAPI.WindowsClose();
