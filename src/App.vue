@@ -38,53 +38,55 @@
           </div>
         </div>
         <br />
-        <div v-loading="keyLoading">
-          <div
-            class="keybutton"
-            style="display: flex; flex-direction: column"
-            v-for="item in keyList"
-          >
-            <el-button
-              @click=""
-              tag="div"
-              text
-              bg
-              style="
-                width: 190px;
-                display: flex;
-                flex-direction: row;
-                justify-content: space-between;
-              "
+        <el-scrollbar style="max-height: calc(100vh - 100px)">
+          <div v-loading="keyLoading">
+            <div
+              class="keybutton"
+              style="display: flex; flex-direction: column"
+              v-for="item in keyList"
             >
-              <div>
-                <transition name="rotate-fade">
-                  <el-button
-                    text
-                    style="height: 32px; width: 32px"
-                    v-show="keyRemoveStatus"
-                    @click="RemoveKey(item)"
-                    ><el-icon><RemoveFilled /></el-icon
-                  ></el-button>
-                </transition>
-              </div>
-              <div
+              <el-button
+                @click="openSign = item"
+                tag="div"
+                text
+                bg
                 style="
-                  text-align: left;
-                  overflow: hidden;
-                  white-space: nowrap;
-                  text-overflow: ellipsis;
-                  width: 135px;
+                  width: 190px;
+                  display: flex;
+                  flex-direction: row;
+                  justify-content: space-between;
                 "
               >
-                <text>{{ item }}</text>
-              </div>
-            </el-button>
+                <div>
+                  <transition name="rotate-fade">
+                    <el-button
+                      text
+                      style="height: 32px; width: 32px"
+                      v-show="keyRemoveStatus"
+                      @click="RemoveKey(item)"
+                      ><el-icon><RemoveFilled /></el-icon
+                    ></el-button>
+                  </transition>
+                </div>
+                <div
+                  style="
+                    text-align: left;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                    width: 135px;
+                  "
+                >
+                  <text>{{ item }}</text>
+                </div>
+              </el-button>
+            </div>
           </div>
-        </div>
+        </el-scrollbar>
       </el-aside>
       <el-container>
         <el-header class="header">
-          <text>标题</text>
+          <text>{{ openSign }}</text>
           <div class="headerbutton">
             <div>
               <el-button
@@ -159,7 +161,12 @@
             <SettingPage />
           </el-drawer>
         </el-header>
-        <el-main style="background-color: #ffffff" class="main">Main</el-main>
+        <el-main style="background-color: #ffffff" class="main">
+          <el-scrollbar style="max-height: calc(100vh - 100px)">
+            <el-empty v-if="!openSign" description="坏了，没导入密钥！" />
+            <Sign v-else :keyname="openSign" />
+          </el-scrollbar>
+        </el-main>
       </el-container>
     </el-container>
   </div>
@@ -273,6 +280,7 @@ import {
 import { Icon } from "@iconify/vue";
 import SettingPage from "./components/Settings.vue";
 import AddKey from "./components/AddKey.vue";
+import Sign from "./components/Sign.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 </script>
 
@@ -291,6 +299,7 @@ export default {
       keyList: [],
       keyLoading: true,
       keyRemoveStatus: false,
+      openSign: "",
     };
   },
   methods: {
@@ -308,6 +317,9 @@ export default {
             MyList.key(i).substring(4, MyList.key(i).length)
           );
         }
+      }
+      if (localStorage.getItem(`key-${this.openSign}`) == null) {
+        this.openSign = "";
       }
       this.keyLoading = false;
     },

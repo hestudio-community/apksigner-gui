@@ -1,50 +1,52 @@
 <template>
   <h2>添加密钥</h2>
-  <div>
-    <text style="font-size: smaller"
-      >目前仅支持 密钥库 (.jks)
-      文件。对于公私钥分离的证书将在后续版本支持。</text
-    >
-  </div>
-  <br />
-  <el-card>
+  <el-scrollbar style="max-height: calc(100vh - 120px)">
     <div>
-      <div>
-        <text>名称</text>
-        <el-input v-model="name" placeholder="名称" />
-      </div>
-      <br />
-      <div>
-        <text>密钥库位置 (.jks)</text>
-        <el-input v-model="keystone" placeholder="密钥库位置 (.jks)">
-          <template #append>
-            <el-button @click="open_keystone">
-              <el-icon><FolderOpened /></el-icon
-            ></el-button>
-          </template>
-        </el-input>
-      </div>
-      <br />
-      <div>
-        <text>证书别名</text>
-        <el-input v-model="keyalias" placeholder="证书别名" />
-      </div>
-      <br />
-      <div>
-        <text>证书密码</text>
-        <el-input
-          v-model="keypasswd"
-          placeholder="证书密码"
-          type="password"
-          show-password
-        />
-      </div>
+      <text style="font-size: smaller"
+        >目前仅支持 密钥库 (.jks)
+        文件。对于公私钥分离的证书将在后续版本支持。</text
+      >
     </div>
     <br />
-    <div style="justify-self: end">
-      <el-button text bg type="primary" @click="save">保存</el-button>
-    </div>
-  </el-card>
+    <el-card>
+      <div>
+        <div>
+          <text>名称</text>
+          <el-input v-model="name" placeholder="名称" />
+        </div>
+        <br />
+        <div>
+          <text>密钥库位置 (.jks)</text>
+          <el-input v-model="keystone" placeholder="密钥库位置 (.jks)">
+            <template #append>
+              <el-button @click="open_keystone">
+                <el-icon><FolderOpened /></el-icon
+              ></el-button>
+            </template>
+          </el-input>
+        </div>
+        <br />
+        <div>
+          <text>证书别名</text>
+          <el-input v-model="keyalias" placeholder="证书别名" />
+        </div>
+        <br />
+        <div>
+          <text>证书密码</text>
+          <el-input
+            v-model="keypasswd"
+            placeholder="证书密码"
+            type="password"
+            show-password
+          />
+        </div>
+      </div>
+      <br />
+      <div style="justify-self: end">
+        <el-button text bg type="primary" @click="save">保存</el-button>
+      </div>
+    </el-card>
+  </el-scrollbar>
 </template>
 
 <style>

@@ -10,34 +10,37 @@
       /></el-button>
     </div>
   </h2>
-
-  <el-card style="display: flex; flex-direction: column">
-    <div>
-      <text>apksigner 位置</text>
-      <el-input v-model="apksigner" placeholder="apksigner">
-        <template #append>
-          <el-button @click="open_apksinger">
-            <el-icon><FolderOpened /></el-icon
-          ></el-button>
-        </template>
-      </el-input>
-    </div>
-    <br />
-    <div>
-      <text>zipalign 位置</text>
-      <el-input v-model="zipalign" placeholder="zipalign">
-        <template #append>
-          <el-button @click="open_zipalign">
-            <el-icon><FolderOpened /></el-icon
-          ></el-button>
-        </template>
-      </el-input>
-    </div>
-    <br />
-    <div style="justify-self: end">
-      <el-button text bg type="primary" @click="save_filepath">保存</el-button>
-    </div>
-  </el-card>
+  <el-scrollbar style="max-height: calc(100vh - 120px)">
+    <el-card style="display: flex; flex-direction: column">
+      <div>
+        <text>apksigner 位置</text>
+        <el-input v-model="apksigner" placeholder="apksigner">
+          <template #append>
+            <el-button @click="open_apksinger">
+              <el-icon><FolderOpened /></el-icon
+            ></el-button>
+          </template>
+        </el-input>
+      </div>
+      <br />
+      <div>
+        <text>zipalign 位置</text>
+        <el-input v-model="zipalign" placeholder="zipalign">
+          <template #append>
+            <el-button @click="open_zipalign">
+              <el-icon><FolderOpened /></el-icon
+            ></el-button>
+          </template>
+        </el-input>
+      </div>
+      <br />
+      <div style="justify-self: end">
+        <el-button text bg type="primary" @click="save_filepath"
+          >保存</el-button
+        >
+      </div>
+    </el-card>
+  </el-scrollbar>
 </template>
 
 <style>
