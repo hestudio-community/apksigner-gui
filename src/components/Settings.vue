@@ -1,17 +1,17 @@
 <template>
   <h2 style="display: flex; justify-content: space-between">
     <text>设置</text>
-    <div >
-      <el-button
-        text
-        style="height: 32px; width: 32px"
-        @click="open_devtools"
+    <div style="display: flex; flex-direction: row">
+      <el-button text style="height: 32px; width: 32px" @click="open_devtools"
         ><Icon icon="fluent:window-dev-tools-20-regular" width="20" height="20"
+      /></el-button>
+      <el-button text style="height: 32px; width: 32px" @click="open_about"
+        ><Icon icon="mdi:about-circle-outline" width="20" height="20"
       /></el-button>
     </div>
   </h2>
 
-  <el-card>
+  <el-card style="display: flex; flex-direction: column">
     <div>
       <text>apksigner 位置</text>
       <el-input v-model="apksigner" placeholder="apksigner">
@@ -41,24 +41,8 @@
 </template>
 
 <style>
-.el-card {
-  border-radius: 15px;
-}
-
-.el-input__wrapper {
-  border-radius: 10px;
-}
-.el-input-group__append {
-  border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
-}
-
-.el-button {
-  border-radius: 10px;
-}
-
-.el-message {
-  border-radius: 10px;
+.el-input {
+  margin-top: 5px;
 }
 </style>
 
@@ -80,6 +64,9 @@ export default {
     open_devtools() {
       window.electronAPI.openDevtools();
     },
+    open_about() {
+      window.electronAPI.AppAbout();
+    },
     open_apksinger() {
       window.electronAPI.openFile().then((result) => {
         this.apksigner = result;
@@ -91,9 +78,22 @@ export default {
       });
     },
     save_filepath() {
-      localStorage.setItem("apksigner", this.apksigner);
-      localStorage.setItem("zipalign", this.zipalign);
-      ElMessage.success("保存成功");
+      if (!this.apksigner || !this.zipalign) {
+        ElMessage({
+          message: "检查一下是不是漏了些什么？？",
+          type: "error",
+          plain: true,
+        });
+        return;
+      } else {
+        localStorage.setItem("apksigner", this.apksigner);
+        localStorage.setItem("zipalign", this.zipalign);
+        ElMessage({
+          message: "保存成功",
+          type: "success",
+          plain: true,
+        });
+      }
     },
   },
   mounted() {

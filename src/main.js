@@ -7,14 +7,6 @@ if (started) {
   app.quit();
 }
 
-// 将所有IPC处理程序移到这里
-async function handleFileOpen() {
-  const { canceled, filePaths } = await dialog.showOpenDialog({});
-  if (!canceled) {
-    return filePaths[0];
-  }
-}
-
 // 保存mainWindow的引用以便在IPC处理程序中使用
 let mainWindow = null;
 
@@ -51,22 +43,32 @@ const createWindow = () => {
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
     );
   }
+  mainWindow.setMinimumSize(640, 480)
+  mainWindow.setHasShadow(true);
 };
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.whenReady().then(() => {
   // 将所有IPC处理程序注册放在这里，确保只注册一次
-  ipcMain.handle("dialog:openFile", handleFileOpen);
+  ipcMain.handle("dialog:openFile", async function handleFileOpen() {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      title: "选择文件 | APKSingerGUI",
+      properties: ["openFile", "showHiddenFiles"],
+    });
+    if (!canceled) {
+      return filePaths[0];
+    }
+  });
   ipcMain.handle("system:platfrom", async () => {
     return process.platform;
   });
-  
+
   // 开发工具处理程序
   ipcMain.handle("devtools:open", async () => {
     if (mainWindow) mainWindow.webContents.openDevTools();
   });
-  
+
   // Windows控制处理程序
   if (process.platform != "darwin") {
     ipcMain.handle("windows:close", async () => {
@@ -84,12 +86,16 @@ app.whenReady().then(() => {
       }
     });
   }
-  
+
+  ipcMain.handle("app:about", async () => {
+    app.showAboutPanel();
+  });
+
   // 窗口状态处理程序
   ipcMain.handle("windows:isMaximized", async () => {
     return mainWindow ? mainWindow.isMaximized() : false;
   });
-  
+
   createWindow();
 
   app.on("activate", () => {

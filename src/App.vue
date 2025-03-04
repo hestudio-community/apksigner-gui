@@ -111,11 +111,6 @@
 </template>
 
 <style>
-body {
-  background-color: #f2f3f5;
-  color: #303133;
-}
-
 .aside {
   width: 100%;
   max-width: 200px;
@@ -147,7 +142,7 @@ body {
 
 .main {
   border-radius: 15px;
-  margin-right: 3px;
+  height: 100%;
 }
 
 .settings {
@@ -159,8 +154,26 @@ body {
   border-top-right-radius: 15px;
   border-bottom-right-radius: 15px;
 }
+.el-card {
+  border-radius: 15px;
+}
+.el-input__wrapper {
+  border-radius: 10px;
+}
+.el-input-group__append {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
 
+.el-button {
+  border-radius: 10px;
+}
+
+.el-message {
+  border-radius: 10px;
+}
 .el-overlay {
+  -webkit-backdrop-filter: blur(6.18px);
   backdrop-filter: blur(6.18px);
 }
 </style>
