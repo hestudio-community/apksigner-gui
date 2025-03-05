@@ -12,8 +12,20 @@
           <el-button
             text
             style="height: 32px; width: 32px"
-            @click="keyRemoveStatus = !keyRemoveStatus"
+            @click="
+              keyRemoveStatus = !keyRemoveStatus;
+              openeditkey = false;
+            "
             ><el-icon><Minus /></el-icon>
+          </el-button>
+          <el-button
+            text
+            style="height: 32px; width: 32px"
+            @click="
+              openeditkey = !openeditkey;
+              keyRemoveStatus = false;
+            "
+            ><el-icon><Edit /></el-icon>
           </el-button>
           <el-button
             text
@@ -34,6 +46,18 @@
               @close="RefreshKey"
             >
               <AddKey />
+            </el-drawer>
+            <el-drawer
+              v-model="editkey.status"
+              class="addkey"
+              :show-close="false"
+              destroy-on-close
+              :with-header="false"
+              size="350"
+              direction="ltr"
+              @close="RefreshKey"
+            >
+              <EditKey :keyname="editkey.keyname" />
             </el-drawer>
           </div>
         </div>
@@ -62,9 +86,21 @@
                     <el-button
                       text
                       style="height: 32px; width: 32px"
-                      v-show="keyRemoveStatus"
+                      v-if="keyRemoveStatus"
                       @click="RemoveKey(item)"
                       ><el-icon><RemoveFilled /></el-icon
+                    ></el-button>
+                  </transition>
+                  <transition name="rotate-fade">
+                    <el-button
+                      text
+                      style="height: 32px; width: 32px"
+                      v-if="openeditkey"
+                      @click="
+                        editkey.status = true;
+                        editkey.keyname = item;
+                      "
+                      ><el-icon><EditPen /></el-icon
                     ></el-button>
                   </transition>
                 </div>
@@ -97,7 +133,7 @@
                 <el-icon><Setting /></el-icon>
               </el-button>
             </div>
-            <div v-show="!darwin.isDarwin">
+            <div v-if="!darwin.isDarwin">
               <el-button
                 text
                 style="height: 32px; width: 32px"
@@ -267,6 +303,15 @@
   transition: transform 0.618s ease;
   transform: rotate(360deg);
 }
+.el-select__wrapper {
+  border-radius: 10px;
+}
+.el-scrollbar__view {
+  border-radius: 15px;
+}
+.el-popper.is-pure {
+  border-radius: 15px;
+}
 </style>
 
 <script setup>
@@ -276,10 +321,13 @@ import {
   Setting,
   Refresh,
   RemoveFilled,
+  Edit,
+  EditPen,
 } from "@element-plus/icons-vue";
 import { Icon } from "@iconify/vue";
 import SettingPage from "./components/Settings.vue";
 import AddKey from "./components/AddKey.vue";
+import EditKey from "./components/EditKey.vue";
 import Sign from "./components/Sign.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 </script>
@@ -290,6 +338,11 @@ export default {
     return {
       opensetting: false,
       openaddkey: false,
+      openeditkey: false,
+      editkey: {
+        status: false,
+        keyname: "",
+      },
       windows: {
         isMaxmaximize: false,
       },

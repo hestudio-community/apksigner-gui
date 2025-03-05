@@ -43,21 +43,30 @@ const createWindow = () => {
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
     );
   }
-  mainWindow.setMinimumSize(640, 480)
+  mainWindow.setMinimumSize(640, 480);
   mainWindow.setHasShadow(true);
 };
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.whenReady().then(() => {
-  // 将所有IPC处理程序注册放在这里，确保只注册一次
-  ipcMain.handle("dialog:openFile", async function handleFileOpen() {
+  ipcMain.handle("dialog:openFile", async (event, filters) => {
     const { canceled, filePaths } = await dialog.showOpenDialog({
       title: "选择文件 | APKSingerGUI",
       properties: ["openFile", "showHiddenFiles"],
+      filters: filters,
     });
     if (!canceled) {
       return filePaths[0];
+    }
+  });
+  ipcMain.handle("dialog:saveFile", async (event, filters) => {
+    const { canceled, filePath } = await dialog.showSaveDialog({
+      title: "保存文件 | APKSingerGUI",
+      filters: filters,
+    });
+    if (!canceled) {
+      return filePath;
     }
   });
   ipcMain.handle("system:platfrom", async () => {

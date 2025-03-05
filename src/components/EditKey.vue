@@ -1,13 +1,6 @@
 <template>
-  <h2>添加密钥</h2>
+  <h2>修改密钥</h2>
   <el-scrollbar style="max-height: calc(100vh - 120px)">
-    <div>
-      <text style="font-size: smaller"
-        >目前仅支持 密钥库 (.jks)
-        文件。对于公私钥分离的证书将在后续版本支持。</text
-      >
-    </div>
-    <br />
     <el-card>
       <div>
         <div>
@@ -70,6 +63,12 @@ export default {
       keypasswd: "",
     };
   },
+  props: {
+    keyname: {
+      type: String,
+      required: true,
+    },
+  },
   methods: {
     open_keystone() {
       window.electronAPI
@@ -81,7 +80,7 @@ export default {
           {
             name: "所有文件",
             extensions: ["*"],
-          }
+          },
         ])
         .then((result) => {
           this.keystone = result;
@@ -95,31 +94,32 @@ export default {
           plain: true,
         });
       } else {
-        if (localStorage.getItem(`key-${this.name}`)) {
-          ElMessage({
-            message: "已存在相同名称的密钥",
-            type: "error",
-            plain: true,
-          });
-          return;
-        } else {
-          localStorage.setItem(
-            `key-${this.name}`,
-            JSON.stringify({
-              type: 1,
-              keystone: this.keystone,
-              keyalias: this.keyalias,
-              keypasswd: this.keypasswd,
-            })
-          );
-          ElMessage({
-            message: "保存成功",
-            type: "success",
-            plain: true,
-          });
+        if (this.name != this.keyname) {
+          localStorage.removeItem(`key-${this.keyname}`);
         }
+        localStorage.setItem(
+          `key-${this.name}`,
+          JSON.stringify({
+            type: 1,
+            keystone: this.keystone,
+            keyalias: this.keyalias,
+            keypasswd: this.keypasswd,
+          })
+        );
+        ElMessage({
+          message: "保存成功",
+          type: "success",
+          plain: true,
+        });
       }
     },
+  },
+  mounted() {
+    const key = JSON.parse(localStorage.getItem(`key-${this.keyname}`));
+    this.name = this.keyname;
+    this.keystone = key.keystone;
+    this.keyalias = key.keyalias;
+    this.keypasswd = key.keypasswd;
   },
 };
 </script>

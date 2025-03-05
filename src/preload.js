@@ -3,7 +3,8 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("electronAPI", {
-  openFile: () => ipcRenderer.invoke("dialog:openFile"),
+  openFile: (filters) => ipcRenderer.invoke("dialog:openFile", filters),
+  saveFile: (filters) => ipcRenderer.invoke("dialog:saveFile", filters),
   openDevtools: () => ipcRenderer.invoke("devtools:open"),
   WindowsClose: () => ipcRenderer.invoke("windows:close"),
   WindowsMaximize: () => ipcRenderer.invoke("windows:maximize"),

@@ -40,6 +40,16 @@
         >
       </div>
     </el-card>
+    <br />
+    <el-card>
+      <div>
+        <el-switch
+          v-model="advancedSetting"
+          @change="openAdvancedSetting"
+          style="margin: 3px"
+        /><text style="margin: 3px">高级选项</text>
+      </div>
+    </el-card>
   </el-scrollbar>
 </template>
 
@@ -51,7 +61,7 @@
 
 <script setup>
 import { FolderOpened } from "@element-plus/icons-vue";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { Icon } from "@iconify/vue";
 </script>
 
@@ -61,6 +71,7 @@ export default {
     return {
       apksigner: "",
       zipalign: "",
+      advancedSetting: false,
     };
   },
   methods: {
@@ -71,14 +82,28 @@ export default {
       window.electronAPI.AppAbout();
     },
     open_apksinger() {
-      window.electronAPI.openFile().then((result) => {
-        this.apksigner = result;
-      });
+      window.electronAPI
+        .openFile([
+          {
+            name: "apksigner",
+            extensions: ["*"],
+          },
+        ])
+        .then((result) => {
+          this.apksigner = result;
+        });
     },
     open_zipalign() {
-      window.electronAPI.openFile().then((result) => {
-        this.zipalign = result;
-      });
+      window.electronAPI
+        .openFile([
+          {
+            name: "zipalign",
+            extensions: ["*"],
+          },
+        ])
+        .then((result) => {
+          this.zipalign = result;
+        });
     },
     save_filepath() {
       if (!this.apksigner || !this.zipalign) {
@@ -98,10 +123,34 @@ export default {
         });
       }
     },
+    openAdvancedSetting() {
+      if (this.advancedSetting) {
+        this.advancedSetting = false;
+        ElMessageBox.confirm(
+          "本安卓签名工具提供高级设置功能旨在为有经验的用户提供更多灵活性。但对于因使用高级设置而导致的任何直接、间接、偶然、特殊或相应的损害，包括但不限于设备损坏、数据丢失、应用程序无法正常使用等，我们不承担任何责任。在使用高级设置前，请您务必谨慎考虑，并充分了解相关操作可能带来的风险。若您不确定如何进行高级设置，建议您寻求专业技术支持或避免使用该功能。\n使用本工具即表示您已阅读、理解并接受上述风险提醒及免责声明。",
+          "高级选项",
+          {
+            confirmButtonText: "打开高级选项",
+            cancelButtonText: "取消",
+            confirmButtonClass: "el-button--danger",
+            type: "danger",
+          }
+        ).then(() => {
+          this.advancedSetting = true;
+          localStorage.setItem("advancedSetting", 1);
+          window.electronAPI.openAdvancedSetting();
+        });
+      } else {
+        localStorage.setItem("advancedSetting", 0);
+      }
+    },
   },
   mounted() {
     this.apksigner = localStorage.getItem("apksigner");
     this.zipalign = localStorage.getItem("zipalign");
+    if (localStorage.getItem("advancedSetting") == 1) {
+      this.advancedSetting = true;
+    }
   },
 };
 </script>
