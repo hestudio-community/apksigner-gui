@@ -6,7 +6,7 @@ module.exports = {
     asar: true,
     icon: './icons/icon',
     appBundleId: "com.hestudio.apksigner",
-    executableName: "APKSignerGUI"  // 添加这一行指定可执行文件名称
+    executableName: "APKSignerGUI"
   },
   rebuildConfig: {},
   makers: [
@@ -24,7 +24,9 @@ module.exports = {
       config: {
         options: {
           maintainer: 'heStudio Community',
-          homepage: 'https://www.hestudio.net'
+          homepage: 'https://www.hestudio.net',
+          bin: "APKSignerGUI",
+          name: "apksignergui"
         }
       },
       platform: ["linux"]
@@ -33,7 +35,9 @@ module.exports = {
       name: '@electron-forge/maker-rpm',
       config: {
         options: {
-          homepage: 'https://www.hestudio.net'
+          homepage: 'https://www.hestudio.net',
+          bin: "APKSignerGUI",
+          name: "apksignergui"
         }
       },
       platform: ["linux"]
