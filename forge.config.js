@@ -16,7 +16,7 @@ module.exports = {
         icon: './icons/icon.icns',
         name: "APKSignerGUI"
       },
-      platfrom: ["drawin"]
+      platfrom: ["darwin"]
     },
     {
       name: '@electron-forge/maker-deb',
