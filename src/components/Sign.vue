@@ -14,7 +14,6 @@
       </el-input>
     </div>
   </el-card>
-  <br />
   <div v-if="advancedSetting">
     <el-card>
       <div>
@@ -74,7 +73,6 @@
         />
       </div>
     </el-card>
-    <br />
     <el-card>
       <div
         style="
@@ -114,7 +112,6 @@
         </div>
       </div>
     </el-card>
-    <br />
     <el-card>
       <div
         style="
@@ -157,7 +154,7 @@
           style="margin: 3px"
         />
       </div>
-      <br />
+      <br v-if="zipalign.status" />
       <div v-if="zipalign.status">
         <div style="align-items: center">
           <text style="margin: 3px">页面大小</text>
@@ -185,8 +182,7 @@
       </div>
     </el-card>
   </div>
-  <br />
-  <el-card>
+  <el-card v-if="!output.rewrite">
     <div>
       <text>将 APK 导出到</text>
     </div>
@@ -201,10 +197,30 @@
       </el-input>
     </div>
   </el-card>
-  <br />
   <el-card>
-    <div style="justify-self: end">
-      <el-button text bg type="primary" @click="save_filepath">签名</el-button>
+    <div
+      style="
+        justify-content: space-between;
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+      "
+    >
+      <div>
+        <el-checkbox v-model="output.rewrite" label="覆盖原文件" />
+        <el-checkbox v-model="output.showSignLog" label="显示日志" />
+      </div>
+      <div>
+        <el-button text bg type="primary" :loading="sign" @click="signButton"
+          >签名</el-button
+        >
+      </div>
+    </div>
+    <br v-if="output.showSignLog" />
+    <div v-if="output.showSignLog">
+      <el-scrollbar style="max-height: 400px">
+        <text>{{ stdout }}</text>
+      </el-scrollbar>
     </div>
   </el-card>
 </template>
@@ -228,7 +244,6 @@ export default {
     return {
       input_apk: "",
       advancedSetting: false,
-
       api: {
         auto: {
           min: true,
@@ -267,7 +282,10 @@ export default {
       output: {
         rewrite: true,
         path: "",
+        showSignLog: false,
       },
+      sign: false,
+      stdout: "",
     };
   },
   methods: {
@@ -294,6 +312,86 @@ export default {
         .then((result) => {
           this.output.path = result;
         });
+    },
+    shell(shell) {
+      window.electronAPI
+        .SystemShell(shell)
+        .then(async (result) => {
+          this.stdout += result;
+        })
+        .catch((error) => {
+          this.stdout += error;
+        });
+    },
+    signButton() {
+      this.sign = true;
+      this.stdout = "";
+      if (!this.input_apk) {
+        ElMessage({
+          message: "检查一下是不是漏了些什么？？",
+          type: "error",
+          plain: true,
+        });
+        this.sign = false;
+        return;
+      } else {
+        window.electronAPI.CopyToTmp(this.input_apk).then(async (result) => {
+          const k = JSON.parse(localStorage.getItem("key-" + this.keyname));
+          const apksigner = localStorage.getItem("apksigner");
+          let script = `${apksigner} sign -v --ks ${k.keystone} --ks-key-alias ${k.keyalias} --ks-pass pass:${k.keypasswd}`;
+          if (!this.output.rewrite) {
+            if (!this.output.path) {
+              ElMessage({
+                message: "检查一下是不是漏了些什么？？",
+                type: "error",
+                plain: true,
+              });
+              this.sign = false;
+              return;
+            } else {
+              script += ` --out ${this.output.path}`;
+            }
+          } else {
+            script += ` --out ${this.input_apk}`;
+          }
+          if (this.advancedSetting) {
+            if (!this.api.auto.min) {
+              script += ` --min-sdk-version ${this.api.min}`;
+            }
+            if (!this.api.auto.max) {
+              script += ` --max-sdk-version ${this.api.max}`;
+            }
+            if (!this.signplan.auto) {
+              script += ` --v1-signing-enabled ${this.signplan.plans.includes(
+                "V1"
+              )}`;
+              script += ` --v2-signing-enabled ${this.signplan.plans.includes(
+                "V2"
+              )}`;
+              script += ` --v3-signing-enabled ${this.signplan.plans.includes(
+                "V3"
+              )}`;
+              script += ` --v4-signing-enabled ${this.signplan.plans.includes(
+                "V4"
+              )}`;
+            }
+            if (this.zipalign.status) {
+              const zipalign = localStorage.getItem("zipalign");
+              script += ` ${result}_zipalign.apk`;
+              this.shell(
+                `${zipalign} -v -P ${this.zipalign.config.P} -f ${
+                  this.Zopfli ? "-z" : ""
+                } 4 ${result} ${result}_zipalign.apk && ${script}`
+              );
+              this.sign = false;
+              return;
+            }
+          }
+          script += ` ${result}`;
+          this.shell(`${script}`);
+          this.sign = false;
+        });
+      }
     },
   },
   mounted() {

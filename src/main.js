@@ -1,10 +1,16 @@
 import { app, BrowserWindow, dialog, ipcMain, Menu } from "electron";
 import path from "node:path";
 import started from "electron-squirrel-startup";
+import { exec } from "node:child_process";
+import fs from "node:fs";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
   app.quit();
+}
+
+if (!fs.existsSync(path.join(__dirname, "./tmp"))) {
+  fs.mkdirSync(path.join(__dirname, "./tmp"));
 }
 
 // 保存mainWindow的引用以便在IPC处理程序中使用
@@ -45,6 +51,10 @@ const createWindow = () => {
   }
   mainWindow.setMinimumSize(640, 480);
   mainWindow.setHasShadow(true);
+
+  app.setAboutPanelOptions({
+    copyright: "Copyright © 2025 heStudio Community",
+  });
 };
 
 // This method will be called when Electron has finished
@@ -100,10 +110,29 @@ app.whenReady().then(() => {
     app.showAboutPanel();
   });
 
-  // 窗口状态处理程序
   ipcMain.handle("windows:isMaximized", async () => {
     return mainWindow ? mainWindow.isMaximized() : false;
   });
+
+  ipcMain.handle("app:copyToTmp", async (event, file) => {
+    const tmpPath = path.join(__dirname, "./tmp", path.basename(file));
+    fs.copyFileSync(file, tmpPath);
+    return tmpPath;
+  });
+
+  ipcMain.handle(
+    "system:shell",
+    (event, shell) =>
+      new Promise((resolve, reject) => {
+        exec(shell, (error, stdout, stderr) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(stdout);
+          }
+        });
+      })
+  );
 
   createWindow();
 

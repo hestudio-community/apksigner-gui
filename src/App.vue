@@ -259,6 +259,8 @@
 }
 .el-card {
   border-radius: 15px;
+  margin: 10px;
+  
 }
 .el-input__wrapper {
   border-radius: 10px;

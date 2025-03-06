@@ -40,14 +40,23 @@
         >
       </div>
     </el-card>
-    <br />
     <el-card>
-      <div>
-        <el-switch
-          v-model="advancedSetting"
-          @change="openAdvancedSetting"
-          style="margin: 3px"
-        /><text style="margin: 3px">高级选项</text>
+      <div
+        style="
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: center;
+        "
+      >
+        <div><text style="margin: 3px">高级选项</text></div>
+        <div>
+          <el-switch
+            v-model="advancedSetting"
+            @change="openAdvancedSetting"
+            style="margin: 3px"
+          />
+        </div>
       </div>
     </el-card>
   </el-scrollbar>
