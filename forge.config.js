@@ -43,16 +43,7 @@ module.exports = {
       platform: ["linux"]
     },
     {
-      name: '@electron-forge/maker-wix',
-      config: {
-        appUserModelId: "com.hestudio.apksigner",
-        description: "Simple but complete APK signing tool.",
-        icon: "./icons/icon.ico",
-        language: 2052,
-        manufacturer: 'heStudio Community',
-        name: "APKSignerGUI",
-        upgradeCode: "01956ab5-b521-74ae-9066-695e7dbe0999"
-      },
+      name: '@electron-forge/maker-zip',
       platform: ["win32"]
     }
   ],
