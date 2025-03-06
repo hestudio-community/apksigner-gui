@@ -1,4 +1,4 @@
-<div style="align-items: center; justify-items: center; justify-content: center;">
+<div align="center">
    <img src="./icons/icon.png" />
    <h1 style="text-align: center">APKSignerGUI</h1>
    <img src="./images/apphome.png" />
