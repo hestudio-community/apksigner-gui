@@ -5,7 +5,8 @@ module.exports = {
   packagerConfig: {
     asar: true,
     icon: './icons/icon',
-    appBundleId: "com.hestudio.apksigner"
+    appBundleId: "com.hestudio.apksigner",
+    executableName: "APKSignerGUI"  // 添加这一行指定可执行文件名称
   },
   rebuildConfig: {},
   makers: [
@@ -16,7 +17,7 @@ module.exports = {
         icon: './icons/icon.icns',
         name: "APKSignerGUI"
       },
-      platfrom: ["darwin"]
+      platform: ["darwin"]
     },
     {
       name: '@electron-forge/maker-deb',
@@ -26,7 +27,7 @@ module.exports = {
           homepage: 'https://www.hestudio.net'
         }
       },
-      platfrom: ["linux"]
+      platform: ["linux"]
     },
     {
       name: '@electron-forge/maker-rpm',
@@ -35,7 +36,7 @@ module.exports = {
           homepage: 'https://www.hestudio.net'
         }
       },
-      platfrom: ["linux"]
+      platform: ["linux"]
     },
     {
       name: '@electron-forge/maker-wix',
@@ -48,7 +49,7 @@ module.exports = {
         name: "APKSignerGUI",
         upgradeCode: "01956ab5-b521-74ae-9066-695e7dbe0999"
       },
-      platfrom: ["win32"]
+      platform: ["win32"]
     }
   ],
   plugins: [
