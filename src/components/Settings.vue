@@ -16,7 +16,7 @@
         <text>apksigner 位置</text>
         <el-input v-model="apksigner" placeholder="apksigner">
           <template #append>
-            <el-button @click="open_apksinger">
+            <el-button @click="open_apksigner">
               <el-icon><FolderOpened /></el-icon
             ></el-button>
           </template>
@@ -90,7 +90,7 @@ export default {
     open_about() {
       window.electronAPI.AppAbout();
     },
-    open_apksinger() {
+    open_apksigner() {
       window.electronAPI
         .openFile([
           {

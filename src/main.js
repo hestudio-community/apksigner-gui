@@ -62,7 +62,7 @@ const createWindow = () => {
 app.whenReady().then(() => {
   ipcMain.handle("dialog:openFile", async (event, filters) => {
     const { canceled, filePaths } = await dialog.showOpenDialog({
-      title: "选择文件 | APKSingerGUI",
+      title: "选择文件 | APKSignerGUI",
       properties: ["openFile", "showHiddenFiles"],
       filters: filters,
     });
@@ -72,7 +72,7 @@ app.whenReady().then(() => {
   });
   ipcMain.handle("dialog:saveFile", async (event, filters) => {
     const { canceled, filePath } = await dialog.showSaveDialog({
-      title: "保存文件 | APKSingerGUI",
+      title: "保存文件 | APKSignerGUI",
       filters: filters,
     });
     if (!canceled) {

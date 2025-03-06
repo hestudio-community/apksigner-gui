@@ -5,26 +5,51 @@ module.exports = {
   packagerConfig: {
     asar: true,
     icon: './icons/icon',
-    appBundleId: "com.hestudio.apksinger"
+    appBundleId: "com.hestudio.apksigner"
   },
   rebuildConfig: {},
   makers: [
     {
-      name: '@electron-forge/maker-squirrel',
-      config: {},
-    },
-    {
-      name: '@electron-forge/maker-zip',
-      platforms: ['darwin'],
+      name: '@electron-forge/maker-dmg',
+      config: {
+        format: 'ULFO',
+        icon: './icons/icon.icns',
+        name: "APKSignerGUI"
+      },
+      platfrom: ["drawin"]
     },
     {
       name: '@electron-forge/maker-deb',
-      config: {},
+      config: {
+        options: {
+          maintainer: 'heStudio Community',
+          homepage: 'https://www.hestudio.net'
+        }
+      },
+      platfrom: ["linux"]
     },
     {
       name: '@electron-forge/maker-rpm',
-      config: {},
+      config: {
+        options: {
+          homepage: 'https://www.hestudio.net'
+        }
+      },
+      platfrom: ["linux"]
     },
+    {
+      name: '@electron-forge/maker-wix',
+      config: {
+        appUserModelId: "com.hestudio.apksigner",
+        description: "Simple but complete APK signing tool.",
+        icon: "./icons/icon.ico",
+        language: 2052,
+        manufacturer: 'heStudio Community',
+        name: "APKSignerGUI",
+        upgradeCode: "01956ab5-b521-74ae-9066-695e7dbe0999"
+      },
+      platfrom: ["win32"]
+    }
   ],
   plugins: [
     {

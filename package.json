@@ -1,6 +1,6 @@
 {
-  "name": "com.hestudio.apksinger",
-  "productName": "APKSinger",
+  "name": "com.hestudio.apksigner",
+  "productName": "APKSignerGUI",
   "version": "1.0.0",
   "description": "My Electron application description",
   "main": ".vite/build/main.js",
@@ -20,8 +20,10 @@
   "devDependencies": {
     "@electron-forge/cli": "^7.7.0",
     "@electron-forge/maker-deb": "^7.7.0",
+    "@electron-forge/maker-dmg": "^7.7.0",
     "@electron-forge/maker-rpm": "^7.7.0",
     "@electron-forge/maker-squirrel": "^7.7.0",
+    "@electron-forge/maker-wix": "^7.7.0",
     "@electron-forge/maker-zip": "^7.7.0",
     "@electron-forge/plugin-auto-unpack-natives": "^7.7.0",
     "@electron-forge/plugin-fuses": "^7.7.0",
@@ -38,11 +40,5 @@
     "electron-squirrel-startup": "^1.0.1",
     "element-plus": "^2.9.5",
     "vue": "^3.5.13"
-  },
-  "build": {
-    "appId": "com.example.apksigner-gui",
-    "mac": {
-      "icon": "build/icon.icns"
-    }
   }
 }
