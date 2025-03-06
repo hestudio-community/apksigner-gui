@@ -218,9 +218,7 @@
     </div>
     <br v-if="output.showSignLog" />
     <div v-if="output.showSignLog">
-      <el-scrollbar style="max-height: 400px">
-        <text>{{ stdout }}</text>
-      </el-scrollbar>
+      <text>{{ stdout }}</text>
     </div>
   </el-card>
 </template>
