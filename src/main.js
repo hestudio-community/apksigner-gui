@@ -129,6 +129,17 @@ app.whenReady().then(() => {
     return tmpPath;
   });
 
+  ipcMain.handle("app:clearTmpDir", async () => {
+    try {
+      fs.rmdirSync(tmp, { recursive: true });
+      fs.mkdirSync(tmp);
+      return true;
+    } catch (e) {
+      console.error(e);
+      return e;
+    }
+  });
+
   ipcMain.handle(
     "system:shell",
     (event, shell) =>

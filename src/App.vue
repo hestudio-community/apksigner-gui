@@ -431,8 +431,8 @@ export default {
       } else {
         document.querySelector("html").classList.remove("dark");
       }
-      this.RefreshKey();
     }, 100);
+    this.RefreshKey();
   },
 };
 </script>

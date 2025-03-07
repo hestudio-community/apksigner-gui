@@ -59,6 +59,23 @@
         </div>
       </div>
     </el-card>
+    <el-card>
+      <div
+        style="
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: center;
+        "
+      >
+        <div><text style="margin: 3px">缓存清理</text></div>
+        <div>
+          <el-button text bg type="primary" :loading="cleaningTmpDir" @click="clearTmpDir"
+            >清理</el-button
+          >
+        </div>
+      </div>
+    </el-card>
   </el-scrollbar>
 </template>
 
@@ -81,6 +98,7 @@ export default {
       apksigner: "",
       zipalign: "",
       advancedSetting: false,
+      cleaningTmpDir: false,
     };
   },
   methods: {
@@ -152,6 +170,26 @@ export default {
       } else {
         localStorage.setItem("advancedSetting", 0);
       }
+    },
+    clearTmpDir() {
+      this.cleaningTmpDir = true;
+      window.electronAPI.ClearTmpDir().then((result) => {
+        if (typeof result == "boolean" && result) {
+          ElMessage({
+            message: "缓存清理成功",
+            type: "success",
+            plain: true,
+          });
+        } else {
+          ElMessage({
+            message: "缓存清理失败",
+            type: "error",
+            plain: true,
+          });
+          console.error(result);
+        }
+        this.cleaningTmpDir = false;
+      });
     },
   },
   mounted() {

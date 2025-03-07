@@ -12,6 +12,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
   WindowsIsMaximized: () => ipcRenderer.invoke("windows:isMaximized"),
   SystemPlatfrom: () => ipcRenderer.invoke("system:platfrom"),
   CopyToTmp: (file) => ipcRenderer.invoke("app:copyToTmp", file),
+  ClearTmpDir: () => ipcRenderer.invoke("app:clearTmpDir"),
   SystemShell: (shell) => ipcRenderer.invoke("system:shell", shell),
   AppAbout: () => ipcRenderer.invoke("app:about"),
 });
