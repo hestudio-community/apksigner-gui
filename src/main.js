@@ -13,6 +13,8 @@ let tmp = undefined;
 
 if (process.platform == "win32") {
   tmp = path.join(process.env.TEMP, "APKSignerGUI");
+} else if (process.platform == "linux") {
+  tmp = path.join("/tmp", "APKSignerGUI");
 }
 
 if (!fs.existsSync(tmp)) {
