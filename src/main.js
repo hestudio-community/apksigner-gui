@@ -34,7 +34,7 @@ const createWindow = () => {
       preload: path.join(__dirname, "preload.js"),
     },
     // 添加图标配置
-    icon: path.join(__dirname, "../build/logo.png"),
+    icon: path.join(__dirname, "../icon.png"),
     titleBarStyle: "hidden",
     frame: false,
   });
@@ -62,6 +62,7 @@ const createWindow = () => {
 
   app.setAboutPanelOptions({
     copyright: "Copyright © 2025 heStudio Community",
+    iconPath: path.join(__dirname, "../icon.png"),
   });
 };
 
