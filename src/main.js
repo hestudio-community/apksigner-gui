@@ -9,8 +9,14 @@ if (started) {
   app.quit();
 }
 
-if (!fs.existsSync(path.join(__dirname, "../../../tmp"))) {
-  fs.mkdirSync(path.join(__dirname, "../../../tmp"));
+let tmp = undefined;
+
+if (process.platform == "win32") {
+  tmp = path.join(process.env.TEMP, "APKSignerGUI");
+}
+
+if (!fs.existsSync(tmp)) {
+  fs.mkdirSync(tmp);
 }
 
 // 保存mainWindow的引用以便在IPC处理程序中使用
@@ -115,7 +121,7 @@ app.whenReady().then(() => {
   });
 
   ipcMain.handle("app:copyToTmp", async (event, file) => {
-    const tmpPath = path.join(__dirname, "../../../tmp", path.basename(file));
+    const tmpPath = path.join(tmp, path.basename(file));
     fs.copyFileSync(file, tmpPath);
     return tmpPath;
   });
