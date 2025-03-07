@@ -9,8 +9,16 @@ if (started) {
   app.quit();
 }
 
-if (!fs.existsSync(path.join(__dirname, "../../../tmp"))) {
-  fs.mkdirSync(path.join(__dirname, "../../../tmp"));
+let tmp = undefined;
+
+if (process.platform == "win32") {
+  tmp = path.join(process.env.TEMP, "APKSignerGUI");
+} else if (process.platform == "linux") {
+  tmp = path.join("/tmp", "APKSignerGUI");
+}
+
+if (!fs.existsSync(tmp)) {
+  fs.mkdirSync(tmp);
 }
 
 // 保存mainWindow的引用以便在IPC处理程序中使用
@@ -26,7 +34,7 @@ const createWindow = () => {
       preload: path.join(__dirname, "preload.js"),
     },
     // 添加图标配置
-    icon: path.join(__dirname, "../build/logo.png"),
+    icon: path.join(__dirname, "../icon.png"),
     titleBarStyle: "hidden",
     frame: false,
   });
@@ -54,6 +62,7 @@ const createWindow = () => {
 
   app.setAboutPanelOptions({
     copyright: "Copyright © 2025 heStudio Community",
+    iconPath: path.join(__dirname, "../icon.png"),
   });
 };
 
@@ -115,7 +124,7 @@ app.whenReady().then(() => {
   });
 
   ipcMain.handle("app:copyToTmp", async (event, file) => {
-    const tmpPath = path.join(__dirname, "../../../tmp", path.basename(file));
+    const tmpPath = path.join(tmp, path.basename(file));
     fs.copyFileSync(file, tmpPath);
     return tmpPath;
   });

@@ -3,3 +3,10 @@ body {
   color: #303133;
   margin: 10px;
 }
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #141414;
+    color: #e5eaf3;
+  }
+}

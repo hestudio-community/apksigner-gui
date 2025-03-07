@@ -197,7 +197,7 @@
             <SettingPage />
           </el-drawer>
         </el-header>
-        <el-main style="background-color: #ffffff" class="main">
+        <el-main class="main">
           <el-scrollbar style="max-height: calc(100vh - 100px)">
             <el-empty v-if="!openSign" description="坏了，没导入密钥！" />
             <Sign v-else :keyname="openSign" />
@@ -246,6 +246,7 @@
 .main {
   border-radius: 15px;
   height: 100%;
+  background-color: #ffffff;
 }
 
 .settings {
@@ -260,7 +261,6 @@
 .el-card {
   border-radius: 15px;
   margin: 10px;
-  
 }
 .el-input__wrapper {
   border-radius: 10px;
@@ -313,6 +313,16 @@
 }
 .el-popper.is-pure {
   border-radius: 15px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .header {
+    background-color: #141414;
+    color: #e5eaf3;
+  }
+  .main {
+    background-color: #1D1E1F;
+  }
 }
 </style>
 
@@ -415,6 +425,11 @@ export default {
         }, 100);
       }
     });
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      document.querySelector("html").classList.add("dark");
+    } else {
+      document.querySelector("html").classList.remove("dark");
+    }
     this.RefreshKey();
   },
 };
