@@ -15,6 +15,8 @@ if (process.platform == "win32") {
   tmp = path.join(process.env.TEMP, "APKSignerGUI");
 } else if (process.platform == "linux") {
   tmp = path.join("/tmp", "APKSignerGUI");
+} else if (process.platform == "darwin") {
+  tmp = path.join(process.env.HOME, "/Library/Caches", "APKSignerGUI");
 }
 
 if (!fs.existsSync(tmp)) {
