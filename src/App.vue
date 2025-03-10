@@ -321,7 +321,7 @@
     color: #e5eaf3;
   }
   .main {
-    background-color: #1D1E1F;
+    background-color: #1d1e1f;
   }
 }
 </style>
@@ -425,11 +425,13 @@ export default {
         }, 100);
       }
     });
-    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      document.querySelector("html").classList.add("dark");
-    } else {
-      document.querySelector("html").classList.remove("dark");
-    }
+    setInterval(async () => {
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        document.querySelector("html").classList.add("dark");
+      } else {
+        document.querySelector("html").classList.remove("dark");
+      }
+    }, 100);
     this.RefreshKey();
   },
 };

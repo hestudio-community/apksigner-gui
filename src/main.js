@@ -15,6 +15,8 @@ if (process.platform == "win32") {
   tmp = path.join(process.env.TEMP, "APKSignerGUI");
 } else if (process.platform == "linux") {
   tmp = path.join("/tmp", "APKSignerGUI");
+} else if (process.platform == "darwin") {
+  tmp = path.join(process.env.HOME, "/Library/Caches", "APKSignerGUI");
 }
 
 if (!fs.existsSync(tmp)) {
@@ -127,6 +129,17 @@ app.whenReady().then(() => {
     const tmpPath = path.join(tmp, path.basename(file));
     fs.copyFileSync(file, tmpPath);
     return tmpPath;
+  });
+
+  ipcMain.handle("app:clearTmpDir", async () => {
+    try {
+      fs.rmdirSync(tmp, { recursive: true });
+      fs.mkdirSync(tmp);
+      return true;
+    } catch (e) {
+      console.error(e);
+      return e;
+    }
   });
 
   ipcMain.handle(

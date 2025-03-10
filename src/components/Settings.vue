@@ -41,23 +41,63 @@
       </div>
     </el-card>
     <el-card>
-      <div
-        style="
-          display: flex;
-          flex-direction: row;
-          justify-content: space-between;
-          align-items: center;
-        "
-      >
-        <div><text style="margin: 3px">高级选项</text></div>
-        <div>
-          <el-switch
-            v-model="advancedSetting"
-            @change="openAdvancedSetting"
-            style="margin: 3px"
-          />
-        </div>
+      <div style="justify-self: end">
+        <el-button text bg type="primary" @click="openAdvancedSettings = true"
+          >高级设置</el-button
+        >
       </div>
+      <el-drawer
+        v-model="openAdvancedSettings"
+        class="settings"
+        :show-close="false"
+        destroy-on-close
+        :with-header="false"
+        size="350"
+        direction="rtl"
+      >
+        <h2>高级设置</h2>
+        <el-card>
+          <div
+            style="
+              display: flex;
+              flex-direction: row;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <div><text style="margin: 3px">签名的高级选项</text></div>
+            <div>
+              <el-switch
+                v-model="advancedSetting"
+                @change="openAdvancedSetting"
+                style="margin: 3px"
+              />
+            </div>
+          </div>
+        </el-card>
+        <el-card>
+          <div
+            style="
+              display: flex;
+              flex-direction: row;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <div><text style="margin: 3px">缓存清理</text></div>
+            <div>
+              <el-button
+                text
+                bg
+                type="primary"
+                :loading="cleaningTmpDir"
+                @click="clearTmpDir"
+                >清理</el-button
+              >
+            </div>
+          </div>
+        </el-card>
+      </el-drawer>
     </el-card>
   </el-scrollbar>
 </template>
@@ -81,6 +121,8 @@ export default {
       apksigner: "",
       zipalign: "",
       advancedSetting: false,
+      cleaningTmpDir: false,
+      openAdvancedSettings: false,
     };
   },
   methods: {
@@ -152,6 +194,26 @@ export default {
       } else {
         localStorage.setItem("advancedSetting", 0);
       }
+    },
+    clearTmpDir() {
+      this.cleaningTmpDir = true;
+      window.electronAPI.ClearTmpDir().then((result) => {
+        if (typeof result == "boolean" && result) {
+          ElMessage({
+            message: "缓存清理成功",
+            type: "success",
+            plain: true,
+          });
+        } else {
+          ElMessage({
+            message: "缓存清理失败",
+            type: "error",
+            plain: true,
+          });
+          console.error(result);
+        }
+        this.cleaningTmpDir = false;
+      });
     },
   },
   mounted() {
