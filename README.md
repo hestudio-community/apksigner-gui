@@ -49,7 +49,65 @@
 
 ### 如何构建？
 
-1. 安装 nodejs 22
+1. 安装 [NodeJS 22 LTS](https://nodejs.org/)
 2. 使用 `npm install` 安装依赖。
 3. 使用 `npm run make` 构建。
 4. 在 `./out/make` 目录中取得构建物。
+
+#### macOS
+
+1. 安装 [NodeJS 22 LTS](https://nodejs.org/)
+2. 使用 `npm install` 安装依赖。
+3. 使用 `npm run make` 构建。
+4. 在 `./out/make` 目录中取得构建物。
+
+#### Windows
+
+##### ZIP 打包 (推荐)
+
+1. 安装 [NodeJS 22 LTS](https://nodejs.org/)
+2. 使用 `npm install` 安装依赖。
+3. 编辑 `forge.config.js`.
+   将
+   ```javascript
+   {
+      name: "@electron-forge/maker-wix",
+      config: {
+        // ...
+      },
+      platfrom: ["win32"],
+   },
+   ```
+   更换为
+   ```javascript
+   {
+     name: "@electron-forge/maker-zip",
+     platfrom: ["win32"],
+   }
+   ```
+4. 使用 `npm run make` 构建。
+5. 在 `./out/make` 目录中取得构建物。
+
+##### MSI 打包
+
+1. 安装 [NodeJS 22 LTS](https://nodejs.org/)
+2. 使用 `npm install` 安装依赖。
+3. 安装 [WiX Toolset v3](https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314-binaries.zip).
+4. 配置环境变量到`PATH`.
+5. 使用 `npm run make` 构建。
+6. 在 `./out/make` 目录中取得构建物。
+
+#### Linux (Debian 及其衍生系统)
+
+1. 安装 [NodeJS 22 LTS](https://nodejs.org/)
+2. 使用 `npm install` 安装依赖。
+3. 安装构建依赖
+   ```shell
+   sudo apt install fakeroot rpm
+   ```
+   或者
+   ```shell
+   sudo apt install fakeroot rpm-build
+   ```
+4. 使用 `npm run make` 构建。
+5. 在 `./out/make` 目录中取得构建物。
