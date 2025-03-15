@@ -28,14 +28,18 @@
 
 // import './index.css';
 
-console.log('👋 This message is being logged by "renderer.js", included via Vite');
+console.log(
+  '👋 This message is being logged by "renderer.js", included via Vite'
+);
 
 import { createApp } from "vue";
 import ElementPlus from "element-plus";
-import 'element-plus/dist/index.css'
+import "element-plus/dist/index.css";
 import "./element.scss";
 import App from "./App.vue";
+import { getLang } from "./utils/i18n.js";
 
+getLang()
 const app = createApp(App);
 
 app.use(ElementPlus);

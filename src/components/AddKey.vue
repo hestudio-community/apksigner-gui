@@ -1,22 +1,19 @@
 <template>
-  <h2>添加密钥</h2>
+  <h2>{{ this.i18n.AddKey }}</h2>
   <el-scrollbar style="max-height: calc(100vh - 120px)">
     <div>
-      <text style="font-size: smaller"
-        >目前仅支持 密钥库 (.jks)
-        文件。对于公私钥分离的证书将在后续版本支持。</text
-      >
+      <text style="font-size: smaller">{{ this.i18n.AddKeyTips }}</text>
     </div>
     <el-card>
       <div>
         <div>
-          <text>名称</text>
-          <el-input v-model="name" placeholder="名称" />
+          <text>{{ this.i18n.name }}</text>
+          <el-input v-model="name" :placeholder="this.i18n.name" />
         </div>
         <br />
         <div>
-          <text>密钥库位置 (.jks)</text>
-          <el-input v-model="keystone" placeholder="密钥库位置 (.jks)">
+          <text>{{ this.i18n.jksLocation }}</text>
+          <el-input v-model="keystone" :placeholder="this.i18n.jksLocation">
             <template #append>
               <el-button @click="open_keystone">
                 <el-icon><FolderOpened /></el-icon
@@ -26,15 +23,15 @@
         </div>
         <br />
         <div>
-          <text>证书别名</text>
-          <el-input v-model="keyalias" placeholder="证书别名" />
+          <text>{{ this.i18n.keyAlias }}</text>
+          <el-input v-model="keyalias" :placeholder="this.i18n.keyAlias" />
         </div>
         <br />
         <div>
-          <text>证书密码</text>
+          <text>{{ this.i18n.keyPasswd }}</text>
           <el-input
             v-model="keypasswd"
-            placeholder="证书密码"
+            :placeholder="this.i18n.keyPasswd"
             type="password"
             show-password
           />
@@ -42,7 +39,9 @@
       </div>
       <br />
       <div style="justify-self: end">
-        <el-button text bg type="primary" @click="save">保存</el-button>
+        <el-button text bg type="primary" @click="save">{{
+          this.i18n.save
+        }}</el-button>
       </div>
     </el-card>
   </el-scrollbar>
@@ -57,6 +56,7 @@
 <script setup>
 import { FolderOpened } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
+import { i18n } from "./../utils/i18n.js";
 </script>
 
 <script>
@@ -67,6 +67,20 @@ export default {
       keystone: "",
       keyalias: "",
       keypasswd: "",
+      i18n: {
+        AddKey: undefined,
+        AddKeyTips: undefined,
+        name: undefined,
+        jksLocation: undefined,
+        keyAlias: undefined,
+        keyPasswd: undefined,
+        save: undefined,
+        saveSuccess: undefined,
+        keyStone: undefined,
+        AllFiles: undefined,
+        CheckDeficiencies: undefined,
+        HadSameKeyName: undefined,
+      },
     };
   },
   methods: {
@@ -74,13 +88,13 @@ export default {
       window.electronAPI
         .openFile([
           {
-            name: "密钥库",
+            name: this.i18n.keyStone,
             extensions: ["jks"],
           },
           {
-            name: "所有文件",
+            name: this.i18n.AllFiles,
             extensions: ["*"],
-          }
+          },
         ])
         .then((result) => {
           this.keystone = result;
@@ -89,14 +103,14 @@ export default {
     save() {
       if (!this.name || !this.keystone || !this.keyalias || !this.keypasswd) {
         ElMessage({
-          message: "检查一下是不是漏了些什么？？",
+          message: this.i18n.CheckDeficiencies,
           type: "error",
           plain: true,
         });
       } else {
         if (localStorage.getItem(`key-${this.name}`)) {
           ElMessage({
-            message: "已存在相同名称的密钥",
+            message: this.i18n.HadSameKeyName,
             type: "error",
             plain: true,
           });
@@ -112,13 +126,22 @@ export default {
             })
           );
           ElMessage({
-            message: "保存成功",
+            message: this.i18n.saveSuccess,
             type: "success",
             plain: true,
           });
         }
       }
     },
+  },
+  created() {
+    for (let i = 0; i < Object.keys(this.i18n).length; i++) {
+      eval(
+        `this.i18n.${Object.keys(this.i18n)[i]} = i18n("${
+          Object.keys(this.i18n)[i]
+        }")`
+      );
+    }
   },
 };
 </script>
