@@ -1,6 +1,6 @@
 <template>
   <h2 style="display: flex; justify-content: space-between">
-    <text>设置</text>
+    <text>{{ this.i18n.Setting }}</text>
     <div style="display: flex; flex-direction: row">
       <el-button text style="height: 32px; width: 32px" @click="open_devtools"
         ><Icon icon="fluent:window-dev-tools-20-regular" width="20" height="20"
@@ -13,7 +13,7 @@
   <el-scrollbar style="max-height: calc(100vh - 120px)">
     <el-card style="display: flex; flex-direction: column">
       <div>
-        <text>apksigner 位置</text>
+        <text>{{ this.i18n.apksignerLocation }}</text>
         <el-input v-model="apksigner" placeholder="apksigner">
           <template #append>
             <el-button @click="open_apksigner">
@@ -24,7 +24,7 @@
       </div>
       <br />
       <div>
-        <text>zipalign 位置</text>
+        <text>{{ this.i18n.zipalignLocation }}</text>
         <el-input v-model="zipalign" placeholder="zipalign">
           <template #append>
             <el-button @click="open_zipalign">
@@ -35,15 +35,19 @@
       </div>
       <br />
       <div style="justify-self: end">
-        <el-button text bg type="primary" @click="save_filepath"
-          >保存</el-button
-        >
+        <el-button text bg type="primary" @click="save_filepath">
+          {{ this.i18n.save }}
+        </el-button>
       </div>
     </el-card>
     <el-card>
       <div style="justify-self: end">
-        <el-button text bg type="primary" @click="openAdvancedSettings = true"
-          >高级设置</el-button
+        <el-button
+          text
+          bg
+          type="primary"
+          @click="openAdvancedSettings = true"
+          >{{ this.i18n.advancedSettings }}</el-button
         >
       </div>
       <el-drawer
@@ -55,7 +59,7 @@
         size="350"
         direction="rtl"
       >
-        <h2>高级设置</h2>
+        <h2>{{ this.i18n.advancedSettings }}</h2>
         <el-card>
           <div
             style="
@@ -65,7 +69,11 @@
               align-items: center;
             "
           >
-            <div><text style="margin: 3px">签名的高级选项</text></div>
+            <div>
+              <text style="margin: 3px">{{
+                this.i18n.signAdvancedOptions
+              }}</text>
+            </div>
             <div>
               <el-switch
                 v-model="advancedSetting"
@@ -76,6 +84,20 @@
           </div>
         </el-card>
         <el-card>
+          <div>
+            <text>{{ this.i18n.chooseLanguage }}</text>
+          </div>
+          <br />
+          <el-select v-model="lang.chooseLang" @change="changelanguage">
+            <el-option
+              v-for="item in lang.langlist"
+              :key="item.lang"
+              :label="item.display"
+              :value="item.lang"
+            />
+          </el-select>
+        </el-card>
+        <el-card>
           <div
             style="
               display: flex;
@@ -84,7 +106,9 @@
               align-items: center;
             "
           >
-            <div><text style="margin: 3px">缓存清理</text></div>
+            <div>
+              <text style="margin: 3px">{{ this.i18n.cacheCleanup }}</text>
+            </div>
             <div>
               <el-button
                 text
@@ -92,7 +116,7 @@
                 type="primary"
                 :loading="cleaningTmpDir"
                 @click="clearTmpDir"
-                >清理</el-button
+                >{{ this.i18n.clean }}</el-button
               >
             </div>
           </div>
@@ -112,6 +136,7 @@
 import { FolderOpened } from "@element-plus/icons-vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { Icon } from "@iconify/vue";
+import { i18n, supportLangList } from "./../utils/i18n.js";
 </script>
 
 <script>
@@ -123,6 +148,31 @@ export default {
       advancedSetting: false,
       cleaningTmpDir: false,
       openAdvancedSettings: false,
+      lang: {
+        chooseLang: "",
+        langlist: [],
+      },
+      i18n: {
+        Setting: undefined,
+        apksignerLocation: undefined,
+        zipalignLocation: undefined,
+        save: undefined,
+        saveSuccess: undefined,
+        advancedSettings: undefined,
+        signAdvancedOptions: undefined,
+        cacheCleanup: undefined,
+        clean: undefined,
+        CheckDeficiencies: undefined,
+        advancedOptions: undefined,
+        openAdvancedOptions: undefined,
+        confirm: undefined,
+        cancel: undefined,
+        cacheCleanSuccess: undefined,
+        cacheCleanFailed: undefined,
+        advancedSettingWarning: undefined,
+        chooseLanguage: undefined,
+        isChangeLanguageTo: undefined
+      },
     };
   },
   methods: {
@@ -159,7 +209,7 @@ export default {
     save_filepath() {
       if (!this.apksigner || !this.zipalign) {
         ElMessage({
-          message: "检查一下是不是漏了些什么？？",
+          message: this.i18n.CheckDeficiencies,
           type: "error",
           plain: true,
         });
@@ -168,7 +218,7 @@ export default {
         localStorage.setItem("apksigner", this.apksigner);
         localStorage.setItem("zipalign", this.zipalign);
         ElMessage({
-          message: "保存成功",
+          message: this.i18n.saveSuccess,
           type: "success",
           plain: true,
         });
@@ -178,11 +228,11 @@ export default {
       if (this.advancedSetting) {
         this.advancedSetting = false;
         ElMessageBox.confirm(
-          "本安卓签名工具提供高级设置功能旨在为有经验的用户提供更多灵活性。但对于因使用高级设置而导致的任何直接、间接、偶然、特殊或相应的损害，包括但不限于设备损坏、数据丢失、应用程序无法正常使用等，我们不承担任何责任。在使用高级设置前，请您务必谨慎考虑，并充分了解相关操作可能带来的风险。若您不确定如何进行高级设置，建议您寻求专业技术支持或避免使用该功能。\n使用本工具即表示您已阅读、理解并接受上述风险提醒及免责声明。",
-          "高级选项",
+          this.i18n.advancedSettingWarning,
+          this.i18n.advancedOptions,
           {
-            confirmButtonText: "打开高级选项",
-            cancelButtonText: "取消",
+            confirmButtonText: this.i18n.openAdvancedOptions,
+            cancelButtonText: this.i18n.cancel,
             confirmButtonClass: "el-button--danger",
             type: "danger",
           }
@@ -200,13 +250,13 @@ export default {
       window.electronAPI.ClearTmpDir().then((result) => {
         if (typeof result == "boolean" && result) {
           ElMessage({
-            message: "缓存清理成功",
+            message: this.i18n.cacheCleanSuccess,
             type: "success",
             plain: true,
           });
         } else {
           ElMessage({
-            message: "缓存清理失败",
+            message: this.i18n.cacheCleanFailed,
             type: "error",
             plain: true,
           });
@@ -215,10 +265,41 @@ export default {
         this.cleaningTmpDir = false;
       });
     },
+    changelanguage() {
+      if (this.lang.chooseLang != localStorage.getItem("lang")) {
+        ElMessageBox.confirm(
+          this.i18n.isChangeLanguageTo(this.lang.chooseLang),
+          this.i18n.chooseLanguage,
+          {
+            confirmButtonText: this.i18n.confirm,
+            cancelButtonText: this.i18n.cancel,
+            type: "warning",
+          }
+        )
+          .then(() => {
+            localStorage.setItem("lang", this.lang.chooseLang);
+            window.location.reload();
+          })
+          .catch(() => {
+            this.lang.chooseLang = localStorage.getItem("lang");
+          });
+      }
+    },
+  },
+  created() {
+    for (let i = 0; i < Object.keys(this.i18n).length; i++) {
+      eval(
+        `this.i18n.${Object.keys(this.i18n)[i]} = i18n("${
+          Object.keys(this.i18n)[i]
+        }")`
+      );
+    }
   },
   mounted() {
     this.apksigner = localStorage.getItem("apksigner");
     this.zipalign = localStorage.getItem("zipalign");
+    this.lang.langlist = supportLangList;
+    this.lang.chooseLang = localStorage.getItem("lang");
     if (localStorage.getItem("advancedSetting") == 1) {
       this.advancedSetting = true;
     }

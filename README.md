@@ -47,6 +47,24 @@
 4. 点击右侧空白区域关闭页面，选中左侧的签名，然后开始签名安装包。
    ![](./images/apphome.png)
 
+### 找到你的语言
+
+[![Crowdin](https://badges.crowdin.net/apksignergui/localized.svg)](https://crowdin.com/project/apksignergui)
+
+我们致力于向全球用户提供相同的服务和体验，如果愿意为这个项目提供相关翻译，我们将会衷心感谢你。
+
+你可以通过以下两种方法提交翻译:
+
+- 在 [crowdin](https://crowdin.com/project/apksignergui) 平台上提交翻译。
+- 通过编辑源代码的 `i18n` 目录下对于语言的文本提交翻译。
+
+没有找到你的语言？同样有两种方法提交你的语言。
+
+- 如果使用 [crowdin](https://crowdin.com/project/apksignergui) 平台，请提交一个 issue，我们将会在平台上预留该语言以提供你进行翻译。
+- 你也可以通过复制源代码的 `i18n` 目录下的其中一个你熟知的语言进行翻译，当你提交后，我们将会为你完成剩余操作。
+
+我们要求的语言代码以 [ISO 639-1](https://en.wikipedia.org/wiki/ISO_639-1) 为标准，国家代码以 [ISO 3166-1](https://en.wikipedia.org/wiki/ISO_3166-1) 为标准。
+
 ### 如何构建？
 
 1. 安装 [NodeJS 22 LTS](https://nodejs.org/)

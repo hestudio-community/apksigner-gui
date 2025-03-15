@@ -199,7 +199,7 @@
         </el-header>
         <el-main class="main">
           <el-scrollbar style="max-height: calc(100vh - 100px)">
-            <el-empty v-if="!openSign" description="坏了，没导入密钥！" />
+            <el-empty v-if="!openSign" :description="this.i18n.noKeyTip" />
             <Sign v-else :keyname="openSign" />
           </el-scrollbar>
         </el-main>
@@ -342,6 +342,7 @@ import AddKey from "./components/AddKey.vue";
 import EditKey from "./components/EditKey.vue";
 import Sign from "./components/Sign.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
+import { i18n } from "./utils/i18n.js";
 </script>
 
 <script>
@@ -365,6 +366,14 @@ export default {
       keyLoading: true,
       keyRemoveStatus: false,
       openSign: "",
+      i18n: {
+        noKeyTip: undefined,
+        confirm: undefined,
+        cancel: undefined,
+        DeleteSuccess: undefined,
+        DeleteKey: undefined,
+        DeleyeKeyTip: undefined,
+      },
     };
   },
   methods: {
@@ -389,14 +398,18 @@ export default {
       this.keyLoading = false;
     },
     RemoveKey(keyname) {
-      ElMessageBox.confirm(`确定要删除密钥 "${keyname}" 吗？`, "删除密钥", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      }).then(() => {
+      ElMessageBox.confirm(
+        this.i18n.DeleyeKeyTip(keyname),
+        this.i18n.DeleteKey,
+        {
+          confirmButtonText: this.i18n.confirm,
+          cancelButtonText: this.i18n.cancel,
+          type: "warning",
+        }
+      ).then(() => {
         localStorage.removeItem(`key-${keyname}`);
         ElMessage({
-          message: "删除成功",
+          message: this.i18n.DeleteSuccess,
           type: "success",
           plain: true,
         });
@@ -412,6 +425,15 @@ export default {
     WindowsMaximize() {
       window.electronAPI.WindowsMaximize();
     },
+  },
+  created() {
+    for (let i = 0; i < Object.keys(this.i18n).length; i++) {
+      eval(
+        `this.i18n.${Object.keys(this.i18n)[i]} = i18n("${
+          Object.keys(this.i18n)[i]
+        }")`
+      );
+    }
   },
   mounted() {
     window.electronAPI.SystemPlatfrom().then(async (result) => {
