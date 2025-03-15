@@ -1,6 +1,6 @@
 <template>
   <h2 style="display: flex; justify-content: space-between">
-    <text>{{ this.i18n.Setting }}</text>
+    <text>{{ i18n.Setting }}</text>
     <div style="display: flex; flex-direction: row">
       <el-button text style="height: 32px; width: 32px" @click="open_devtools"
         ><Icon icon="fluent:window-dev-tools-20-regular" width="20" height="20"
@@ -13,7 +13,7 @@
   <el-scrollbar style="max-height: calc(100vh - 120px)">
     <el-card style="display: flex; flex-direction: column">
       <div>
-        <text>{{ this.i18n.apksignerLocation }}</text>
+        <text>{{ i18n.apksignerLocation }}</text>
         <el-input v-model="apksigner" placeholder="apksigner">
           <template #append>
             <el-button @click="open_apksigner">
@@ -24,7 +24,7 @@
       </div>
       <br />
       <div>
-        <text>{{ this.i18n.zipalignLocation }}</text>
+        <text>{{ i18n.zipalignLocation }}</text>
         <el-input v-model="zipalign" placeholder="zipalign">
           <template #append>
             <el-button @click="open_zipalign">
@@ -36,7 +36,7 @@
       <br />
       <div style="justify-self: end">
         <el-button text bg type="primary" @click="save_filepath">
-          {{ this.i18n.save }}
+          {{ i18n.save }}
         </el-button>
       </div>
     </el-card>
@@ -47,7 +47,7 @@
           bg
           type="primary"
           @click="openAdvancedSettings = true"
-          >{{ this.i18n.advancedSettings }}</el-button
+          >{{ i18n.advancedSettings }}</el-button
         >
       </div>
       <el-drawer
@@ -59,7 +59,7 @@
         size="350"
         direction="rtl"
       >
-        <h2>{{ this.i18n.advancedSettings }}</h2>
+        <h2>{{ i18n.advancedSettings }}</h2>
         <el-card>
           <div
             style="
@@ -70,9 +70,7 @@
             "
           >
             <div>
-              <text style="margin: 3px">{{
-                this.i18n.signAdvancedOptions
-              }}</text>
+              <text style="margin: 3px">{{ i18n.signAdvancedOptions }}</text>
             </div>
             <div>
               <el-switch
@@ -85,7 +83,7 @@
         </el-card>
         <el-card>
           <div>
-            <text>{{ this.i18n.chooseLanguage }}</text>
+            <text>{{ i18n.chooseLanguage }}</text>
           </div>
           <br />
           <el-select v-model="lang.chooseLang" @change="changelanguage">
@@ -107,7 +105,7 @@
             "
           >
             <div>
-              <text style="margin: 3px">{{ this.i18n.cacheCleanup }}</text>
+              <text style="margin: 3px">{{ i18n.cacheCleanup }}</text>
             </div>
             <div>
               <el-button
@@ -116,7 +114,7 @@
                 type="primary"
                 :loading="cleaningTmpDir"
                 @click="clearTmpDir"
-                >{{ this.i18n.clean }}</el-button
+                >{{ i18n.clean }}</el-button
               >
             </div>
           </div>
@@ -136,7 +134,7 @@
 import { FolderOpened } from "@element-plus/icons-vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { Icon } from "@iconify/vue";
-import { i18n, supportLangList } from "./../utils/i18n.js";
+import { geti18n, supportLangList } from "../utils/i18n.js";
 </script>
 
 <script>
@@ -171,7 +169,7 @@ export default {
         cacheCleanFailed: undefined,
         advancedSettingWarning: undefined,
         chooseLanguage: undefined,
-        isChangeLanguageTo: undefined
+        isChangeLanguageTo: undefined,
       },
     };
   },
@@ -288,11 +286,8 @@ export default {
   },
   created() {
     for (let i = 0; i < Object.keys(this.i18n).length; i++) {
-      eval(
-        `this.i18n.${Object.keys(this.i18n)[i]} = i18n("${
-          Object.keys(this.i18n)[i]
-        }")`
-      );
+      const key = Object.keys(this.i18n)[i];
+      this.i18n[key] = geti18n(key);
     }
   },
   mounted() {

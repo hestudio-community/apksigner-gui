@@ -56,7 +56,8 @@ const userLang = ((langName) => {
 /**
  * Translation to user language
  * @param {string} source
+ * @returns {string} Translated string
  */
-export function i18n(source) {
+export function geti18n(source) {
   return userLang[source];
 }
