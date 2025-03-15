@@ -63,7 +63,7 @@
 - 如果使用 [crowdin](https://crowdin.com/project/apksignergui) 平台，请提交一个 issue，我们将会在平台上预留该语言以提供你进行翻译。
 - 你也可以通过复制源代码的 `i18n` 目录下的其中一个你熟知的语言进行翻译，当你提交后，我们将会为你完成剩余操作。
 
-我们要求的语言代码以 [ISO 639-1](https://en.wikipedia.org/wiki/ISO_639-1) 为标准，国家代码以 [ISO 3166-1](https://en.wikipedia.org/wiki/ISO_3166-1) 为标准。
+我们要求的语言代码以 [ISO 639-1](https://en.wikipedia.org/wiki/ISO_639-1) 为标准，国家或地区代码以 [ISO 3166-1](https://en.wikipedia.org/wiki/ISO_3166-1) 为标准。
 
 ### 如何构建？
 
