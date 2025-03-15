@@ -1,16 +1,16 @@
 <template>
-  <h2>{{ this.i18n.EditKey }}</h2>
+  <h2>{{ i18n.EditKey }}</h2>
   <el-scrollbar style="max-height: calc(100vh - 120px)">
     <el-card>
       <div>
         <div>
-          <text>{{ this.i18n.name }}</text>
-          <el-input v-model="name" :placeholder="this.i18n.name" />
+          <text>{{ i18n.name }}</text>
+          <el-input v-model="name" :placeholder="i18n.name" />
         </div>
         <br />
         <div>
-          <text>{{ this.i18n.name }}</text>
-          <el-input v-model="keystone" :placeholder="this.i18n.jksLocation">
+          <text>{{ i18n.name }}</text>
+          <el-input v-model="keystone" :placeholder="i18n.jksLocation">
             <template #append>
               <el-button @click="open_keystone">
                 <el-icon><FolderOpened /></el-icon
@@ -20,15 +20,15 @@
         </div>
         <br />
         <div>
-          <text>{{ this.i18n.keyAlias }}</text>
-          <el-input v-model="keyalias" :placeholder="this.i18n.keyAlias" />
+          <text>{{ i18n.keyAlias }}</text>
+          <el-input v-model="keyalias" :placeholder="i18n.keyAlias" />
         </div>
         <br />
         <div>
-          <text>{{ this.i18n.keyPasswd }}</text>
+          <text>{{ i18n.keyPasswd }}</text>
           <el-input
             v-model="keypasswd"
-            :placeholder="this.i18n.keyPasswd"
+            :placeholder="i18n.keyPasswd"
             type="password"
             show-password
           />
@@ -37,7 +37,7 @@
       <br />
       <div style="justify-self: end">
         <el-button text bg type="primary" @click="save">{{
-          this.i18n.save
+          i18n.save
         }}</el-button>
       </div>
     </el-card>
@@ -53,7 +53,7 @@
 <script setup>
 import { FolderOpened } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
-import { i18n } from "./../utils/i18n.js";
+import { geti18n } from "../utils/i18n.js";
 </script>
 
 <script>
@@ -133,11 +133,8 @@ export default {
   },
   created() {
     for (let i = 0; i < Object.keys(this.i18n).length; i++) {
-      eval(
-        `this.i18n.${Object.keys(this.i18n)[i]} = i18n("${
-          Object.keys(this.i18n)[i]
-        }")`
-      );
+      const key = Object.keys(this.i18n)[i];
+      this.i18n[key] = geti18n(key);
     }
   },
   mounted() {

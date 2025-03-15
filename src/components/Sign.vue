@@ -1,15 +1,11 @@
 <template>
   <el-card>
     <div>
-      <text>{{ this.i18n.apkLocation }}</text>
+      <text>{{ i18n.apkLocation }}</text>
     </div>
     <br />
     <div>
-      <el-input
-        v-model="input_apk"
-        clearable
-        :placeholder="this.i18n.apkLocation"
-      >
+      <el-input v-model="input_apk" clearable :placeholder="i18n.apkLocation">
         <template #append>
           <el-button @click="open_input_apk">
             <el-icon><FolderOpened /></el-icon>
@@ -21,19 +17,19 @@
   <div v-if="advancedSetting">
     <el-card>
       <div>
-        <text>{{ this.i18n.minAndroidApi }}</text>
+        <text>{{ i18n.minAndroidApi }}</text>
       </div>
       <br />
       <div style="display: flex; flex-direction: row; align-items: center">
         <el-checkbox
           v-model="api.auto.min"
-          :label="this.i18n.autoDecideMinSDK"
+          :label="i18n.autoDecideMinSDK"
           style="margin: 3px"
         />
         <el-tooltip placement="right">
           <template #content>
             <div style="width: calc(30vw); max-width: fit-content">
-              <text>{{ this.i18n.minSDKTooltip }}</text>
+              <text>{{ i18n.minSDKTooltip }}</text>
             </div>
           </template>
           <el-icon><QuestionFilled /></el-icon>
@@ -49,13 +45,13 @@
       <div style="display: flex; flex-direction: row; align-items: center">
         <el-checkbox
           v-model="api.auto.max"
-          :label="this.i18n.autoDecideMaxSDK"
+          :label="i18n.autoDecideMaxSDK"
           style="margin: 3px"
         />
         <el-tooltip placement="right">
           <template #content>
             <div style="width: calc(30vw); max-width: fit-content">
-              <text>{{ this.i18n.maxSDKTooltip }}</text>
+              <text>{{ i18n.maxSDKTooltip }}</text>
             </div>
           </template>
           <el-icon><QuestionFilled /></el-icon>
@@ -77,11 +73,11 @@
           justify-content: space-between;
         "
       >
-        <text>{{ this.i18n.signingScheme }}</text>
+        <text>{{ i18n.signingScheme }}</text>
         <el-tooltip placement="right">
           <template #content>
             <div style="width: calc(30vw); max-width: fit-content">
-              <text>{{ this.i18n.signingSchemeTooltip }}</text>
+              <text>{{ i18n.signingSchemeTooltip }}</text>
             </div>
           </template>
           <el-icon><QuestionFilled /></el-icon>
@@ -91,11 +87,11 @@
       <div>
         <el-checkbox
           v-model="signplan.auto"
-          :label="this.i18n.autoDecideScheme"
+          :label="i18n.autoDecideScheme"
           style="margin: 3px"
         />
         <div v-if="!signplan.auto" style="margin-top: 10px">
-          <text>{{ this.i18n.selectScheme }}</text>
+          <text>{{ i18n.selectScheme }}</text>
           <el-checkbox-group v-model="signplan.plans">
             <el-checkbox label="V1" value="V1" />
             <el-checkbox label="V2" value="V2" />
@@ -113,11 +109,11 @@
           justify-content: space-between;
         "
       >
-        <text>{{ this.i18n.zipalignTitle }}</text>
+        <text>{{ i18n.zipalignTitle }}</text>
         <el-tooltip placement="right">
           <template #content>
             <div style="width: calc(30vw); max-width: fit-content">
-              <text>{{ this.i18n.zipalignTooltip }}</text>
+              <text>{{ i18n.zipalignTooltip }}</text>
             </div>
           </template>
           <el-icon><QuestionFilled /></el-icon>
@@ -127,17 +123,17 @@
       <div>
         <el-checkbox
           v-model="zipalign.status"
-          :label="this.i18n.useZipalign"
+          :label="i18n.useZipalign"
           style="margin: 3px"
         />
       </div>
       <br v-if="zipalign.status" />
       <div v-if="zipalign.status">
         <div style="align-items: center">
-          <text style="margin: 3px">{{ this.i18n.pageSize }}</text>
+          <text style="margin: 3px">{{ i18n.pageSize }}</text>
           <el-select
             v-model="zipalign.config.P"
-            :placeholder="this.i18n.pageSize"
+            :placeholder="i18n.pageSize"
             style="width: 240px"
           >
             <el-option
@@ -152,7 +148,7 @@
         <div>
           <el-checkbox
             v-model="zipalign.config.Zopfli"
-            :label="this.i18n.useZopfliRecompress"
+            :label="i18n.useZopfliRecompress"
             style="margin: 3px"
           />
         </div>
@@ -161,15 +157,11 @@
   </div>
   <el-card v-if="!output.rewrite">
     <div>
-      <text>{{ this.i18n.exportApkTo }}</text>
+      <text>{{ i18n.exportApkTo }}</text>
     </div>
     <br />
     <div>
-      <el-input
-        v-model="output.path"
-        clearable
-        :placeholder="this.i18n.exportApkTo"
-      >
+      <el-input v-model="output.path" clearable :placeholder="i18n.exportApkTo">
         <template #append>
           <el-button @click="save_apk">
             <el-icon><FolderOpened /></el-icon>
@@ -188,15 +180,12 @@
       "
     >
       <div>
-        <el-checkbox
-          v-model="output.rewrite"
-          :label="this.i18n.overwriteOriginal"
-        />
-        <el-checkbox v-model="output.showSignLog" :label="this.i18n.showLog" />
+        <el-checkbox v-model="output.rewrite" :label="i18n.overwriteOriginal" />
+        <el-checkbox v-model="output.showSignLog" :label="i18n.showLog" />
       </div>
       <div>
         <el-button text bg type="primary" :loading="sign" @click="signButton">
-          {{ this.i18n.sign }}
+          {{ i18n.sign }}
         </el-button>
       </div>
     </div>
@@ -212,7 +201,7 @@
 <script setup>
 import { FolderOpened, QuestionFilled } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
-import { i18n } from "./../utils/i18n.js";
+import { geti18n } from "../utils/i18n.js";
 </script>
 
 <script>
@@ -400,13 +389,9 @@ export default {
     },
   },
   created() {
-    // 初始化国际化翻译
     for (let i = 0; i < Object.keys(this.i18n).length; i++) {
-      eval(
-        `this.i18n.${Object.keys(this.i18n)[i]} = i18n("${
-          Object.keys(this.i18n)[i]
-        }")`
-      );
+      const key = Object.keys(this.i18n)[i];
+      this.i18n[key] = geti18n(key);
     }
   },
   mounted() {

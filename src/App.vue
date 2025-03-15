@@ -199,7 +199,7 @@
         </el-header>
         <el-main class="main">
           <el-scrollbar style="max-height: calc(100vh - 100px)">
-            <el-empty v-if="!openSign" :description="this.i18n.noKeyTip" />
+            <el-empty v-if="!openSign" :description="i18n.noKeyTip" />
             <Sign v-else :keyname="openSign" />
           </el-scrollbar>
         </el-main>
@@ -342,7 +342,7 @@ import AddKey from "./components/AddKey.vue";
 import EditKey from "./components/EditKey.vue";
 import Sign from "./components/Sign.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { i18n } from "./utils/i18n.js";
+import { geti18n } from "./utils/i18n.js";
 </script>
 
 <script>
@@ -428,11 +428,8 @@ export default {
   },
   created() {
     for (let i = 0; i < Object.keys(this.i18n).length; i++) {
-      eval(
-        `this.i18n.${Object.keys(this.i18n)[i]} = i18n("${
-          Object.keys(this.i18n)[i]
-        }")`
-      );
+      const key = Object.keys(this.i18n)[i];
+      this.i18n[key] = geti18n(key);
     }
   },
   mounted() {
