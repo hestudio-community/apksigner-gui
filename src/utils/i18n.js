@@ -1,10 +1,22 @@
 import zhCN from "../../i18n/zh-CN";
+import zhHK from "../../i18n/zh-HK";
+import enUS from "../../i18n/en-US";
 
 const supportLangList = [
   {
     lang: "zh-CN",
-    display: "中文（简体）",
+    display: "简体中文",
     library: zhCN,
+  },
+  {
+    lang: "zh-HK",
+    display: "繁體中文",
+    library: zhHK,
+  },
+  {
+    lang: "en-US",
+    display: "English (US)",
+    library: enUS,
   },
 ];
 
@@ -26,7 +38,7 @@ function getLang() {
         }
       }
     }
-    localStorage.setItem("lang", "zh-CN");
+    localStorage.setItem("lang", "en-US");
     return localStorage.getItem("lang");
   }
 }
