@@ -1,8 +1,8 @@
 {
   "name": "com.hestudio.apksigner",
   "productName": "APKSignerGUI",
-  "version": "1.0.3",
-  "description": "My Electron application description",
+  "version": "1.1.0-alpha.1",
+  "description": "Simple but complete APK signing tool.",
   "main": ".vite/build/main.js",
   "scripts": {
     "start": "electron-forge start",
