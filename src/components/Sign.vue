@@ -312,9 +312,19 @@ export default {
         .SystemShell(shell)
         .then(async (result) => {
           this.stdout += result;
+          ElMessage({
+            message: this.i18n.signSuccess,
+            type: "success",
+            plain: true,
+          });
         })
         .catch((error) => {
           this.stdout += error;
+          ElMessage({
+            message: this.i18n.signFailed,
+            type: "error",
+            plain: true,
+          });
         });
     },
     signButton() {

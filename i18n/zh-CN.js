@@ -61,4 +61,6 @@ export default {
   isChangeLanguageTo: (lang) => {
     return `是否将语言切换为 ${lang} ？`;
   },
+  signSuccess: "签名成功",
+  signFailed: "签名失败",
 };

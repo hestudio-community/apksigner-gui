@@ -61,4 +61,6 @@ export default {
   isChangeLanguageTo: (lang) => {
     return `Do you want to switch the language to ${lang}?`;
   },
+  signSuccess: "Signature successful",
+  signFailed: "Signature failed",
 };
