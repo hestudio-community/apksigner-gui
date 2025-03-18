@@ -13,9 +13,9 @@
         <br />
         <div>
           <text>{{ i18n.jksLocation }}</text>
-          <el-input v-model="keystone" :placeholder="i18n.jksLocation">
+          <el-input v-model="keystore" :placeholder="i18n.jksLocation">
             <template #append>
-              <el-button @click="open_keystone">
+              <el-button @click="open_keystore">
                 <el-icon><FolderOpened /></el-icon
               ></el-button>
             </template>
@@ -64,7 +64,7 @@ export default {
   data() {
     return {
       name: "",
-      keystone: "",
+      keystore: "",
       keyalias: "",
       keypasswd: "",
       i18n: {
@@ -76,7 +76,7 @@ export default {
         keyPasswd: undefined,
         save: undefined,
         saveSuccess: undefined,
-        keyStone: undefined,
+        keyStore: undefined,
         AllFiles: undefined,
         CheckDeficiencies: undefined,
         HadSameKeyName: undefined,
@@ -84,11 +84,11 @@ export default {
     };
   },
   methods: {
-    open_keystone() {
+    open_keystore() {
       window.electronAPI
         .openFile([
           {
-            name: this.i18n.keyStone,
+            name: this.i18n.keyStore,
             extensions: ["jks"],
           },
           {
@@ -97,11 +97,11 @@ export default {
           },
         ])
         .then((result) => {
-          this.keystone = result;
+          this.keystore = result;
         });
     },
     save() {
-      if (!this.name || !this.keystone || !this.keyalias || !this.keypasswd) {
+      if (!this.name || !this.keystore || !this.keyalias || !this.keypasswd) {
         ElMessage({
           message: this.i18n.CheckDeficiencies,
           type: "error",
@@ -120,7 +120,7 @@ export default {
             `key-${this.name}`,
             JSON.stringify({
               type: 1,
-              keystone: this.keystone,
+              keystore: this.keystore,
               keyalias: this.keyalias,
               keypasswd: this.keypasswd,
             })

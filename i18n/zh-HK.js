@@ -17,7 +17,7 @@ export default {
   keyPasswd: "證書密碼",
   save: "保存",
   saveSuccess: "保存成功",
-  keyStone: "密鑰庫",
+  keyStore: "密鑰庫",
   AllFiles: "所有文件",
   CheckDeficiencies: "檢查一下是不是漏填了些什麼？？",
   HadSameKeyName: "已存在相同名稱的密鑰",

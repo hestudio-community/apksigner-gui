@@ -342,7 +342,7 @@ export default {
         window.electronAPI.CopyToTmp(this.input_apk).then(async (result) => {
           const k = JSON.parse(localStorage.getItem("key-" + this.keyname));
           const apksigner = localStorage.getItem("apksigner");
-          let script = `${apksigner} sign -v --ks ${k.keystone} --ks-key-alias ${k.keyalias} --ks-pass pass:${k.keypasswd}`;
+          let script = `${apksigner} sign -v --ks ${k.keystore} --ks-key-alias ${k.keyalias} --ks-pass pass:${k.keypasswd}`;
           if (!this.output.rewrite) {
             if (!this.output.path) {
               ElMessage({
