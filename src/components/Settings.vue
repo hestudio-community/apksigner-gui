@@ -265,8 +265,15 @@ export default {
     },
     changelanguage() {
       if (this.lang.chooseLang != localStorage.getItem("lang")) {
+        let display = null
+        for (let index = 0; index < supportLangList.length; index++) {
+          const element = supportLangList[index];
+          if (element.lang == this.lang.chooseLang) {
+            display = element.display
+          }
+        }
         ElMessageBox.confirm(
-          this.i18n.isChangeLanguageTo(this.lang.chooseLang),
+          this.i18n.isChangeLanguageTo(display),
           this.i18n.chooseLanguage,
           {
             confirmButtonText: this.i18n.confirm,
