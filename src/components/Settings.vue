@@ -1,132 +1,190 @@
 <template>
-  <h2 style="display: flex; justify-content: space-between">
-    <text>{{ i18n.Setting }}</text>
-    <div style="display: flex; flex-direction: row">
-      <el-button text style="height: 32px; width: 32px" @click="open_devtools"
-        ><Icon icon="fluent:window-dev-tools-20-regular" width="20" height="20"
-      /></el-button>
-      <el-button text style="height: 32px; width: 32px" @click="open_about"
-        ><Icon icon="mdi:about-circle-outline" width="20" height="20"
-      /></el-button>
-    </div>
-  </h2>
-  <el-scrollbar style="max-height: calc(100vh - 120px)">
-    <el-card style="display: flex; flex-direction: column">
-      <div>
-        <text>{{ i18n.apksignerLocation }}</text>
-        <el-input v-model="apksigner" placeholder="apksigner">
-          <template #append>
-            <el-button @click="open_apksigner">
-              <el-icon><FolderOpened /></el-icon
-            ></el-button>
-          </template>
-        </el-input>
-      </div>
-      <br />
-      <div>
-        <text>{{ i18n.zipalignLocation }}</text>
-        <el-input v-model="zipalign" placeholder="zipalign">
-          <template #append>
-            <el-button @click="open_zipalign">
-              <el-icon><FolderOpened /></el-icon
-            ></el-button>
-          </template>
-        </el-input>
-      </div>
-      <br />
-      <div style="justify-self: end">
-        <el-button text bg type="primary" @click="save_filepath">
-          {{ i18n.save }}
-        </el-button>
-      </div>
-    </el-card>
-    <el-card>
-      <div style="justify-self: end">
-        <el-button
-          text
-          bg
-          type="primary"
-          @click="openAdvancedSettings = true"
-          >{{ i18n.advancedSettings }}</el-button
-        >
-      </div>
-      <el-drawer
-        v-model="openAdvancedSettings"
-        class="settings"
-        :show-close="false"
-        destroy-on-close
-        :with-header="false"
-        size="350"
-        direction="rtl"
-      >
-        <h2>{{ i18n.advancedSettings }}</h2>
-        <el-card>
-          <div
-            style="
-              display: flex;
-              flex-direction: row;
-              justify-content: space-between;
-              align-items: center;
-            "
-          >
+  <div class="transition-container">
+    <Transition :name="transitionName">
+      <div v-if="!openAdvancedSettings" class="mainPage" key="main">
+        <h2 style="display: flex; justify-content: space-between">
+          <text>{{ i18n.Setting }}</text>
+          <div style="display: flex; flex-direction: row">
+            <el-button
+              text
+              style="height: 32px; width: 32px"
+              @click="open_devtools"
+              ><Icon
+                icon="fluent:window-dev-tools-20-regular"
+                width="20"
+                height="20"
+            /></el-button>
+            <el-button text style="height: 32px; width: 32px" @click="open_about"
+              ><Icon icon="mdi:about-circle-outline" width="20" height="20"
+            /></el-button>
+          </div>
+        </h2>
+        <el-scrollbar style="max-height: calc(100vh - 120px)">
+          <el-card style="display: flex; flex-direction: column">
             <div>
-              <text style="margin: 3px">{{ i18n.signAdvancedOptions }}</text>
+              <text>{{ i18n.apksignerLocation }}</text>
+              <el-input v-model="apksigner" placeholder="apksigner">
+                <template #append>
+                  <el-button @click="open_apksigner">
+                    <el-icon><FolderOpened /></el-icon
+                  ></el-button>
+                </template>
+              </el-input>
             </div>
+            <br />
             <div>
-              <el-switch
-                v-model="advancedSetting"
-                @change="openAdvancedSetting"
-                style="margin: 3px"
+              <text>{{ i18n.zipalignLocation }}</text>
+              <el-input v-model="zipalign" placeholder="zipalign">
+                <template #append>
+                  <el-button @click="open_zipalign">
+                    <el-icon><FolderOpened /></el-icon
+                  ></el-button>
+                </template>
+              </el-input>
+            </div>
+            <br />
+            <div style="justify-self: end">
+              <el-button text bg type="primary" @click="save_filepath">
+                {{ i18n.save }}
+              </el-button>
+            </div>
+          </el-card>
+          <el-card>
+            <div style="justify-self: end">
+              <el-button text bg type="primary" @click="open_advancedSetting">{{
+                i18n.advancedSettings
+              }}</el-button>
+            </div>
+          </el-card>
+        </el-scrollbar>
+      </div>
+      <div v-else class="advancedSetting" key="advanced">
+        <el-page-header @back="close_advancedSetting" :title="i18n.back">
+          <template #content>
+            <h3>{{ i18n.advancedSettings }}</h3>
+          </template>
+        </el-page-header>
+        <el-scrollbar style="max-height: calc(100vh - 120px)">
+          <el-card>
+            <div
+              style="
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+              "
+            >
+              <div>
+                <text style="margin: 3px">{{ i18n.signAdvancedOptions }}</text>
+              </div>
+              <div>
+                <el-switch
+                  v-model="advancedSetting"
+                  @change="openSignAdvancedSetting"
+                  style="margin: 3px"
+                />
+              </div>
+            </div>
+          </el-card>
+          <el-card>
+            <div>
+              <text>{{ i18n.chooseLanguage }}</text>
+            </div>
+            <br />
+            <el-select v-model="lang.chooseLang" @change="changelanguage">
+              <el-option
+                v-for="item in lang.langlist"
+                :key="item.lang"
+                :label="item.display"
+                :value="item.lang"
               />
+            </el-select>
+          </el-card>
+          <el-card>
+            <div
+              style="
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+              "
+            >
+              <div>
+                <text style="margin: 3px">{{ i18n.cacheCleanup }}</text>
+              </div>
+              <div>
+                <el-button
+                  text
+                  bg
+                  type="primary"
+                  :loading="cleaningTmpDir"
+                  @click="clearTmpDir"
+                  >{{ i18n.clean }}</el-button
+                >
+              </div>
             </div>
-          </div>
-        </el-card>
-        <el-card>
-          <div>
-            <text>{{ i18n.chooseLanguage }}</text>
-          </div>
-          <br />
-          <el-select v-model="lang.chooseLang" @change="changelanguage">
-            <el-option
-              v-for="item in lang.langlist"
-              :key="item.lang"
-              :label="item.display"
-              :value="item.lang"
-            />
-          </el-select>
-        </el-card>
-        <el-card>
-          <div
-            style="
-              display: flex;
-              flex-direction: row;
-              justify-content: space-between;
-              align-items: center;
-            "
-          >
-            <div>
-              <text style="margin: 3px">{{ i18n.cacheCleanup }}</text>
-            </div>
-            <div>
-              <el-button
-                text
-                bg
-                type="primary"
-                :loading="cleaningTmpDir"
-                @click="clearTmpDir"
-                >{{ i18n.clean }}</el-button
-              >
-            </div>
-          </div>
-        </el-card>
-      </el-drawer>
-    </el-card>
-  </el-scrollbar>
+          </el-card>
+        </el-scrollbar>
+      </div>
+    </Transition>
+  </div>
 </template>
 
 <style>
 .el-input {
   margin-top: 5px;
+}
+.el-page-header__title {
+  font-size: 18px;
+  color: gray;
+}
+
+/* 容器样式 */
+.transition-container {
+  position: relative;
+  overflow: hidden;
+  min-height: calc(100vh - 120px);
+}
+
+/* 共用的过渡效果设置 - 优化动画体验 */
+.slide-left-enter-active,
+.slide-left-leave-active,
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: all 0.309s ease-in;
+  position: absolute;
+  width: 100%;
+  left: 0;
+  right: 0;
+}
+
+/* 从主页到高级设置(向左滑动) */
+.slide-left-leave-to {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+.slide-left-enter-from {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+/* 从高级设置返回主页(向右滑动) */
+.slide-right-leave-to {
+  transform: translateX(100%);
+  opacity: 0;
+}
+.slide-right-enter-from {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+/* 共用的静态状态 */
+.slide-left-enter-to,
+.slide-left-leave-from,
+.slide-right-enter-to,
+.slide-right-leave-from {
+  transform: translateX(0);
+  opacity: 1;
 }
 </style>
 
@@ -145,7 +203,9 @@ export default {
       zipalign: "",
       advancedSetting: false,
       cleaningTmpDir: false,
+      mainPage: true,
       openAdvancedSettings: false,
+      transitionName: 'slide-left',
       lang: {
         chooseLang: "",
         langlist: [],
@@ -170,7 +230,9 @@ export default {
         advancedSettingWarning: undefined,
         chooseLanguage: undefined,
         isChangeLanguageTo: undefined,
+        back: undefined,
       },
+      transitionName: "slide-left",
     };
   },
   methods: {
@@ -222,7 +284,17 @@ export default {
         });
       }
     },
-    openAdvancedSetting() {
+    open_advancedSetting() {
+      this.transitionName = 'slide-left';
+      this.mainPage = false;
+      this.openAdvancedSettings = true;
+    },
+    close_advancedSetting() {
+      this.transitionName = 'slide-right';
+      this.openAdvancedSettings = false;
+      this.mainPage = true;
+    },
+    openSignAdvancedSetting() {
       if (this.advancedSetting) {
         this.advancedSetting = false;
         ElMessageBox.confirm(
@@ -265,11 +337,11 @@ export default {
     },
     changelanguage() {
       if (this.lang.chooseLang != localStorage.getItem("lang")) {
-        let display = null
+        let display = null;
         for (let index = 0; index < supportLangList.length; index++) {
           const element = supportLangList[index];
           if (element.lang == this.lang.chooseLang) {
-            display = element.display
+            display = element.display;
           }
         }
         ElMessageBox.confirm(
