@@ -279,6 +279,8 @@ export default {
         showLog: undefined,
         sign: undefined,
         CheckDeficiencies: undefined,
+        signSuccess: undefined,
+        signFailed: undefined,
       },
     };
   },
