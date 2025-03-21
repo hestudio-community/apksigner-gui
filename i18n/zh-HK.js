@@ -63,4 +63,5 @@ export default {
   },
   signSuccess: "簽名成功",
   signFailed: "簽名失敗",
+  back: "返回",
 };

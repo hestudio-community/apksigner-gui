@@ -63,4 +63,5 @@ export default {
   },
   signSuccess: "Signature successful",
   signFailed: "Signature failed",
+  back: "Back",
 };
