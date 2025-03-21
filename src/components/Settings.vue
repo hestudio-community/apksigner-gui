@@ -151,7 +151,7 @@
 .slide-left-leave-active,
 .slide-right-enter-active,
 .slide-right-leave-active {
-  transition: all 0.309s ease-in;
+  transition: all 0.25s ease-in-out;
   position: absolute;
   width: 100%;
   left: 0;
