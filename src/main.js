@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain, Menu } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, Menu, shell } from "electron";
 import path from "node:path";
 import started from "electron-squirrel-startup";
 import { exec } from "node:child_process";
@@ -26,8 +26,66 @@ if (!fs.existsSync(tmp)) {
 // 保存mainWindow的引用以便在IPC处理程序中使用
 let mainWindow = null;
 
+const AboutPanel = () => {
+  dialog
+    .showMessageBox({
+      title: "APKSignerGUI",
+      message: "APKSignerGUI",
+      detail: `
+Version: ${app.getVersion()}
+Platform: ${process.platform}
+AppPATH: ${app.getAppPath()}
+Copyright: Copyright © 2025 heStudio Community
+    `,
+      type: "none",
+      icon: path.join(__dirname, "../icon.png"),
+      buttons: ["Close", "Github"],
+    })
+    .then((response) => {
+      if (response.response == 1) {
+        shell.openExternal(
+          "https://github.com/hestudio-community/apksigner-gui"
+        );
+      }
+    });
+};
+
 const createWindow = () => {
-  Menu.setApplicationMenu(null);
+  if (process.platform == "darwin") {
+    Menu.setApplicationMenu(
+      Menu.buildFromTemplate([
+        {
+          label: app.name,
+          submenu: [
+            {
+              label: "About APKSignerGUI",
+              click: () => {
+                AboutPanel();
+              },
+            },
+            {
+              label: "View in Github",
+              click: () => {
+                shell.openExternal(
+                  "https://github.com/hestudio-community/apksigner-gui"
+                );
+              },
+            },
+            { type: "separator" },
+            { role: "services" },
+            { type: "separator" },
+            { role: "hide" },
+            { role: "hideOthers" },
+            { role: "unhide" },
+            { type: "separator" },
+            { role: "quit" },
+          ],
+        },
+      ])
+    );
+  } else {
+    Menu.setApplicationMenu(null);
+  }
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 800,
@@ -61,11 +119,6 @@ const createWindow = () => {
   }
   mainWindow.setMinimumSize(640, 480);
   mainWindow.setHasShadow(true);
-
-  app.setAboutPanelOptions({
-    copyright: "Copyright © 2025 heStudio Community",
-    iconPath: path.join(__dirname, "../icon.png"),
-  });
 };
 
 // This method will be called when Electron has finished
@@ -73,7 +126,7 @@ const createWindow = () => {
 app.whenReady().then(() => {
   ipcMain.handle("dialog:openFile", async (event, filters) => {
     const { canceled, filePaths } = await dialog.showOpenDialog({
-      title: "选择文件 | APKSignerGUI",
+      title: "APKSignerGUI",
       properties: ["openFile", "showHiddenFiles"],
       filters: filters,
     });
@@ -83,7 +136,7 @@ app.whenReady().then(() => {
   });
   ipcMain.handle("dialog:saveFile", async (event, filters) => {
     const { canceled, filePath } = await dialog.showSaveDialog({
-      title: "保存文件 | APKSignerGUI",
+      title: "APKSignerGUI",
       filters: filters,
     });
     if (!canceled) {
@@ -118,7 +171,7 @@ app.whenReady().then(() => {
   }
 
   ipcMain.handle("app:about", async () => {
-    app.showAboutPanel();
+    AboutPanel();
   });
 
   ipcMain.handle("windows:isMaximized", async () => {
