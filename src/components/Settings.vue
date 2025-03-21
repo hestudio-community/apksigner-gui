@@ -14,7 +14,10 @@
                 width="20"
                 height="20"
             /></el-button>
-            <el-button text style="height: 32px; width: 32px" @click="open_about"
+            <el-button
+              text
+              style="height: 32px; width: 32px"
+              @click="open_about"
               ><Icon icon="mdi:about-circle-outline" width="20" height="20"
             /></el-button>
           </div>
@@ -123,6 +126,26 @@
                 >
               </div>
             </div>
+            <br />
+            <div
+              style="
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+              "
+            >
+              <div>
+                <text style="margin: 3px">{{ i18n.openAutoCheckUpdate }}</text>
+              </div>
+              <div>
+                <el-switch
+                  v-model="AutoCheckUpdate"
+                  @change="ChangeAutoCheckUpdate"
+                  style="margin: 3px"
+                />
+              </div>
+            </div>
           </el-card>
         </el-scrollbar>
       </div>
@@ -205,7 +228,7 @@ export default {
       cleaningTmpDir: false,
       mainPage: true,
       openAdvancedSettings: false,
-      transitionName: 'slide-left',
+      transitionName: "slide-left",
       lang: {
         chooseLang: "",
         langlist: [],
@@ -231,8 +254,10 @@ export default {
         chooseLanguage: undefined,
         isChangeLanguageTo: undefined,
         back: undefined,
+        openAutoCheckUpdate: undefined,
       },
       transitionName: "slide-left",
+      AutoCheckUpdate: true,
     };
   },
   methods: {
@@ -285,12 +310,12 @@ export default {
       }
     },
     open_advancedSetting() {
-      this.transitionName = 'slide-left';
+      this.transitionName = "slide-left";
       this.mainPage = false;
       this.openAdvancedSettings = true;
     },
     close_advancedSetting() {
-      this.transitionName = 'slide-right';
+      this.transitionName = "slide-right";
       this.openAdvancedSettings = false;
       this.mainPage = true;
     },
@@ -362,6 +387,13 @@ export default {
           });
       }
     },
+    ChangeAutoCheckUpdate() {
+      if (this.AutoCheckUpdate) {
+        localStorage.setItem("checkUpdate", "true");
+      } else {
+        localStorage.setItem("checkUpdate", "false");
+      }
+    },
   },
   created() {
     for (let i = 0; i < Object.keys(this.i18n).length; i++) {
@@ -376,6 +408,11 @@ export default {
     this.lang.chooseLang = localStorage.getItem("lang");
     if (localStorage.getItem("advancedSetting") == 1) {
       this.advancedSetting = true;
+    }
+    if (localStorage.getItem("checkUpdate") == "true") {
+      this.AutoCheckUpdate = true;
+    } else {
+      this.AutoCheckUpdate = false;
     }
   },
 };

@@ -64,4 +64,5 @@ export default {
   signSuccess: "签名成功",
   signFailed: "签名失败",
   back: "返回",
+  openAutoCheckUpdate: "开启自动检查更新",
 };

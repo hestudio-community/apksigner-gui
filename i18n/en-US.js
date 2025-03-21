@@ -64,4 +64,5 @@ export default {
   signSuccess: "Signature successful",
   signFailed: "Signature failed",
   back: "Back",
+  openAutoCheckUpdate: "Enable automatic update check",
 };

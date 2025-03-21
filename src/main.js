@@ -26,6 +26,91 @@ if (!fs.existsSync(tmp)) {
 // 保存mainWindow的引用以便在IPC处理程序中使用
 let mainWindow = null;
 
+const CheckUpdate = (forceShow) => {
+  fetch(
+    "https://api.github.com/repos/hestudio-community/apksigner-gui/releases/latest"
+  )
+    .then(async (response) => {
+      const data = await response.json();
+      if (data.name == `v${app.getVersion()}`) {
+        if (forceShow) {
+          dialog
+            .showMessageBox({
+              title: "APKSignerGUI",
+              message: "APKSignerGUI",
+              detail: "You are using the latest version.",
+              type: "info",
+              buttons: ["OK", "View in Github"],
+            })
+            .then((response) => {
+              if (response.response == 1) {
+                shell.openExternal(
+                  "https://github.com/hestudio-community/apksigner-gui/releases/latest"
+                );
+              }
+            });
+        }
+      } else {
+        dialog
+          .showMessageBox({
+            title: "APKSignerGUI",
+            message: "APKSignerGUI",
+            detail: `New version ${data.name} is available.`,
+            type: "info",
+            buttons: ["Close", "Download Now", "View in Github"],
+          })
+          .then((response) => {
+            if (response.response == 1) {
+              if (process.platform == "darwin" && process.arch == "arm64") {
+                shell.openExternal(
+                  `https://github.com/hestudio-community/apksigner-gui/releases/download/${
+                    data.name
+                  }/apksignergui_${String(data.name).replace(
+                    "v",
+                    ""
+                  )}_arm64.dmg`
+                );
+              } else if (process.platform == "win32" && process.arch == "x64") {
+                shell.openExternal(
+                  `https://github.com/hestudio-community/apksigner-gui/releases/download/${
+                    data.name
+                  }/apksignergui_${String(data.name).replace(
+                    "v",
+                    ""
+                  )}_amd64.msi`
+                );
+              } else if (
+                process.platform == "win32" &&
+                process.arch == "arm64"
+              ) {
+                shell.openExternal(
+                  `https://github.com/hestudio-community/apksigner-gui/releases/download/${
+                    data.name
+                  }/apksignergui_${String(data.name).replace(
+                    "v",
+                    ""
+                  )}_arm64.msi`
+                );
+              } else {
+                shell.openExternal(
+                  "https://github.com/hestudio-community/apksigner-gui/releases/latest"
+                );
+              }
+            } else if (response.response == 2) {
+              shell.openExternal(
+                "https://github.com/hestudio-community/apksigner-gui/releases/latest"
+              );
+            }
+          });
+      }
+    })
+    .catch((error) => {
+      if (forceShow) {
+        dialog.showErrorBox("APKSignerGUI", "Failed to check for updates.");
+      }
+    });
+};
+
 const AboutPanel = () => {
   dialog
     .showMessageBox({
@@ -39,10 +124,12 @@ Copyright: Copyright © 2025 heStudio Community
     `,
       type: "none",
       icon: path.join(__dirname, "../icon.png"),
-      buttons: ["Close", "Github"],
+      buttons: ["Close", "Check Update", "View in Github"],
     })
     .then((response) => {
       if (response.response == 1) {
+        CheckUpdate(true);
+      } else if (response.response == 2) {
         shell.openExternal(
           "https://github.com/hestudio-community/apksigner-gui"
         );
@@ -61,6 +148,12 @@ const createWindow = () => {
               label: "About APKSignerGUI",
               click: () => {
                 AboutPanel();
+              },
+            },
+            {
+              label: "Check Update",
+              click: () => {
+                CheckUpdate(true);
               },
             },
             {
@@ -172,6 +265,10 @@ app.whenReady().then(() => {
 
   ipcMain.handle("app:about", async () => {
     AboutPanel();
+  });
+
+  ipcMain.handle("app:checkUpdate", async (forceShow) => {
+    CheckUpdate(forceShow);
   });
 
   ipcMain.handle("windows:isMaximized", async () => {

@@ -444,6 +444,14 @@ export default {
         }, 100);
       }
     });
+
+    if (localStorage.getItem("checkUpdate") == null) {
+      localStorage.setItem("checkUpdate", "true");
+    }
+    if (localStorage.getItem("checkUpdate") == "true") {
+      window.electronAPI.AppCheckUpdate(false);
+    }
+
     setInterval(async () => {
       if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
         document.querySelector("html").classList.add("dark");
