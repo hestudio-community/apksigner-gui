@@ -378,6 +378,8 @@ export default {
   },
   methods: {
     async RefreshKey() {
+      this.openeditkey = false;
+      this.keyRemoveStatus = false;
       this.keyLoading = true;
       document.querySelector(".refresh").classList.add("element-rotate");
       setTimeout(() => {
