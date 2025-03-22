@@ -267,7 +267,7 @@ app.whenReady().then(() => {
     AboutPanel();
   });
 
-  ipcMain.handle("app:checkUpdate", async (forceShow) => {
+  ipcMain.handle("app:checkUpdate", async (event, forceShow) => {
     CheckUpdate(forceShow);
   });
 
