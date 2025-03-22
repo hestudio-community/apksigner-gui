@@ -460,6 +460,10 @@ export default {
       }
     }, 100);
     this.RefreshKey();
+    const lastUseKey = localStorage.getItem("lastUseKey");
+    if (this.keyList.includes(lastUseKey)) {
+      this.openSign = lastUseKey;
+    }
   },
 };
 </script>

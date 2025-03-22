@@ -407,6 +407,7 @@ export default {
     }
   },
   mounted() {
+    localStorage.setItem("lastUseKey", this.keyname);
     setInterval(async () => {
       if (localStorage.getItem("advancedSetting") == 1) {
         this.advancedSetting = true;
