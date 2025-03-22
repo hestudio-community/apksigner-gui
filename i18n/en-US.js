@@ -10,14 +10,14 @@ export default {
   AddKey: "Add key",
   EditKey: "Edit key",
   AddKeyTips:
-    "Currently, only Keystore (.jks) files are supported. Support for certificates with separate public and private keys will be added in future versions.",
+    "Currently, only keystore (.jks) files are supported. Support for certificates with separate public and private keys will be added in future versions.",
   name: "Name",
   jksLocation: "Keystore location (.jks)",
   keyAlias: "Certificate alias",
   keyPasswd: "Certificate password",
   save: "Save",
   saveSuccess: "Successfully saved",
-  keyStone: "Keystore",
+  keyStore: "Keystore",
   AllFiles: "All files",
   CheckDeficiencies: "Check if something is missing??",
   HadSameKeyName: "A key with the same name already exists",
@@ -61,4 +61,8 @@ export default {
   isChangeLanguageTo: (lang) => {
     return `Do you want to switch the language to ${lang}?`;
   },
+  signSuccess: "Signature successful",
+  signFailed: "Signature failed",
+  back: "Back",
+  openAutoCheckUpdate: "Enable automatic update check",
 };

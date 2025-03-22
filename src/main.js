@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain, Menu } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, Menu, shell } from "electron";
 import path from "node:path";
 import started from "electron-squirrel-startup";
 import { exec } from "node:child_process";
@@ -26,8 +26,159 @@ if (!fs.existsSync(tmp)) {
 // 保存mainWindow的引用以便在IPC处理程序中使用
 let mainWindow = null;
 
+const CheckUpdate = (forceShow) => {
+  fetch(
+    "https://api.github.com/repos/hestudio-community/apksigner-gui/releases/latest"
+  )
+    .then(async (response) => {
+      const data = await response.json();
+      if (data.name == `v${app.getVersion()}`) {
+        if (forceShow) {
+          dialog
+            .showMessageBox({
+              title: "APKSignerGUI",
+              message: "APKSignerGUI",
+              detail: "You are using the latest version.",
+              type: "info",
+              buttons: ["OK", "View in Github"],
+            })
+            .then((response) => {
+              if (response.response == 1) {
+                shell.openExternal(
+                  "https://github.com/hestudio-community/apksigner-gui/releases/latest"
+                );
+              }
+            });
+        }
+      } else {
+        dialog
+          .showMessageBox({
+            title: "APKSignerGUI",
+            message: "APKSignerGUI",
+            detail: `New version ${data.name} is available.`,
+            type: "info",
+            buttons: ["Close", "Download Now", "View in Github"],
+          })
+          .then((response) => {
+            if (response.response == 1) {
+              if (process.platform == "darwin" && process.arch == "arm64") {
+                shell.openExternal(
+                  `https://github.com/hestudio-community/apksigner-gui/releases/download/${
+                    data.name
+                  }/apksignergui_${String(data.name).replace(
+                    "v",
+                    ""
+                  )}_arm64.dmg`
+                );
+              } else if (process.platform == "win32" && process.arch == "x64") {
+                shell.openExternal(
+                  `https://github.com/hestudio-community/apksigner-gui/releases/download/${
+                    data.name
+                  }/apksignergui_${String(data.name).replace(
+                    "v",
+                    ""
+                  )}_amd64.msi`
+                );
+              } else if (
+                process.platform == "win32" &&
+                process.arch == "arm64"
+              ) {
+                shell.openExternal(
+                  `https://github.com/hestudio-community/apksigner-gui/releases/download/${
+                    data.name
+                  }/apksignergui_${String(data.name).replace(
+                    "v",
+                    ""
+                  )}_arm64.msi`
+                );
+              } else {
+                shell.openExternal(
+                  "https://github.com/hestudio-community/apksigner-gui/releases/latest"
+                );
+              }
+            } else if (response.response == 2) {
+              shell.openExternal(
+                "https://github.com/hestudio-community/apksigner-gui/releases/latest"
+              );
+            }
+          });
+      }
+    })
+    .catch((error) => {
+      if (forceShow) {
+        dialog.showErrorBox("APKSignerGUI", "Failed to check for updates.");
+      }
+    });
+};
+
+const AboutPanel = () => {
+  dialog
+    .showMessageBox({
+      title: "APKSignerGUI",
+      message: "APKSignerGUI",
+      detail: `
+Version: ${app.getVersion()}
+Platform: ${process.platform}
+AppPATH: ${app.getAppPath()}
+Copyright: Copyright © 2025 heStudio Community
+    `,
+      type: "none",
+      icon: path.join(__dirname, "../icon.png"),
+      buttons: ["Close", "Check Update", "View in Github"],
+    })
+    .then((response) => {
+      if (response.response == 1) {
+        CheckUpdate(true);
+      } else if (response.response == 2) {
+        shell.openExternal(
+          "https://github.com/hestudio-community/apksigner-gui"
+        );
+      }
+    });
+};
+
 const createWindow = () => {
-  Menu.setApplicationMenu(null);
+  if (process.platform == "darwin") {
+    Menu.setApplicationMenu(
+      Menu.buildFromTemplate([
+        {
+          label: app.name,
+          submenu: [
+            {
+              label: "About APKSignerGUI",
+              click: () => {
+                AboutPanel();
+              },
+            },
+            {
+              label: "Check Update",
+              click: () => {
+                CheckUpdate(true);
+              },
+            },
+            {
+              label: "View in Github",
+              click: () => {
+                shell.openExternal(
+                  "https://github.com/hestudio-community/apksigner-gui"
+                );
+              },
+            },
+            { type: "separator" },
+            { role: "services" },
+            { type: "separator" },
+            { role: "hide" },
+            { role: "hideOthers" },
+            { role: "unhide" },
+            { type: "separator" },
+            { role: "quit" },
+          ],
+        },
+      ])
+    );
+  } else {
+    Menu.setApplicationMenu(null);
+  }
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 800,
@@ -61,11 +212,6 @@ const createWindow = () => {
   }
   mainWindow.setMinimumSize(640, 480);
   mainWindow.setHasShadow(true);
-
-  app.setAboutPanelOptions({
-    copyright: "Copyright © 2025 heStudio Community",
-    iconPath: path.join(__dirname, "../icon.png"),
-  });
 };
 
 // This method will be called when Electron has finished
@@ -73,7 +219,7 @@ const createWindow = () => {
 app.whenReady().then(() => {
   ipcMain.handle("dialog:openFile", async (event, filters) => {
     const { canceled, filePaths } = await dialog.showOpenDialog({
-      title: "选择文件 | APKSignerGUI",
+      title: "APKSignerGUI",
       properties: ["openFile", "showHiddenFiles"],
       filters: filters,
     });
@@ -83,7 +229,7 @@ app.whenReady().then(() => {
   });
   ipcMain.handle("dialog:saveFile", async (event, filters) => {
     const { canceled, filePath } = await dialog.showSaveDialog({
-      title: "保存文件 | APKSignerGUI",
+      title: "APKSignerGUI",
       filters: filters,
     });
     if (!canceled) {
@@ -118,7 +264,11 @@ app.whenReady().then(() => {
   }
 
   ipcMain.handle("app:about", async () => {
-    app.showAboutPanel();
+    AboutPanel();
+  });
+
+  ipcMain.handle("app:checkUpdate", async (forceShow) => {
+    CheckUpdate(forceShow);
   });
 
   ipcMain.handle("windows:isMaximized", async () => {

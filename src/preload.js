@@ -15,4 +15,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
   ClearTmpDir: () => ipcRenderer.invoke("app:clearTmpDir"),
   SystemShell: (shell) => ipcRenderer.invoke("system:shell", shell),
   AppAbout: () => ipcRenderer.invoke("app:about"),
+  AppCheckUpdate: (forceShow) =>
+    ipcRenderer.invoke("app:checkUpdate", forceShow),
 });

@@ -378,6 +378,8 @@ export default {
   },
   methods: {
     async RefreshKey() {
+      this.openeditkey = false;
+      this.keyRemoveStatus = false;
       this.keyLoading = true;
       document.querySelector(".refresh").classList.add("element-rotate");
       setTimeout(() => {
@@ -444,6 +446,14 @@ export default {
         }, 100);
       }
     });
+
+    if (localStorage.getItem("checkUpdate") == null) {
+      localStorage.setItem("checkUpdate", "true");
+    }
+    if (localStorage.getItem("checkUpdate") == "true") {
+      window.electronAPI.AppCheckUpdate(false);
+    }
+
     setInterval(async () => {
       if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
         document.querySelector("html").classList.add("dark");
@@ -452,6 +462,10 @@ export default {
       }
     }, 100);
     this.RefreshKey();
+    const lastUseKey = localStorage.getItem("lastUseKey");
+    if (this.keyList.includes(lastUseKey)) {
+      this.openSign = lastUseKey;
+    }
   },
 };
 </script>

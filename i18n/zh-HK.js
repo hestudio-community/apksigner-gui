@@ -17,7 +17,7 @@ export default {
   keyPasswd: "證書密碼",
   save: "保存",
   saveSuccess: "保存成功",
-  keyStone: "密鑰庫",
+  keyStore: "密鑰庫",
   AllFiles: "所有文件",
   CheckDeficiencies: "檢查一下是不是漏填了些什麼？？",
   HadSameKeyName: "已存在相同名稱的密鑰",
@@ -61,4 +61,8 @@ export default {
   isChangeLanguageTo: (lang) => {
     return `是否將語言切換為 ${lang} ？`;
   },
+  signSuccess: "簽名成功",
+  signFailed: "簽名失敗",
+  back: "返回",
+  openAutoCheckUpdate: "開啟自動檢查更新",
 };

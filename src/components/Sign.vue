@@ -279,6 +279,8 @@ export default {
         showLog: undefined,
         sign: undefined,
         CheckDeficiencies: undefined,
+        signSuccess: undefined,
+        signFailed: undefined,
       },
     };
   },
@@ -312,9 +314,19 @@ export default {
         .SystemShell(shell)
         .then(async (result) => {
           this.stdout += result;
+          ElMessage({
+            message: this.i18n.signSuccess,
+            type: "success",
+            plain: true,
+          });
         })
         .catch((error) => {
           this.stdout += error;
+          ElMessage({
+            message: this.i18n.signFailed,
+            type: "error",
+            plain: true,
+          });
         });
     },
     signButton() {
@@ -332,7 +344,7 @@ export default {
         window.electronAPI.CopyToTmp(this.input_apk).then(async (result) => {
           const k = JSON.parse(localStorage.getItem("key-" + this.keyname));
           const apksigner = localStorage.getItem("apksigner");
-          let script = `${apksigner} sign -v --ks ${k.keystone} --ks-key-alias ${k.keyalias} --ks-pass pass:${k.keypasswd}`;
+          let script = `${apksigner} sign -v --ks ${k.keystore} --ks-key-alias ${k.keyalias} --ks-pass pass:${k.keypasswd}`;
           if (!this.output.rewrite) {
             if (!this.output.path) {
               ElMessage({
@@ -395,6 +407,7 @@ export default {
     }
   },
   mounted() {
+    localStorage.setItem("lastUseKey", this.keyname);
     setInterval(async () => {
       if (localStorage.getItem("advancedSetting") == 1) {
         this.advancedSetting = true;
