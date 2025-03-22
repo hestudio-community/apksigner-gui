@@ -138,6 +138,8 @@ export default {
     for (let i = 0; i < Object.keys(this.i18n).length; i++) {
       const key = Object.keys(this.i18n)[i];
       this.i18n[key] = geti18n(key);
+      const key = Object.keys(this.i18n)[i];
+      this.i18n[key] = geti18n(key);
     }
   },
 };
