@@ -461,11 +461,18 @@ export default {
         document.querySelector("html").classList.remove("dark");
       }
     }, 100);
-    this.RefreshKey();
-    const lastUseKey = localStorage.getItem("lastUseKey");
-    if (this.keyList.includes(lastUseKey)) {
-      this.openSign = lastUseKey;
-    }
+    this.RefreshKey().then(() => {
+      const lastUseKey = localStorage.getItem("lastUseKey");
+      if (this.keyList.includes(lastUseKey)) {
+        this.openSign = lastUseKey;
+      }
+    });
+
+    setInterval(async () => {
+      if (this.keyList.includes(this.openSign)) {
+        localStorage.setItem("lastUseKey", this.openSign);
+      }
+    });
   },
 };
 </script>
