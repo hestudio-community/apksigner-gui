@@ -7,6 +7,14 @@
 
 ---
 
+<div align="center">
+   <a href="../../README.md">English</a> | 
+   <a href="./README_CN.md">简体中文</a> | 
+   <a href="./README_HK.md">繁體中文</a>
+</div>
+
+---
+
 ### 特點
 
 - **上手簡單**：面向新手用戶，只需要導入 APK 就可以直接簽名。
