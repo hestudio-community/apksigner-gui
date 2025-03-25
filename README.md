@@ -2,122 +2,140 @@
    <img src="./icons/icon.png" />
    <h1 style="text-align: center">APKSignerGUI</h1>
    <img src="./images/apphome.png" />
-   <p style="text-align: center">简单又完整的APK签名图形化工具</p>
+   <p style="text-align: center">A simple yet complete graphical tool for APK signing</p>
 </div>
 
 ---
 
-### 特点
+<div align="center">
+   <a href="./README.md">English</a> | 
+   <a href="./i18n/README/README_CN.md">简体中文</a> | 
+   <a href="./i18n/README/README_HK.md">繁體中文</a>
+</div>
 
-- **上手简单**: 面向小白用户，只需要导 APK 就可以直接签名。
-- **功能完整**: 面向资深用户，提供了谷歌官方提供的所有签名参数支持。
-- **兼容性好**: 支持多种操作系统和架构，包括 Windows、Linux、MacOS 等。
-- **饼画的圆**: 初期项目，有许多不完善的地方，给大佬们留下足够的扩展空间。
+---
 
-### 关于兼容性
+### Features
 
-已知支持的平台 (由官方打包并经过测试)：
+- **Easy to Use**: Designed for beginners, you only need to import an APK to sign it.
+- **Fully Functional**: For advanced users, it supports all signing parameters provided by Google.
+- **High Compatibility**: Supports multiple operating systems and architectures, including Windows, Linux, and macOS.
+- **Well-structured for Expansion**: As an early-stage project, there is plenty of room for enhancement by experienced developers.
 
-- **Windows**: Windows 10/11 x86_64 (其中 Windows10 为最新版本), Windows 10/11 ARM64 (其中 Windows10 为最新版本)
-- **Linux**: Debian 12 及其衍生版本 x86_64 和 ARM64 平台， RedHat 9.5 及其衍生版本 x86_64 和 ARM64 平台
-- **macOS**: 所有采用了 Apple Silicon 的 macOS 10.11 以上设备
+### How to Install
 
-其他的平台可能需要你自行编译。
+1. Go to [Release](https://github.com/hestudio-community/apksigner-gui/releases/latest) and download the latest version.
+2. Windows users can install it via [WinGet](https://learn.microsoft.com/en-us/windows/package-manager/winget/):
+   ```powershell
+   winget install "heStudioCommunity.APKSignerGUI(Machine-MSI)"
+   ```
+3. Build it using the method described at the end of this document.
 
-#### 为什么不支持 32 位系统或处理器？
+### Compatibility
 
-我们认为 32 位系统已经落伍，甚至已经无法维持基本的运作了。很多系统厂商和软件厂商不再提供 32 位应用程序和系统。我们认为你几乎不可能在 32 位系统上完成软件开发，因为很多开发工具或者面向对象已经不支持 32 位系统。如果你仍然使用 32 位系统，我们认为你应该可以通过自己的力量使得这个应用程序运作。
+Supported platforms (officially packaged and tested):
 
-### 如何使用？
+- **Windows**: Windows 10/11 x86_64 (latest version of Windows 10), Windows 10/11 ARM64 (latest version of Windows 10)
+- **Linux**: Debian 12 and its derivatives on x86_64 and ARM64 platforms, RedHat 9.5 and its derivatives on x86_64 and ARM64 platforms
+- **macOS**: All macOS 10.11+ devices with Apple Silicon
 
-1. 打开应用程序后，你应该能看到这样的界面。点击右上角设置开始首次配置。
+Other platforms may require manual compilation.
+
+#### Why Not Support 32-bit Systems or Processors?
+
+We believe 32-bit systems are outdated and struggle to maintain basic operations. Many system and software vendors have stopped providing 32-bit applications and systems. It is nearly impossible to perform software development on a 32-bit system since many development tools and target platforms no longer support it. If you still use a 32-bit system, we believe you should have the capability to make this application work by yourself.
+
+### How to Use?
+
+1. After opening the application, you should see this interface. Click the settings icon in the top right to begin initial configuration.
    ![](./images/1.png)
-2. 在 `sdk/build-tools/<版本号>`目录中找到 `apksigner` 和 `zipalign`, 然后点击保存。
+2. Locate `apksigner` and `zipalign` in the `sdk/build-tools/<version>` directory, then click save.
    ![](./images/2.png)
-3. 点击左侧空白区域关闭设置，然后点击左上角 `+` 添加密钥。
+3. Click the blank area on the left to close the settings, then click `+` in the top left to add a key.
    ![](./images/3.png)
-4. 点击右侧空白区域关闭页面，选中左侧的签名，然后开始签名安装包。
+4. Click the blank area on the right to close the page, select the signature option on the left, and start signing the package.
    ![](./images/apphome.png)
 
-### 找到你的语言
+### Find Your Language
 
 [![Crowdin](https://badges.crowdin.net/apksignergui/localized.svg)](https://crowdin.com/project/apksignergui)
 
-我们致力于向全球用户提供相同的服务和体验，如果愿意为这个项目提供相关翻译，我们将会衷心感谢你。
+We strive to provide the same service and experience to users worldwide. If you're willing to contribute translations to this project, we sincerely appreciate your help.
 
-你可以通过以下两种方法提交翻译:
+You can submit translations in two ways:
 
-- 在 [crowdin](https://crowdin.com/project/apksignergui) 平台上提交翻译。
-- 通过编辑源代码的 `i18n` 目录下对于语言的文本提交翻译。
+- Submit translations via the [Crowdin](https://crowdin.com/project/apksignergui) platform.
+- Edit and submit translations in the `i18n` directory of the source code.
 
-没有找到你的语言？同样有两种方法提交你的语言。
+Didn't find your language? You can submit it in two ways:
 
-- 如果使用 [crowdin](https://crowdin.com/project/apksignergui) 平台，请提交一个 issue，我们将会在平台上预留该语言以提供你进行翻译。
-- 你也可以通过复制源代码的 `i18n` 目录下的其中一个你熟知的语言进行翻译，当你提交后，我们将会为你完成剩余操作。
+- If using [Crowdin](https://crowdin.com/project/apksignergui), submit an issue, and we will add the language for you to translate.
+- Alternatively, copy an existing language file from the `i18n` directory, translate it, and submit it. We will handle the rest.
 
-我们要求的语言代码以 [ISO 639-1](https://en.wikipedia.org/wiki/ISO_639-1) 为标准，国家或地区代码以 [ISO 3166-1](https://en.wikipedia.org/wiki/ISO_3166-1) 为标准。
+We follow the [ISO 639-1](https://en.wikipedia.org/wiki/ISO_639-1) standard for language codes and [ISO 3166-1](https://en.wikipedia.org/wiki/ISO_3166-1) for country or region codes.
 
-### 如何构建？
+### How to Build?
 
-1. 安装 [NodeJS 22 LTS](https://nodejs.org/)
-2. 使用 `npm install` 安装依赖。
-3. 使用 `npm run make` 构建。
-4. 在 `./out/make` 目录中取得构建物。
+1. Install [NodeJS 22 LTS](https://nodejs.org/)
+2. Install dependencies using `npm install`.
+3. Run `npm run make` to build.
+4. The built files can be found in the `./out/make` directory.
 
 #### macOS
 
-1. 安装 [NodeJS 22 LTS](https://nodejs.org/)
-2. 使用 `npm install` 安装依赖。
-3. 使用 `npm run make` 构建。
-4. 在 `./out/make` 目录中取得构建物。
+1. Install [NodeJS 22 LTS](https://nodejs.org/)
+2. Install dependencies using `npm install`.
+3. Run `npm run make` to build.
+4. The built files can be found in the `./out/make` directory.
 
 #### Windows
 
-##### ZIP 打包 (推荐)
+##### ZIP Packaging (Recommended)
 
-1. 安装 [NodeJS 22 LTS](https://nodejs.org/)
-2. 使用 `npm install` 安装依赖。
-3. 编辑 `forge.config.js`.
-   将
+1. Install [NodeJS 22 LTS](https://nodejs.org/)
+2. Install dependencies using `npm install`.
+3. Edit `forge.config.js`:
+   Replace:
    ```javascript
    {
       name: "@electron-forge/maker-wix",
       config: {
         // ...
       },
-      platfrom: ["win32"],
+      platform: ["win32"],
    },
    ```
-   更换为
+   with:
    ```javascript
    {
      name: "@electron-forge/maker-zip",
-     platfrom: ["win32"],
+     platform: ["win32"],
    }
    ```
-4. 使用 `npm run make` 构建。
-5. 在 `./out/make` 目录中取得构建物。
+4. Run `npm run make` to build.
+5. The built files can be found in the `./out/make` directory.
 
-##### MSI 打包
+##### MSI Packaging
 
-1. 安装 [NodeJS 22 LTS](https://nodejs.org/)
-2. 使用 `npm install` 安装依赖。
-3. 安装 [WiX Toolset v3](https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314-binaries.zip).
-4. 配置环境变量到`PATH`.
-5. 使用 `npm run make` 构建。
-6. 在 `./out/make` 目录中取得构建物。
+1. Install [NodeJS 22 LTS](https://nodejs.org/)
+2. Install dependencies using `npm install`.
+3. Install [WiX Toolset v3](https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314-binaries.zip).
+4. Add WiX to the `PATH` environment variable.
+5. Run `npm run make` to build.
+6. The built files can be found in the `./out/make` directory.
 
-#### Linux (Debian 及其衍生系统)
+#### Linux (Debian and Derivatives)
 
-1. 安装 [NodeJS 22 LTS](https://nodejs.org/)
-2. 使用 `npm install` 安装依赖。
-3. 安装构建依赖
+1. Install [NodeJS 22 LTS](https://nodejs.org/)
+2. Install dependencies using `npm install`.
+3. Install build dependencies:
    ```shell
    sudo apt install fakeroot rpm
    ```
-   或者
+   or
    ```shell
    sudo apt install fakeroot rpm-build
    ```
-4. 使用 `npm run make` 构建。
-5. 在 `./out/make` 目录中取得构建物。
+4. Run `npm run make` to build.
+5. The built files can be found in the `./out/make` directory.
+
