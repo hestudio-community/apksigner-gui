@@ -63,6 +63,16 @@ module.exports = {
       },
       platfrom: ["win32"],
     },
+    {
+      name: "@electron-forge/maker-appx",
+      config: {
+        assets: "./icons/assets",
+        publisher: "CN=heStudio Community",
+        packageDescription: "Simple but complete APK signing tool.",
+        manifest: "./AppXManifest.xml"
+      },
+      platfrom: ["win32"],
+    },
   ],
   plugins: [
     {
