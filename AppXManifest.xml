@@ -26,7 +26,7 @@
     <Application Id="com.hestudio.apksigner" Executable="app\APKSignerGUI.exe" EntryPoint="Windows.FullTrustApplication">
       <uap:VisualElements
        BackgroundColor="#464646"
-       DisplayName="heStudio Community"
+       DisplayName="APKSignerGUI"
        Square150x150Logo="assets\SampleAppx.150x150.png"
        Square44x44Logo="assets\SampleAppx.44x44.png"
        Description="Simple but complete APK signing tool.">

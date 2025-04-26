@@ -67,7 +67,7 @@ module.exports = {
       name: "@electron-forge/maker-appx",
       config: {
         assets: "./icons/assets",
-        publisher: "CN=heStudio Community",
+        publisher: "CN=73AC1CCD-0F7C-48FE-A64D-F404735487C1",
         packageDescription: "Simple but complete APK signing tool.",
         manifest: "./AppXManifest.xml"
       },
