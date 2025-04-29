@@ -29,6 +29,12 @@
    ```powershell
    winget install "heStudioCommunity.APKSignerGUI(Machine-MSI)"
    ```
+   
+   当然，你也可以通过 Microsoft Store 下载，目前，该下载方法仅适用于 `amd64`.
+
+   <a href="https://apps.microsoft.com/detail/9n3q8bk8dp86?mode=direct">
+   <img src="https://get.microsoft.com/images/zh-cn%20dark.svg" width="200"/>
+   </a>
 3. 参考文末方式构建。
 
 ### 关于兼容性

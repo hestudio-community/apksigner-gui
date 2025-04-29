@@ -29,6 +29,12 @@
    ```powershell
    winget install "heStudioCommunity.APKSignerGUI(Machine-MSI)"
    ```
+   
+   Of course, you can also download it from the Microsoft Store, which is currently only available for `amd64`.
+
+   <a href="https://apps.microsoft.com/detail/9n3q8bk8dp86?mode=direct">
+   <img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200"/>
+   </a>
 3. Build it using the method described at the end of this document.
 
 ### Compatibility
@@ -138,4 +144,3 @@ We follow the [ISO 639-1](https://en.wikipedia.org/wiki/ISO_639-1) standard for 
    ```
 4. Run `npm run make` to build.
 5. The built files can be found in the `./out/make` directory.
-
