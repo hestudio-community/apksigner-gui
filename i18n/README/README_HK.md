@@ -26,9 +26,17 @@
 
 1. 前往 [Release](https://github.com/hestudio-community/apksigner-gui/releases/latest) 下載最新版本。
 2. Windows 用戶可使用 [WinGet](https://learn.microsoft.com/zh-tw/windows/package-manager/winget/) 安裝：
+
    ```powershell
    winget install "heStudioCommunity.APKSignerGUI(Machine-MSI)"
    ```
+
+   當然，你也可以通過 Microsoft Store 下載，目前，該下載方法僅適用於 `amd64`.
+
+   <a href="https://apps.microsoft.com/detail/9n3q8bk8dp86?mode=direct">
+   <img src="https://get.microsoft.com/images/zh-tw%20dark.svg" width="200"/>
+   </a>
+
 3. 可參考文末的方法自行構建。
 
 ### 兼容性說明
