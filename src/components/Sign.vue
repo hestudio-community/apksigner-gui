@@ -314,6 +314,7 @@ export default {
         .SystemShell(shell)
         .then(async (result) => {
           this.stdout += result;
+          this.sign = false;
           ElMessage({
             message: this.i18n.signSuccess,
             type: "success",
@@ -322,6 +323,7 @@ export default {
         })
         .catch((error) => {
           this.stdout += error;
+          this.sign = false;
           ElMessage({
             message: this.i18n.signFailed,
             type: "error",
@@ -389,13 +391,11 @@ export default {
                   this.Zopfli ? "-z" : ""
                 } 4 ${result} ${result}_zipalign.apk && ${script}`
               );
-              this.sign = false;
               return;
             }
           }
           script += ` ${result}`;
           this.shell(`${script}`);
-          this.sign = false;
         });
       }
     },

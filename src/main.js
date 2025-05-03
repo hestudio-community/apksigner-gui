@@ -1,7 +1,7 @@
 import { app, BrowserWindow, dialog, ipcMain, Menu, shell } from "electron";
 import path from "node:path";
 import started from "electron-squirrel-startup";
-import { exec } from "node:child_process";
+import { spawn } from "node:child_process";
 import fs from "node:fs";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -292,19 +292,36 @@ app.whenReady().then(() => {
     }
   });
 
-  ipcMain.handle(
-    "system:shell",
-    (event, shell) =>
-      new Promise((resolve, reject) => {
-        exec(shell, (error, stdout, stderr) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(stdout);
-          }
-        });
-      })
-  );
+  ipcMain.handle("system:shell", (event, shellCommand) => {
+    return new Promise((resolve, reject) => {
+      const shell = spawn(shellCommand, {
+        shell: true,
+      });
+
+      let stdout = "";
+      let stderr = "";
+
+      shell.stdout.on("data", (data) => {
+        stdout += data.toString();
+      });
+
+      shell.stderr.on("data", (data) => {
+        stderr += data.toString();
+      });
+
+      shell.on("close", (code) => {
+        if (code === 0) {
+          resolve(stdout);
+        } else {
+          reject(stderr || `Process exited with code ${code}`);
+        }
+      });
+
+      shell.on("error", (err) => {
+        reject(`Failed to start command: ${err.message}`);
+      });
+    });
+  });
 
   createWindow();
 
