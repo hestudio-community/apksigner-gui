@@ -9,6 +9,22 @@ if (started) {
   app.quit();
 }
 
+// Ensure only one instance of the application is running
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+  console.log('Another instance is already running, exiting current instance');
+  app.quit();
+} else {
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    // When a second instance is launched, focus on the main window
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+  });
+}
+
 let tmp = undefined;
 
 if (process.platform == "win32") {
@@ -23,7 +39,7 @@ if (!fs.existsSync(tmp)) {
   fs.mkdirSync(tmp);
 }
 
-// 保存mainWindow的引用以便在IPC处理程序中使用
+// Save reference to mainWindow for use in IPC handlers
 let mainWindow = null;
 
 const CheckUpdate = (forceShow) => {
@@ -186,13 +202,13 @@ const createWindow = () => {
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
-    // 添加图标配置
+    // Add icon configuration
     icon: path.join(__dirname, "../icon.png"),
     titleBarStyle: "hidden",
     frame: false,
   });
 
-  // 为Mac设置Dock图标
+  // Set Dock icon for Mac
   if (process.platform === "darwin") {
     const { nativeImage } = require("electron");
     const image = nativeImage.createFromPath(
@@ -240,12 +256,12 @@ app.whenReady().then(() => {
     return process.platform;
   });
 
-  // 开发工具处理程序
+  // DevTools handler
   ipcMain.handle("devtools:open", async () => {
     if (mainWindow) mainWindow.webContents.openDevTools();
   });
 
-  // Windows控制处理程序
+  // Windows control handlers
   if (process.platform != "darwin") {
     ipcMain.handle("windows:close", async () => {
       app.quit();
@@ -332,7 +348,7 @@ app.whenReady().then(() => {
   });
 });
 
-// 其余代码保持不变
+// Remaining code stays unchanged
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
