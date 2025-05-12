@@ -38,10 +38,15 @@
         </div>
       </div>
       <br />
+      <!-- 添加位置 -->
       <div style="justify-self: end">
-        <el-button text bg type="primary" @click="save">{{
-          i18n.save
-        }}</el-button>
+        <el-button text bg type="info" @click="createKey">
+          {{ i18n.createKey }}
+        </el-button>
+
+        <el-button text bg type="primary" @click="save">
+          {{ i18n.save }}
+        </el-button>
       </div>
     </el-card>
   </el-scrollbar>
@@ -80,6 +85,7 @@ export default {
         AllFiles: undefined,
         CheckDeficiencies: undefined,
         HadSameKeyName: undefined,
+        createKey: undefined,
       },
     };
   },
@@ -133,6 +139,8 @@ export default {
         }
       }
     },
+    // 创建密钥预留接口
+    createKey() {},
   },
   created() {
     for (let i = 0; i < Object.keys(this.i18n).length; i++) {
