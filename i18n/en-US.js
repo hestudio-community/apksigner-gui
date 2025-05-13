@@ -65,4 +65,5 @@ export default {
   signFailed: "Signature failed",
   back: "Back",
   openAutoCheckUpdate: "Enable automatic update check",
+  createKey: "创建密钥",
 };
