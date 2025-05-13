@@ -66,4 +66,6 @@ export default {
   back: "返回",
   openAutoCheckUpdate: "开启自动检查更新",
   createKey: "创建密钥",
+  AliasPassword: "别名密码",
+  javaLocation: "Java路径",
 };
