@@ -3,6 +3,7 @@ import path from "node:path";
 import started from "electron-squirrel-startup";
 import { spawn } from "node:child_process";
 import fs from "node:fs";
+import { CheckJavaHome, CreateKey } from "./utils/CreateKey";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -13,10 +14,10 @@ if (started) {
 const gotTheLock = app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
-  console.log('Another instance is already running, exiting current instance');
+  console.log("Another instance is already running, exiting current instance");
   app.quit();
 } else {
-  app.on('second-instance', (event, commandLine, workingDirectory) => {
+  app.on("second-instance", (event, commandLine, workingDirectory) => {
     // When a second instance is launched, focus on the main window
     if (mainWindow) {
       if (mainWindow.isMinimized()) mainWindow.restore();
@@ -338,6 +339,66 @@ app.whenReady().then(() => {
       });
     });
   });
+
+  ipcMain.handle("system:checkJavaHome", (event) => {
+    return new Promise((resolve, reject) => {
+      try {
+        const isJavaHomeValid = CheckJavaHome();
+        if (isJavaHomeValid) {
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      } catch (error) {
+        reject(error.message);
+      }
+    });
+  });
+
+  ipcMain.handle(
+    "app:createKey",
+    (
+      event,
+      keyPath,
+      keyPasswd,
+      alias,
+      aliasPasswd,
+      expireDay,
+      name,
+      org,
+      orgUnit,
+      locality,
+      state,
+      country,
+      keyalg,
+      keysize,
+      sigalg
+    ) => {
+      return new Promise((resolve, reject) => {
+        try {
+          const result = CreateKey(
+            keyPath,
+            keyPasswd,
+            alias,
+            aliasPasswd,
+            expireDay,
+            name,
+            org,
+            orgUnit,
+            locality,
+            state,
+            country,
+            keyalg,
+            keysize,
+            sigalg
+          );
+          resolve(result);
+        } catch (error) {
+          reject(error.message);
+        }
+      });
+    }
+  );
 
   createWindow();
 

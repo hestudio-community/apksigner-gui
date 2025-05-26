@@ -270,6 +270,18 @@
   border-bottom-right-radius: 10px;
 }
 
+.el-input-number__decrease {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  margin-top: 3%;
+}
+
+.el-input-number__increase {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  margin-top: 3%;
+}
+
 .el-button {
   border-radius: 10px;
 }
@@ -283,6 +295,10 @@
 }
 
 .el-message-box {
+  border-radius: 15px;
+}
+
+.el-dialog {
   border-radius: 15px;
 }
 
