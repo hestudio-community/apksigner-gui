@@ -205,7 +205,7 @@ const createWindow = () => {
     },
     // Add icon configuration
     icon: path.join(__dirname, "../icon.png"),
-    titleBarStyle: "hidden",
+    titleBarStyle: "hiddenInset",
     frame: false,
   });
 

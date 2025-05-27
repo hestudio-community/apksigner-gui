@@ -2,36 +2,15 @@
   <div style="max-height: calc(100vh)">
     <el-container>
       <el-aside class="aside">
-        <div class="buttonbox">
-          <el-button
-            text
-            style="height: 32px; width: 32px"
-            @click="openaddkey = true"
+        <div class="toolbar">
+          <el-button text class="toolbutton" @click="openaddkey = true"
             ><el-icon><Plus /></el-icon
           ></el-button>
           <el-button
             text
-            style="height: 32px; width: 32px"
-            @click="
-              keyRemoveStatus = !keyRemoveStatus;
-              openeditkey = false;
-            "
-            ><el-icon><Minus /></el-icon>
-          </el-button>
-          <el-button
-            text
-            style="height: 32px; width: 32px"
-            @click="
-              openeditkey = !openeditkey;
-              keyRemoveStatus = false;
-            "
-            ><el-icon><Edit /></el-icon>
-          </el-button>
-          <el-button
-            text
-            style="height: 32px; width: 32px"
+            style="height: 18px; width: 18px"
             @click="RefreshKey"
-            class="refresh"
+            class="toolbutton refresh"
             ><el-icon><Refresh /></el-icon>
           </el-button>
           <div>
@@ -62,60 +41,54 @@
           </div>
         </div>
         <br />
-        <el-scrollbar style="max-height: calc(100vh - 100px)">
+        <el-scrollbar style="max-height: calc(100vh - 100px - 40px)">
           <div v-loading="keyLoading">
             <div
               class="keybutton"
               style="display: flex; flex-direction: column"
               v-for="item in keyList"
             >
-              <el-button
-                @click="openSign = item"
-                tag="div"
-                text
-                bg
-                style="
-                  width: 190px;
-                  display: flex;
-                  flex-direction: row;
-                  justify-content: space-between;
-                "
-              >
-                <div>
-                  <transition name="rotate-fade">
-                    <el-button
-                      text
-                      style="height: 32px; width: 32px"
-                      v-if="keyRemoveStatus"
-                      @click="RemoveKey(item)"
-                      ><el-icon><RemoveFilled /></el-icon
-                    ></el-button>
-                  </transition>
-                  <transition name="rotate-fade">
-                    <el-button
-                      text
-                      style="height: 32px; width: 32px"
-                      v-if="openeditkey"
-                      @click="
-                        editkey.status = true;
-                        editkey.keyname = item;
-                      "
-                      ><el-icon><EditPen /></el-icon
-                    ></el-button>
-                  </transition>
-                </div>
-                <div
+              <el-dropdown trigger="contextmenu" placement="bottom-end">
+                <el-button
+                  @click="openSign = item"
+                  tag="div"
+                  text
+                  bg
                   style="
-                    text-align: left;
-                    overflow: hidden;
-                    white-space: nowrap;
-                    text-overflow: ellipsis;
-                    width: 135px;
+                    width: 190px;
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
                   "
                 >
-                  <text>{{ item }}</text>
-                </div>
-              </el-button>
+                  <div
+                    style="
+                      text-align: left;
+                      overflow: hidden;
+                      white-space: nowrap;
+                      text-overflow: ellipsis;
+                      width: 135px;
+                    "
+                  >
+                    <text>{{ item }}</text>
+                  </div>
+                </el-button>
+                <template #dropdown>
+                  <el-dropdown-item
+                    :icon="Edit"
+                    @click="
+                      editkey.status = true;
+                      editkey.keyname = item;
+                    "
+                    >{{ i18n.editKey }}</el-dropdown-item
+                  >
+                  <el-dropdown-item
+                    :icon="RemoveFilled"
+                    @click="RemoveKey(item)"
+                    >{{ i18n.DeleteKey }}</el-dropdown-item
+                  >
+                </template>
+              </el-dropdown>
             </div>
           </div>
         </el-scrollbar>
@@ -216,9 +189,14 @@
   height: calc(100vh - 20px);
 }
 
-.buttonbox {
+.toolbar {
   display: flex;
   flex-direction: row;
+}
+
+.toolbutton {
+  height: 18px;
+  width: 18px;
 }
 
 .keybutton {
@@ -302,21 +280,6 @@
   border-radius: 15px;
 }
 
-.rotate-fade-enter-active,
-.rotate-fade-leave-active {
-  transition: opacity 0.309s ease, transform 0.618s ease;
-}
-
-.rotate-fade-enter-from {
-  opacity: 0;
-  transform: rotate(-90deg);
-}
-
-.rotate-fade-leave-to {
-  opacity: 0;
-  transform: rotate(90deg);
-}
-
 .element-rotate {
   transition: transform 0.618s ease;
   transform: rotate(360deg);
@@ -328,6 +291,10 @@
   border-radius: 15px;
 }
 .el-popper.is-pure {
+  border-radius: 15px;
+}
+
+.el-dropdown-menu__item {
   border-radius: 15px;
 }
 
@@ -367,7 +334,6 @@ export default {
     return {
       opensetting: false,
       openaddkey: false,
-      openeditkey: false,
       editkey: {
         status: false,
         keyname: "",
@@ -380,7 +346,6 @@ export default {
       },
       keyList: [],
       keyLoading: true,
-      keyRemoveStatus: false,
       openSign: "",
       i18n: {
         noKeyTip: undefined,
@@ -389,13 +354,12 @@ export default {
         DeleteSuccess: undefined,
         DeleteKey: undefined,
         DeleyeKeyTip: undefined,
+        editKey: undefined,
       },
     };
   },
   methods: {
     async RefreshKey() {
-      this.openeditkey = false;
-      this.keyRemoveStatus = false;
       this.keyLoading = true;
       document.querySelector(".refresh").classList.add("element-rotate");
       setTimeout(() => {
@@ -454,7 +418,7 @@ export default {
     window.electronAPI.SystemPlatfrom().then(async (result) => {
       if (result == "darwin") {
         this.darwin.isDarwin = true;
-        document.querySelector(".buttonbox").style.marginTop = "16px";
+        document.querySelector(".toolbar").style.marginLeft = "64px";
       } else {
         setInterval(async () => {
           this.windows.isMaxmaximize =

@@ -1,5 +1,5 @@
 <template>
-  <h2>{{ i18n.EditKey }}</h2>
+  <h2>{{ i18n.editKey }}</h2>
   <el-scrollbar style="max-height: calc(100vh - 120px)">
     <el-card>
       <div>
@@ -65,7 +65,7 @@ export default {
       keyalias: "",
       keypasswd: "",
       i18n: {
-        EditKey: undefined,
+        editKey: undefined,
         AddKeyTips: undefined,
         name: undefined,
         jksLocation: undefined,

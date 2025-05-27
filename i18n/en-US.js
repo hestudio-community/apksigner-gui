@@ -8,7 +8,7 @@ export default {
     return `Are you sure you want to delete the key "${keyname}"?`;
   },
   AddKey: "Add key",
-  EditKey: "Edit key",
+  editKey: "Edit key",
   AddKeyTips:
     "Currently, only keystore (.jks) files are supported. Support for certificates with separate public and private keys will be added in future versions.",
   name: "Name",

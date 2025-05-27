@@ -8,7 +8,7 @@ export default {
     return `確定要刪除密鑰 "${keyname}" 嗎？`;
   },
   AddKey: "添加密鑰",
-  EditKey: "修改密鑰",
+  editKey: "修改密鑰",
   AddKeyTips:
     "目前僅支持 密鑰庫 (.jks)文件。對於公私鑰分離的證書將在後續版本支持。",
   name: "名稱",
