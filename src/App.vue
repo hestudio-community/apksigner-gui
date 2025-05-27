@@ -8,7 +8,6 @@
           ></el-button>
           <el-button
             text
-            style="height: 18px; width: 18px"
             @click="RefreshKey"
             class="toolbutton refresh"
             ><el-icon><Refresh /></el-icon>
@@ -40,7 +39,6 @@
             </el-drawer>
           </div>
         </div>
-        <br />
         <el-scrollbar style="max-height: calc(100vh - 100px - 40px)">
           <div v-loading="keyLoading">
             <div
@@ -192,11 +190,18 @@
 .toolbar {
   display: flex;
   flex-direction: row;
+  height: 40px;
+  margin-bottom: 8px;
 }
 
-.toolbutton {
+.toolbutton-darwin {
   height: 18px;
   width: 18px;
+}
+
+.toolbutton-other {
+  height: 32px;
+  width: 32px;
 }
 
 .keybutton {
@@ -312,12 +317,10 @@
 <script setup>
 import {
   Plus,
-  Minus,
   Setting,
   Refresh,
   RemoveFilled,
   Edit,
-  EditPen,
 } from "@element-plus/icons-vue";
 import { Icon } from "@iconify/vue";
 import SettingPage from "./components/Settings.vue";
@@ -413,20 +416,23 @@ export default {
       const key = Object.keys(this.i18n)[i];
       this.i18n[key] = geti18n(key);
     }
-  },
-  mounted() {
     window.electronAPI.SystemPlatfrom().then(async (result) => {
       if (result == "darwin") {
         this.darwin.isDarwin = true;
         document.querySelector(".toolbar").style.marginLeft = "64px";
+        document.querySelector(".toolbutton").classList.add("toolbutton-darwin")
       } else {
+        document.querySelector(".toolbar").style.marginLeft = "4px";
+        document.querySelector(".toolbar").style.alignItems = "center";
+        document.querySelector(".toolbutton").classList.add("toolbutton-other")
         setInterval(async () => {
           this.windows.isMaxmaximize =
             await window.electronAPI.WindowsIsMaximized();
         }, 100);
       }
     });
-
+  },
+  mounted() {
     if (localStorage.getItem("checkUpdate") == null) {
       localStorage.setItem("checkUpdate", "true");
     }
@@ -448,7 +454,7 @@ export default {
       }
     });
 
-    setInterval(async () => {
+    setInterval(async () => { 
       if (this.keyList.includes(this.openSign)) {
         localStorage.setItem("lastUseKey", this.openSign);
       }
