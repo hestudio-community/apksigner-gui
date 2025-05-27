@@ -71,7 +71,6 @@ export default {
   aliasPasswd: "别名密码",
   aliasPasswdAgain: "再次输入别名密码",
   expireDay: "有效期",
-  name: "姓名",
   org: "组织",
   orgUnit: "组织单位",
   locality: "城市",
