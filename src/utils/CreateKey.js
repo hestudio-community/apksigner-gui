@@ -6,8 +6,15 @@ export function CheckJavaHome() {
   if (!javaHome) {
     return false;
   }
-  const javaPath = path.join(javaHome, "bin", "java");
-  const keytoolPath = path.join(process.env.JAVA_HOME, "bin", "keytool");
+  let javaPath;
+  let keytoolPath;
+  if (process.platform == "win32") {
+    javaPath = path.join(javaHome, "bin", "java.exe");
+    keytoolPath = path.join(process.env.JAVA_HOME, "bin", "keytool.exe");
+  } else {
+    javaPath = path.join(javaHome, "bin", "java");
+    keytoolPath = path.join(process.env.JAVA_HOME, "bin", "keytool");
+  }
   return fs.existsSync(javaPath) && fs.existsSync(keytoolPath);
 }
 
@@ -27,7 +34,12 @@ export function CreateKey(
   keysize,
   sigalg
 ) {
-  const keytoolPath = path.join(process.env.JAVA_HOME, "bin", "keytool");
+  let keytoolPath;
+  if (process.platform == "win32") {
+    keytoolPath = path.join(process.env.JAVA_HOME, "bin", "keytool.exe");
+  } else {
+    keytoolPath = path.join(process.env.JAVA_HOME, "bin", "keytool");
+  }
   if (!fs.existsSync(keytoolPath)) {
     throw new Error(
       "Java keytool not found. Please ensure JAVA_HOME is set correctly."
