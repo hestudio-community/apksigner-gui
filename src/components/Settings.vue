@@ -300,8 +300,8 @@ export default {
         });
         return;
       } else {
-        localStorage.setItem("apksigner", this.apksigner);
-        localStorage.setItem("zipalign", this.zipalign);
+        window.electronAPI.config.set("apksigner", this.apksigner);
+        window.electronAPI.config.set("zipalign", this.zipalign);
         ElMessage({
           message: this.i18n.saveSuccess,
           type: "success",
@@ -333,11 +333,10 @@ export default {
           }
         ).then(() => {
           this.advancedSetting = true;
-          localStorage.setItem("advancedSetting", 1);
-          window.electronAPI.openAdvancedSetting();
+          window.electronAPI.config.set("advancedSetting", true);
         });
       } else {
-        localStorage.setItem("advancedSetting", 0);
+        window.electronAPI.config.set("advancedSetting", false);
       }
     },
     clearTmpDir() {
@@ -361,7 +360,11 @@ export default {
       });
     },
     changelanguage() {
-      if (this.lang.chooseLang != localStorage.getItem("lang")) {
+      let sourceLang;
+      window.electronAPI.config.get("lang").then((result) => {
+        sourceLang = result;
+      });
+      if (this.lang.chooseLang != sourceLang) {
         let display = null;
         for (let index = 0; index < supportLangList.length; index++) {
           const element = supportLangList[index];
@@ -379,19 +382,21 @@ export default {
           }
         )
           .then(() => {
-            localStorage.setItem("lang", this.lang.chooseLang);
+            window.electronAPI.config.set("lang", this.lang.chooseLang);
             window.location.reload();
           })
           .catch(() => {
-            this.lang.chooseLang = localStorage.getItem("lang");
+            window.electronAPI.config.get("lang").then((result) => {
+              this.lang.chooseLang = result;
+            });
           });
       }
     },
     ChangeAutoCheckUpdate() {
       if (this.AutoCheckUpdate) {
-        localStorage.setItem("checkUpdate", "true");
+        window.electronAPI.config.set("checkUpdate", true);
       } else {
-        localStorage.setItem("checkUpdate", "false");
+        window.electronAPI.config.set("checkUpdate", false);
       }
     },
   },
@@ -402,18 +407,22 @@ export default {
     }
   },
   mounted() {
-    this.apksigner = localStorage.getItem("apksigner");
-    this.zipalign = localStorage.getItem("zipalign");
+    window.electronAPI.config.get("apksigner").then((result) => {
+      this.apksigner = result;
+    });
+    window.electronAPI.config.get("zipalign").then((result) => {
+      this.zipalign = result;
+    });
+    window.electronAPI.config.get("advancedSetting").then((result) => {
+      this.advancedSetting = result;
+    });
+    window.electronAPI.config.get("lang").then((result) => {
+      this.lang.chooseLang = result;
+    });
     this.lang.langlist = supportLangList;
-    this.lang.chooseLang = localStorage.getItem("lang");
-    if (localStorage.getItem("advancedSetting") == 1) {
-      this.advancedSetting = true;
-    }
-    if (localStorage.getItem("checkUpdate") == "true") {
-      this.AutoCheckUpdate = true;
-    } else {
-      this.AutoCheckUpdate = false;
-    }
+    window.electronAPI.config.get("checkUpdate").then((result) => {
+      this.AutoCheckUpdate = result;
+    });
   },
 };
 </script>

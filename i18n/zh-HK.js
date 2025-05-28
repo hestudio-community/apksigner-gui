@@ -83,4 +83,6 @@ export default {
   keyalg: "密鑰算法",
   keysize: "密鑰大小",
   sigalg: "簽名算法",
+  noApksignerLocation: "未設置 apksigner 位置",
+  noZipalignLocation: "未設置 zipalign 位置",
 };

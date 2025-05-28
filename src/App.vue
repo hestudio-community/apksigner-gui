@@ -370,17 +370,16 @@ export default {
         document.querySelector(".refresh").classList.remove("element-rotate");
       }, 618);
       this.keyList = [];
-      const MyList = localStorage;
-      for (let i = 0; i < MyList.length; i++) {
-        if (MyList.key(i).substring(0, 4) == "key-") {
-          await this.keyList.push(
-            MyList.key(i).substring(4, MyList.key(i).length)
-          );
+      window.electronAPI.config.get("keys").then((data) => {
+        if (data) {
+          this.keyList = Object.keys(data);
+          if (!this.keyList.includes(this.openSign)) {
+            this.openSign = "";
+          }
+        } else {
+          this.openSign = "";
         }
-      }
-      if (localStorage.getItem(`key-${this.openSign}`) == null) {
-        this.openSign = "";
-      }
+      });
       this.keyLoading = false;
     },
     RemoveKey(keyname) {
@@ -393,13 +392,18 @@ export default {
           type: "warning",
         }
       ).then(() => {
-        localStorage.removeItem(`key-${keyname}`);
-        ElMessage({
-          message: this.i18n.DeleteSuccess,
-          type: "success",
-          plain: true,
+        window.electronAPI.config.get("keys").then((data) => {
+          if (data && data[keyname]) {
+            delete data[keyname];
+            window.electronAPI.config.set("keys", data);
+          }
+          ElMessage({
+            message: this.i18n.DeleteSuccess,
+            type: "success",
+            plain: true,
+          });
+          this.RefreshKey();
         });
-        this.RefreshKey();
       });
     },
     WindowsClose() {
@@ -436,12 +440,14 @@ export default {
     });
   },
   mounted() {
-    if (localStorage.getItem("checkUpdate") == null) {
-      localStorage.setItem("checkUpdate", "true");
-    }
-    if (localStorage.getItem("checkUpdate") == "true") {
-      window.electronAPI.AppCheckUpdate(false);
-    }
+    window.electronAPI.config.get("checkUpdate").then((data) => {
+      if (data == null) {
+        window.electronAPI.config.set("checkUpdate", true);
+        window.electronAPI.AppCheckUpdate(false);
+      } else if (data) {
+        window.electronAPI.AppCheckUpdate(false);
+      }
+    });
 
     setInterval(async () => {
       if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
@@ -451,17 +457,20 @@ export default {
       }
     }, 100);
     this.RefreshKey().then(() => {
-      const lastUseKey = localStorage.getItem("lastUseKey");
-      if (this.keyList.includes(lastUseKey)) {
-        this.openSign = lastUseKey;
-      }
+      window.electronAPI.config.get("lastUseKey").then((data) => {
+        if (data && this.keyList.includes(data)) {
+          this.openSign = data;
+        } else {
+          this.openSign = "";
+        }
+      });
     });
 
     setInterval(async () => {
       if (this.keyList.includes(this.openSign)) {
-        localStorage.setItem("lastUseKey", this.openSign);
+        window.electronAPI.config.set("lastUseKey", this.openSign);
       }
-    });
+    }, 100);
   },
 };
 </script>

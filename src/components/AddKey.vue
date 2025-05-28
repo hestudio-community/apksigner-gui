@@ -350,7 +350,15 @@ export default {
           plain: true,
         });
       } else {
-        if (localStorage.getItem(`key-${this.name}`)) {
+        let keyList;
+        window.electronAPI.config.get("keys").then((res) => {
+          if (res) {
+            keyList = res;
+          } else {
+            keyList = {};
+          }
+          
+          if (Object.keys(keyList).includes(this.name)) {
           ElMessage({
             message: this.i18n.HadSameKeyName,
             type: "error",
@@ -358,21 +366,20 @@ export default {
           });
           return;
         } else {
-          localStorage.setItem(
-            `key-${this.name}`,
-            JSON.stringify({
-              type: 1,
-              keystore: this.keystore,
-              keyalias: this.keyalias,
-              keypasswd: this.keypasswd,
-            })
-          );
+          keyList[this.name] = {
+            type: 1,
+            keystore: this.keystore,
+            keyalias: this.keyalias,
+            keypasswd: this.keypasswd,
+          };
+          window.electronAPI.config.set("keys", keyList);
           ElMessage({
             message: this.i18n.saveSuccess,
             type: "success",
             plain: true,
           });
         }
+        });
       }
     },
     createKey() {
@@ -460,11 +467,11 @@ export default {
     }
   },
   mounted() {
-    if (localStorage.getItem("advancedSetting") == 1) {
-      this.create.advancedSetting = true;
-    } else {
-      this.create.advancedSetting = false;
-    }
+    window.electronAPI.config.get("advancedSetting").then((res) => {
+      if (res) {
+        this.create.advancedSetting = res;
+      }
+    });
   },
 };
 </script>

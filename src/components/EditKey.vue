@@ -111,22 +111,24 @@ export default {
           plain: true,
         });
       } else {
-        if (this.name != this.keyname) {
-          localStorage.removeItem(`key-${this.keyname}`);
-        }
-        localStorage.setItem(
-          `key-${this.name}`,
-          JSON.stringify({
+        let keyList;
+        window.electronAPI.config.get("keys").then((res) => {
+          keyList = res;
+          if (this.name != this.keyname) {
+            delete keyList[this.keyname];
+          }
+          keyList[this.name] = {
             type: 1,
             keystore: this.keystore,
             keyalias: this.keyalias,
             keypasswd: this.keypasswd,
-          })
-        );
-        ElMessage({
-          message: this.i18n.saveSuccess,
-          type: "success",
-          plain: true,
+          };
+          window.electronAPI.config.set("keys", keyList);
+          ElMessage({
+            message: this.i18n.saveSuccess,
+            type: "success",
+            plain: true,
+          });
         });
       }
     },
@@ -138,11 +140,13 @@ export default {
     }
   },
   mounted() {
-    const key = JSON.parse(localStorage.getItem(`key-${this.keyname}`));
-    this.name = this.keyname;
-    this.keystore = key.keystore;
-    this.keyalias = key.keyalias;
-    this.keypasswd = key.keypasswd;
+    window.electronAPI.config.get("keys").then((res) => {
+      const keyInfo = res[this.keyname];
+      this.name = this.keyname;
+      this.keystore = keyInfo.keystore;
+      this.keyalias = keyInfo.keyalias;
+      this.keypasswd = keyInfo.keypasswd;
+    });
   },
 };
 </script>

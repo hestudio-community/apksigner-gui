@@ -52,7 +52,12 @@ export class Config extends Storage {
     if (!fs.existsSync(this.configPath)) {
       fs.writeFileSync(this.configPath, JSON.stringify({}));
     }
-    this.config = JSON.parse(fs.readFileSync(this.configPath, "utf-8"));
+    try {
+      this.config = JSON.parse(fs.readFileSync(this.configPath, "utf-8"));
+    } catch (error) {
+      fs.writeFileSync(this.configPath, JSON.stringify({}));
+      this.config = JSON.parse(fs.readFileSync(this.configPath, "utf-8"));
+    }
   }
   /**
    *

@@ -83,4 +83,6 @@ export default {
   keyalg: "Key algorithm",
   keysize: "Key size",
   sigalg: "Signature algorithm",
+  noApksignerLocation: "No apksigner location set",
+  noZipalignLocation: "No zipalign location set",
 };
