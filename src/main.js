@@ -125,7 +125,8 @@ const AboutPanel = () => {
       detail: `
 Version: ${app.getVersion()}
 Platform: ${process.platform}
-AppPATH: ${app.getAppPath()}
+Architecture: ${process.arch}
+WorkStatus: ${app.isPackaged ? "Product" : "Develop"}
 Copyright: Copyright © 2025 heStudio Community
     `,
       type: "none",
