@@ -1,45 +1,45 @@
 <div align="center">
-   <img src="./../../icons/icon.png" />
+   <img src="./icons/icon.png" />
    <h1 style="text-align: center">APKSignerGUI</h1>
-   <img src="./../../images/apphome.png" />
+   <img src="./images/apphome.png" />
    <p style="text-align: center">Simple and complete graphical tool for APK signing</p>
 </div>
 
 ---
 
 <div align="center">
-   <a href="../../README.md">English</a> | 
-   <a href="./README_CN.md">简体中文</a> | 
-   <a href="./README_HK.md">繁體中文</a>
+   <a href="./README.md">English</a> | 
+   <a href="./i18n/README/README_CN.md">简体中文</a> | 
+   <a href="./i18n/README/README_HK.md">繁體中文</a>
 </div>
 
 ---
 
 ### Features
 
-- **Easy to use**: Designed for beginners, just import the APK to sign directly.
+- **Easy to use**: Designed for beginners, just import the APK and sign it directly.
 - **Complete functionality**: For advanced users, supports all signing parameters provided by Google.
 - **Good compatibility**: Supports multiple operating systems and architectures, including Windows, Linux, MacOS, etc.
-- **Room for improvement**: As an initial project, there are many imperfections, leaving enough space for expansion.
+- **Ambitious plans**: An initial project with many imperfections, leaving plenty of room for expansion.
 
-### How to Install
+### How to install
 
 1. Go to [Release](https://github.com/hestudio-community/apksigner-gui/releases/latest) to download the latest version.
-2. Windows users can use [WinGet](https://learn.microsoft.com/zh-cn/windows/package-manager/winget/) to install.
+2. Windows users can use [WinGet](https://learn.microsoft.com/en-us/windows/package-manager/winget/) to install.
 
    ```powershell
    winget install "heStudioCommunity.APKSignerGUI(Machine-MSI)"
    ```
 
-   Of course, you can also download it through Microsoft Store, currently, this method is only applicable to `amd64`.
+   Of course, you can also download it through the Microsoft Store, currently, this download method is only applicable to `amd64`.
 
    <a href="https://apps.microsoft.com/detail/9n3q8bk8dp86?mode=direct">
-   <img src="https://get.microsoft.com/images/zh-cn%20dark.svg" width="200"/>
+   <img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200"/>
    </a>
 
 3. Refer to the method at the end to build.
 
-### About Compatibility
+### About compatibility
 
 Known supported platforms (officially packaged and tested):
 
@@ -47,28 +47,28 @@ Known supported platforms (officially packaged and tested):
 - **Linux**: Debian 12 and its derivatives x86_64 and ARM64 platforms, RedHat 9.5 and its derivatives x86_64 and ARM64 platforms
 - **macOS**: All macOS 10.11 and above devices with Apple Silicon
 
-Other platforms may require you to compile by yourself.
+Other platforms may require you to compile them yourself.
 
 #### Why not support 32-bit systems or processors?
 
-We believe that 32-bit systems are outdated and can no longer maintain basic operations. Many system and software vendors no longer provide 32-bit applications and systems. We think it's almost impossible for you to complete software development on a 32-bit system because many development tools or targets no longer support 32-bit systems. If you still use a 32-bit system, we believe you should be able to make this application work by your own efforts.
+We believe that 32-bit systems are outdated and can no longer maintain basic operations. Many system and software vendors no longer provide 32-bit applications and systems. We think it's almost impossible to complete software development on a 32-bit system because many development tools or targets no longer support 32-bit systems. If you still use a 32-bit system, we believe you should be able to make this application work with your own efforts.
 
-### How to Use?
+### How to use?
 
-1. After opening the application, you should see such an interface. Click the settings in the upper right corner to start the first configuration.
-   ![](./../../images/1.png)
+1. After opening the application, you should see an interface like this. Click the settings in the upper right corner to start the first configuration.
+   ![](./images/1.png)
 2. Find `apksigner` and `zipalign` in the `sdk/build-tools/<version>` directory, then click save.
-   ![](./../../images/2.png)
+   ![](./images/2.png)
 3. Click the blank area on the left to close the settings, then click the `+` in the upper left corner to add a key.
-   ![](./../../images/3.png)
+   ![](./images/3.png)
 4. Click the blank area on the right to close the page, select the signature on the left, and then start signing the installation package.
-   ![](./../../images/apphome.png)
+   ![](./images/apphome.png)
 
-### Find Your Language
+### Find your language
 
 [![Crowdin](https://badges.crowdin.net/apksignergui/localized.svg)](https://crowdin.com/project/apksignergui)
 
-We are committed to providing the same service and experience to users worldwide. If you are willing to provide translations for this project, we would sincerely appreciate it.
+We are committed to providing the same service and experience to users worldwide. If you are willing to provide relevant translations for this project, we will sincerely thank you.
 
 You can submit translations in the following two ways:
 
@@ -78,13 +78,13 @@ You can submit translations in the following two ways:
 Didn't find your language? There are also two ways to submit your language.
 
 - If using the [crowdin](https://crowdin.com/project/apksignergui) platform, please submit an issue, and we will reserve the language on the platform for you to translate.
-- You can also copy one of the languages you know in the `i18n` directory of the source code for translation. After submission, we will complete the remaining operations for you.
+- You can also translate by copying one of the languages you know in the `i18n` directory of the source code. After submission, we will complete the remaining operations for you.
 
 We require the language code to be based on [ISO 639-1](https://en.wikipedia.org/wiki/ISO_639-1), and the country or region code to be based on [ISO 3166-1](https://en.wikipedia.org/wiki/ISO_3166-1).
 
 Thanks to [Crowdin](https://crowdin.com/) for the open source license provided for this project.
 
-### How to Build?
+### How to build?
 
 1. Install [NodeJS 22 LTS](https://nodejs.org/)
 2. Use `npm install` to install dependencies.
@@ -100,12 +100,12 @@ Thanks to [Crowdin](https://crowdin.com/) for the open source license provided f
 
 #### Windows
 
-##### ZIP Packaging (Recommended)
+##### ZIP packaging (recommended)
 
 1. Install [NodeJS 22 LTS](https://nodejs.org/)
 2. Use `npm install` to install dependencies.
 3. Edit `forge.config.js`.
-   Replace
+   Change
    ```javascript
    {
       name: "@electron-forge/maker-wix",
@@ -115,7 +115,7 @@ Thanks to [Crowdin](https://crowdin.com/) for the open source license provided f
       platfrom: ["win32"],
    },
    ```
-   with
+   to
    ```javascript
    {
      name: "@electron-forge/maker-zip",
@@ -125,7 +125,7 @@ Thanks to [Crowdin](https://crowdin.com/) for the open source license provided f
 4. Use `npm run make` to build.
 5. Get the build in the `./out/make` directory.
 
-##### MSI Packaging
+##### MSI packaging
 
 1. Install [NodeJS 22 LTS](https://nodejs.org/)
 2. Use `npm install` to install dependencies.

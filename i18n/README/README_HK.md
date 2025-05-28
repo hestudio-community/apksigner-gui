@@ -34,7 +34,7 @@
    當然，你也可以通過 Microsoft Store 下載，目前，該下載方法僅適用於 `amd64`.
 
    <a href="https://apps.microsoft.com/detail/9n3q8bk8dp86?mode=direct">
-   <img src="https://get.microsoft.com/images/zh-cn%20dark.svg" width="200"/>
+   <img src="https://get.microsoft.com/images/zh-hk%20dark.svg" width="200"/>
    </a>
 
 3. 參考文末方式構建。
