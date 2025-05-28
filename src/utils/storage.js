@@ -3,11 +3,6 @@ import fs from "node:fs";
 
 export class Storage {
   constructor() {
-    this.tmp = this.init().tmp;
-    this.init();
-  }
-
-  init() {
     if (process.platform == "win32") {
       this.tmp = path.join(process.env.TEMP, "APKSignerGUI");
     } else if (process.platform == "linux") {
