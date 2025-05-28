@@ -2,8 +2,8 @@ import { app, BrowserWindow, dialog, ipcMain, Menu, shell } from "electron";
 import path from "node:path";
 import started from "electron-squirrel-startup";
 import { spawn } from "node:child_process";
-import fs from "node:fs";
 import { CheckJavaHome, CreateKey } from "./utils/CreateKey";
+import { Storage } from "./utils/storage";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -26,19 +26,7 @@ if (!gotTheLock) {
   });
 }
 
-let tmp = undefined;
-
-if (process.platform == "win32") {
-  tmp = path.join(process.env.TEMP, "APKSignerGUI");
-} else if (process.platform == "linux") {
-  tmp = path.join("/tmp", "APKSignerGUI");
-} else if (process.platform == "darwin") {
-  tmp = path.join(process.env.HOME, "/Library/Caches", "APKSignerGUI");
-}
-
-if (!fs.existsSync(tmp)) {
-  fs.mkdirSync(tmp);
-}
+const storage = new Storage();
 
 // Save reference to mainWindow for use in IPC handlers
 let mainWindow = null;
@@ -293,20 +281,25 @@ app.whenReady().then(() => {
   });
 
   ipcMain.handle("app:copyToTmp", async (event, file) => {
-    const tmpPath = path.join(tmp, path.basename(file));
-    fs.copyFileSync(file, tmpPath);
-    return tmpPath;
+    return new Promise((resolve, reject) => {
+      try {
+        const tmpFilePath = storage.copyToTmp(file);
+        resolve(tmpFilePath);
+      } catch (error) {
+        reject(error.message);
+      }
+    });
   });
 
   ipcMain.handle("app:clearTmpDir", async () => {
-    try {
-      fs.rmdirSync(tmp, { recursive: true });
-      fs.mkdirSync(tmp);
-      return true;
-    } catch (e) {
-      console.error(e);
-      return e;
-    }
+    return new Promise((resolve, reject) => {
+      try {
+        storage.clearTmpDir();
+        resolve(true);
+      } catch (error) {
+        reject(error.message);
+      }
+    });
   });
 
   ipcMain.handle("system:shell", (event, shellCommand) => {
