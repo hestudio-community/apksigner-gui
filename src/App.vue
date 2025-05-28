@@ -6,10 +6,7 @@
           <el-button text class="toolbutton" @click="openaddkey = true"
             ><el-icon><Plus /></el-icon
           ></el-button>
-          <el-button
-            text
-            @click="RefreshKey"
-            class="toolbutton refresh"
+          <el-button text @click="RefreshKey" class="toolbutton refresh"
             ><el-icon><Refresh /></el-icon>
           </el-button>
           <div>
@@ -256,13 +253,13 @@
 .el-input-number__decrease {
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
-  margin-top: 5.5px
+  margin-top: 5.5px;
 }
 
 .el-input-number__increase {
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
-  margin-top: 5.5px
+  margin-top: 5.5px;
 }
 
 .el-button {
@@ -301,6 +298,10 @@
 
 .el-dropdown-menu__item {
   border-radius: 15px;
+}
+
+.el-popper__arrow {
+  left: 80% !important;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -420,11 +421,13 @@ export default {
       if (result == "darwin") {
         this.darwin.isDarwin = true;
         document.querySelector(".toolbar").style.marginLeft = "64px";
-        document.querySelector(".toolbutton").classList.add("toolbutton-darwin")
+        document
+          .querySelector(".toolbutton")
+          .classList.add("toolbutton-darwin");
       } else {
         document.querySelector(".toolbar").style.marginLeft = "4px";
         document.querySelector(".toolbar").style.alignItems = "center";
-        document.querySelector(".toolbutton").classList.add("toolbutton-other")
+        document.querySelector(".toolbutton").classList.add("toolbutton-other");
         setInterval(async () => {
           this.windows.isMaxmaximize =
             await window.electronAPI.WindowsIsMaximized();
@@ -454,7 +457,7 @@ export default {
       }
     });
 
-    setInterval(async () => { 
+    setInterval(async () => {
       if (this.keyList.includes(this.openSign)) {
         localStorage.setItem("lastUseKey", this.openSign);
       }
