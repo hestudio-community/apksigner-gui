@@ -3,7 +3,7 @@ import path from "node:path";
 import started from "electron-squirrel-startup";
 import { spawn } from "node:child_process";
 import { CheckJavaHome, CreateKey } from "./utils/CreateKey";
-import { Storage } from "./utils/storage";
+import { Config, Storage } from "./utils/storage";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -27,6 +27,7 @@ if (!gotTheLock) {
 }
 
 const storage = new Storage();
+const config = new Config();
 
 // Save reference to mainWindow for use in IPC handlers
 let mainWindow = null;
@@ -330,6 +331,37 @@ app.whenReady().then(() => {
       shell.on("error", (err) => {
         reject(`Failed to start command: ${err.message}`);
       });
+    });
+  });
+
+  ipcMain.handle("config:get", (event, key) => {
+    return new Promise((resolve, reject) => {
+      try {
+        const value = config.get(key);
+        resolve(value);
+      } catch (error) {
+        reject(error.message);
+      }
+    });
+  });
+  ipcMain.handle("config:set", (event, key, value) => {
+    return new Promise((resolve, reject) => {
+      try {
+        config.set(key, value);
+        resolve(true);
+      } catch (error) {
+        reject(error.message);
+      }
+    });
+  });
+  ipcMain.handle("config:del", (event, key) => {
+    return new Promise((resolve, reject) => {
+      try {
+        config.del(key);
+        resolve(true);
+      } catch (error) {
+        reject(error.message);
+      }
     });
   });
 

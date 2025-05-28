@@ -27,20 +27,26 @@ export { supportLangList };
  * @returns
  */
 function getLang() {
-  if (localStorage.getItem("lang") != null) {
-    return localStorage.getItem("lang");
-  } else {
+  let lang;
+  window.electronAPI.config.get("lang").then((value) => {
+    if (value != null) {
+      lang = value;
+    }
+  })
+  if (lang == null) {
     for (let i = 0; i < navigator.languages.length; i++) {
       for (let j = 0; j < supportLangList.length; j++) {
         if (navigator.languages[i] == supportLangList[j].lang) {
-          localStorage.setItem("lang", navigator.languages[i]);
-          return localStorage.getItem("lang");
+          lang = navigator.languages[i];
+          window.electronAPI.config.set("lang", lang);
+          return lang
         }
       }
     }
-    localStorage.setItem("lang", "en-US");
-    return localStorage.getItem("lang");
+    lang = "en-US";
+    window.electronAPI.config.set("lang", lang);
   }
+  return lang
 }
 
 export { getLang };

@@ -51,4 +51,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
       keysize,
       sigalg
     ),
+  config: {
+    get: (key) => ipcRenderer.invoke("config:get", key),
+    set: (key, value) => ipcRenderer.invoke("config:set", key, value),
+    del: (key) => ipcRenderer.invoke("config:del", key),
+  },
 });
