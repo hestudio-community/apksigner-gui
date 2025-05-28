@@ -115,6 +115,25 @@ const CheckUpdate = (forceShow) => {
         dialog.showErrorBox("APKSignerGUI", "Failed to check for updates.");
       }
     });
+
+  if (app.runningUnderARM64Translation) {
+    dialog
+      .showMessageBox({
+        title: "APKSignerGUI",
+        message: "APKSignerGUI",
+        detail:
+          "You are running the x86_64 version of APKSignerGUI on an arm64 platform via translation, we provide native arm64 platforms, you can check it out on our Github.",
+        type: "warning",
+        buttons: ["OK", "View in Github"],
+      })
+      .then((response) => {
+        if (response.response == 1) {
+          shell.openExternal(
+            "https://github.com/hestudio-community/apksigner-gui/releases/latest"
+          );
+        }
+      });
+  }
 };
 
 const AboutPanel = () => {
