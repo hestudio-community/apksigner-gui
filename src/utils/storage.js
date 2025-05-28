@@ -4,6 +4,7 @@ import fs from "node:fs";
 export class Storage {
   constructor() {
     this.tmp = this.init().tmp;
+    this.init();
   }
 
   init() {
@@ -18,10 +19,6 @@ export class Storage {
     if (!fs.existsSync(this.tmp)) {
       fs.mkdirSync(this.tmp);
     }
-
-    return {
-      tmp: this.tmp,
-    };
   }
 
   clearTmpDir() {
