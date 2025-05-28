@@ -327,7 +327,7 @@ import AddKey from "./components/AddKey.vue";
 import EditKey from "./components/EditKey.vue";
 import Sign from "./components/Sign.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { geti18n } from "./utils/i18n.js";
+import { internationalization } from "./utils/i18n.js";
 </script>
 
 <script>
@@ -414,10 +414,12 @@ export default {
       window.electronAPI.WindowsMaximize();
     },
   },
-  created() {
+  async created() {
+    const i18n = new internationalization();
+    await i18n.init();
     for (let i = 0; i < Object.keys(this.i18n).length; i++) {
       const key = Object.keys(this.i18n)[i];
-      this.i18n[key] = geti18n(key);
+      this.i18n[key] = i18n.geti18n(key);
     }
     window.electronAPI.SystemPlatfrom().then(async (result) => {
       if (result == "darwin") {

@@ -215,7 +215,7 @@
 import { FolderOpened } from "@element-plus/icons-vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { Icon } from "@iconify/vue";
-import { geti18n, supportLangList } from "../utils/i18n.js";
+import { internationalization, supportLangList } from "../utils/i18n.js";
 </script>
 
 <script>
@@ -381,37 +381,42 @@ export default {
       });
     },
     changelanguage() {
-      let sourceLang;
       window.electronAPI.config.get("lang").then((result) => {
-        sourceLang = result;
-      });
-      if (this.lang.chooseLang != sourceLang) {
-        let display = null;
-        for (let index = 0; index < supportLangList.length; index++) {
-          const element = supportLangList[index];
-          if (element.lang == this.lang.chooseLang) {
-            display = element.display;
+        if (this.lang.chooseLang != result) {
+          let display = null;
+          for (
+            let index = 0;
+            index < Object.values(supportLangList).length;
+            index++
+          ) {
+            const element = Object.values(supportLangList)[index];
+            if (element.lang == this.lang.chooseLang) {
+              display = element.display;
+            }
           }
-        }
-        ElMessageBox.confirm(
-          this.i18n.isChangeLanguageTo(display),
-          this.i18n.chooseLanguage,
-          {
-            confirmButtonText: this.i18n.confirm,
-            cancelButtonText: this.i18n.cancel,
-            type: "warning",
-          }
-        )
-          .then(() => {
-            window.electronAPI.config.set("lang", this.lang.chooseLang);
-            window.location.reload();
-          })
-          .catch(() => {
-            window.electronAPI.config.get("lang").then((result) => {
-              this.lang.chooseLang = result;
+          ElMessageBox.confirm(
+            this.i18n.isChangeLanguageTo(display),
+            this.i18n.chooseLanguage,
+            {
+              confirmButtonText: this.i18n.confirm,
+              cancelButtonText: this.i18n.cancel,
+              type: "warning",
+            }
+          )
+            .then(() => {
+              window.electronAPI.config
+                .set("lang", this.lang.chooseLang)
+                .then(() => {
+                  window.location.reload();
+                });
+            })
+            .catch(() => {
+              window.electronAPI.config.get("lang").then((result) => {
+                this.lang.chooseLang = result;
+              });
             });
-          });
-      }
+        }
+      });
     },
     ChangeAutoCheckUpdate() {
       if (this.AutoCheckUpdate) {
@@ -421,10 +426,12 @@ export default {
       }
     },
   },
-  created() {
+  async created() {
+    const i18n = new internationalization();
+    await i18n.init();
     for (let i = 0; i < Object.keys(this.i18n).length; i++) {
       const key = Object.keys(this.i18n)[i];
-      this.i18n[key] = geti18n(key);
+      this.i18n[key] = i18n.geti18n(key);
     }
   },
   mounted() {
@@ -440,7 +447,7 @@ export default {
     window.electronAPI.config.get("lang").then((result) => {
       this.lang.chooseLang = result;
     });
-    this.lang.langlist = supportLangList;
+    this.lang.langlist = Object.values(supportLangList);
     window.electronAPI.config.get("checkUpdate").then((result) => {
       this.AutoCheckUpdate = result;
     });
