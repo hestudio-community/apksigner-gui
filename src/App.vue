@@ -36,7 +36,7 @@
             </el-drawer>
           </div>
         </div>
-        <el-scrollbar style="max-height: calc(100vh - 100px - 40px)">
+        <el-scrollbar style="max-height: calc(100vh - 100px - 18px)">
           <div v-loading="keyLoading">
             <div
               class="keybutton"
@@ -95,7 +95,7 @@
             <div>
               <el-button
                 text
-                style="height: 32px; width: 32px"
+                style="height: 18px; width: 18px"
                 @click="opensetting = true"
               >
                 <el-icon><Setting /></el-icon>
@@ -104,7 +104,7 @@
             <div v-if="!darwin.isDarwin">
               <el-button
                 text
-                style="height: 32px; width: 32px"
+                style="height: 18px; width: 18px"
                 @click="WindowsMinimize"
               >
                 <el-icon
@@ -116,7 +116,7 @@
               </el-button>
               <el-button
                 text
-                style="height: 32px; width: 32px"
+                style="height: 18px; width: 18px"
                 @click="WindowsMaximize"
                 v-if="windows.isMaxmaximize"
               >
@@ -129,7 +129,7 @@
               </el-button>
               <el-button
                 text
-                style="height: 32px; width: 32px"
+                style="height: 18px; width: 18px"
                 @click="WindowsMaximize"
                 v-else
               >
@@ -142,7 +142,7 @@
               </el-button>
               <el-button
                 text
-                style="height: 32px; width: 32px"
+                style="height: 18px; width: 18px"
                 @click="WindowsClose"
               >
                 <el-icon
@@ -187,18 +187,16 @@
 .toolbar {
   display: flex;
   flex-direction: row;
-  height: 40px;
+  height: 18px;
   margin-bottom: 8px;
+  align-items: center;
+  -webkit-app-region: drag;
 }
 
-.toolbutton-darwin {
+.toolbutton {
   height: 18px;
   width: 18px;
-}
-
-.toolbutton-other {
-  height: 32px;
-  width: 32px;
+  -webkit-app-region: no-drag;
 }
 
 .keybutton {
@@ -207,14 +205,14 @@
 }
 
 .header {
-  justify-self: center;
-  height: 40px;
+  height: 18px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   background-color: #f2f3f5;
   -webkit-app-region: drag;
+  margin-bottom: 8px;
 }
 
 .headerbutton {
@@ -425,13 +423,16 @@ export default {
       if (result == "darwin") {
         this.darwin.isDarwin = true;
         document.querySelector(".toolbar").style.marginLeft = "64px";
-        document
-          .querySelector(".toolbutton")
-          .classList.add("toolbutton-darwin");
+        setInterval(async () => {
+          const isFullScreen = await window.electronAPI.WindowsIsFullScreen();
+          if (isFullScreen) {
+            document.querySelector(".toolbar").style.marginLeft = "4px";
+          } else {
+            document.querySelector(".toolbar").style.marginLeft = "64px";
+          }
+        }, 100);
       } else {
         document.querySelector(".toolbar").style.marginLeft = "4px";
-        document.querySelector(".toolbar").style.alignItems = "center";
-        document.querySelector(".toolbutton").classList.add("toolbutton-other");
         setInterval(async () => {
           this.windows.isMaxmaximize =
             await window.electronAPI.WindowsIsMaximized();

@@ -281,6 +281,10 @@ app.whenReady().then(() => {
     return mainWindow ? mainWindow.isMaximized() : false;
   });
 
+  ipcMain.handle("windows:isFullScreen", async () => {
+    return mainWindow ? mainWindow.isFullScreen() : false;
+  });
+
   ipcMain.handle("app:copyToTmp", async (event, file) => {
     return new Promise((resolve, reject) => {
       try {
