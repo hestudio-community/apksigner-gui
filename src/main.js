@@ -4,6 +4,7 @@ import started from "electron-squirrel-startup";
 import { spawn } from "node:child_process";
 import { CheckJavaHome, CreateKey } from "./utils/CreateKey";
 import { Config, Storage } from "./utils/storage";
+import fs from "node:fs";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -398,6 +399,16 @@ app.whenReady().then(() => {
         } else {
           resolve(false);
         }
+      } catch (error) {
+        reject(error.message);
+      }
+    });
+  });
+
+  ipcMain.handle("system:checkFileExists", (event, filePath) => {
+    return new Promise((resolve, reject) => {
+      try {
+        resolve(fs.existsSync(filePath));
       } catch (error) {
         reject(error.message);
       }

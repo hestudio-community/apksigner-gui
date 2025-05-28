@@ -284,6 +284,7 @@ export default {
         keyalg: undefined,
         keysize: undefined,
         sigalg: undefined,
+        fileNotExists: undefined,
       },
       create: {
         open: false,
@@ -350,35 +351,45 @@ export default {
           plain: true,
         });
       } else {
-        let keyList;
-        window.electronAPI.config.get("keys").then((res) => {
-          if (res) {
-            keyList = res;
-          } else {
-            keyList = {};
+        window.electronAPI.checkFileExists(this.keystore).then((exists) => {
+          if (!exists) {
+            ElMessage({
+              message: this.i18n.fileNotExists(this.keystore),
+              type: "error",
+              plain: true,
+            });
+            return;
           }
-          
-          if (Object.keys(keyList).includes(this.name)) {
-          ElMessage({
-            message: this.i18n.HadSameKeyName,
-            type: "error",
-            plain: true,
+          let keyList;
+          window.electronAPI.config.get("keys").then((res) => {
+            if (res) {
+              keyList = res;
+            } else {
+              keyList = {};
+            }
+
+            if (Object.keys(keyList).includes(this.name)) {
+              ElMessage({
+                message: this.i18n.HadSameKeyName,
+                type: "error",
+                plain: true,
+              });
+              return;
+            } else {
+              keyList[this.name] = {
+                type: 1,
+                keystore: this.keystore,
+                keyalias: this.keyalias,
+                keypasswd: this.keypasswd,
+              };
+              window.electronAPI.config.set("keys", keyList);
+              ElMessage({
+                message: this.i18n.saveSuccess,
+                type: "success",
+                plain: true,
+              });
+            }
           });
-          return;
-        } else {
-          keyList[this.name] = {
-            type: 1,
-            keystore: this.keystore,
-            keyalias: this.keyalias,
-            keypasswd: this.keypasswd,
-          };
-          window.electronAPI.config.set("keys", keyList);
-          ElMessage({
-            message: this.i18n.saveSuccess,
-            type: "success",
-            plain: true,
-          });
-        }
         });
       }
     },

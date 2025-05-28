@@ -77,6 +77,7 @@ export default {
         AllFiles: undefined,
         CheckDeficiencies: undefined,
         HadSameKeyName: undefined,
+        fileNotExists: undefined,
       },
     };
   },
@@ -111,23 +112,33 @@ export default {
           plain: true,
         });
       } else {
-        let keyList;
-        window.electronAPI.config.get("keys").then((res) => {
-          keyList = res;
-          if (this.name != this.keyname) {
-            delete keyList[this.keyname];
+        window.electronAPI.checkFileExists(this.keystore).then((exists) => {
+          if (!exists) {
+            ElMessage({
+              message: this.i18n.fileNotExists(this.keystore),
+              type: "error",
+              plain: true,
+            });
+            return;
           }
-          keyList[this.name] = {
-            type: 1,
-            keystore: this.keystore,
-            keyalias: this.keyalias,
-            keypasswd: this.keypasswd,
-          };
-          window.electronAPI.config.set("keys", keyList);
-          ElMessage({
-            message: this.i18n.saveSuccess,
-            type: "success",
-            plain: true,
+          let keyList;
+          window.electronAPI.config.get("keys").then((res) => {
+            keyList = res;
+            if (this.name != this.keyname) {
+              delete keyList[this.keyname];
+            }
+            keyList[this.name] = {
+              type: 1,
+              keystore: this.keystore,
+              keyalias: this.keyalias,
+              keypasswd: this.keypasswd,
+            };
+            window.electronAPI.config.set("keys", keyList);
+            ElMessage({
+              message: this.i18n.saveSuccess,
+              type: "success",
+              plain: true,
+            });
           });
         });
       }

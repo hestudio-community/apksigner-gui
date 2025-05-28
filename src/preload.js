@@ -57,4 +57,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
     set: (key, value) => ipcRenderer.invoke("config:set", key, value),
     del: (key) => ipcRenderer.invoke("config:del", key),
   },
+  checkFileExists: (filePath) =>
+    ipcRenderer.invoke("system:checkFileExists", filePath),
 });

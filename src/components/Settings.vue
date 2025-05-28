@@ -255,6 +255,7 @@ export default {
         isChangeLanguageTo: undefined,
         back: undefined,
         openAutoCheckUpdate: undefined,
+        fileNotExists: undefined,
       },
       transitionName: "slide-left",
       AutoCheckUpdate: true,
@@ -300,12 +301,32 @@ export default {
         });
         return;
       } else {
-        window.electronAPI.config.set("apksigner", this.apksigner);
-        window.electronAPI.config.set("zipalign", this.zipalign);
-        ElMessage({
-          message: this.i18n.saveSuccess,
-          type: "success",
-          plain: true,
+        window.electronAPI.checkFileExists(this.apksigner).then((exists) => {
+          if (!exists) {
+            ElMessage({
+              message: this.i18n.fileNotExists(this.apksigner),
+              type: "error",
+              plain: true,
+            });
+            return;
+          }
+          window.electronAPI.config.set("apksigner", this.apksigner);
+          window.electronAPI.checkFileExists(this.zipalign).then((exists) => {
+            if (!exists) {
+              ElMessage({
+                message: this.i18n.fileNotExists(this.zipalign),
+                type: "error",
+                plain: true,
+              });
+              return;
+            }
+            window.electronAPI.config.set("zipalign", this.zipalign);
+            ElMessage({
+              message: this.i18n.saveSuccess,
+              type: "success",
+              plain: true,
+            });
+          });
         });
       }
     },

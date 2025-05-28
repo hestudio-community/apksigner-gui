@@ -85,4 +85,7 @@ export default {
   sigalg: "Signature algorithm",
   noApksignerLocation: "No apksigner location set",
   noZipalignLocation: "No zipalign location set",
+  fileNotExists: (filePath) => {
+    return `The file ${filePath} does not exist, please check if the path is correct`;
+  },
 };

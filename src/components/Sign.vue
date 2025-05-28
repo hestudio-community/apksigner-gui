@@ -283,6 +283,7 @@ export default {
         signFailed: undefined,
         noApksignerLocation: undefined,
         noZipalignLocation: undefined,
+        fileNotExists: undefined,
       },
     };
   },
@@ -345,83 +346,98 @@ export default {
         this.sign = false;
         return;
       } else {
-        window.electronAPI.CopyToTmp(this.input_apk).then(async (result) => {
-          window.electronAPI.config.get("keys").then((res) => {
-            const k = res[this.keyname];
-            window.electronAPI.config.get("apksigner").then((apksigner) => {
-              if (!apksigner) {
-                ElMessage({
-                  message: this.i18n.noApksignerLocation,
-                  type: "error",
-                  plain: true,
-                });
-                this.sign = false;
-                return;
-              }
-              let script = `${apksigner} sign -v --ks ${k.keystore} --ks-key-alias ${k.keyalias} --ks-pass pass:${k.keypasswd}`;
-              if (!this.output.rewrite) {
-                if (!this.output.path) {
+        window.electronAPI.checkFileExists(this.input_apk).then((exists) => {
+          if (!exists) {
+            ElMessage({
+              message: this.i18n.fileNotExists(this.input_apk),
+              type: "error",
+              plain: true,
+            });
+            this.sign = false;
+            return;
+          }
+          window.electronAPI.CopyToTmp(this.input_apk).then(async (result) => {
+            window.electronAPI.config.get("keys").then((res) => {
+              const k = res[this.keyname];
+              window.electronAPI.config.get("apksigner").then((apksigner) => {
+                if (!apksigner) {
                   ElMessage({
-                    message: this.i18n.CheckDeficiencies,
+                    message: this.i18n.noApksignerLocation,
                     type: "error",
                     plain: true,
                   });
                   this.sign = false;
                   return;
-                } else {
-                  script += ` --out ${this.output.path}`;
                 }
-              } else {
-                script += ` --out ${this.input_apk}`;
-              }
-              if (this.advancedSetting) {
-                if (!this.api.auto.min) {
-                  script += ` --min-sdk-version ${this.api.min}`;
-                }
-                if (!this.api.auto.max) {
-                  script += ` --max-sdk-version ${this.api.max}`;
-                }
-                if (!this.signplan.auto) {
-                  script += ` --v1-signing-enabled ${this.signplan.plans.includes(
-                    "V1"
-                  )}`;
-                  script += ` --v2-signing-enabled ${this.signplan.plans.includes(
-                    "V2"
-                  )}`;
-                  script += ` --v3-signing-enabled ${this.signplan.plans.includes(
-                    "V3"
-                  )}`;
-                  script += ` --v4-signing-enabled ${this.signplan.plans.includes(
-                    "V4"
-                  )}`;
-                }
-                if (this.zipalign.status) {
-                  window.electronAPI.config.get("zipalign").then((zipalign) => {
-                    if (!zipalign) {
-                      ElMessage({
-                        message: this.i18n.noZipalignLocation,
-                        type: "error",
-                        plain: true,
-                      });
-                      this.sign = false;
-                      return;
-                    }
-                    script += ` ${result}_zipalign.apk`;
-                    console.log(`${zipalign} -v -P ${this.zipalign.config.P} -f ${
-                        this.zipalign.config.Zopfli ? "-z" : ""
-                      } 4 ${result} ${result}_zipalign.apk && ${script}`)
-                    this.shell(
-                      `${zipalign} -v -P ${this.zipalign.config.P} -f ${
-                        this.zipalign.config.Zopfli ? "-z" : ""
-                      } 4 ${result} ${result}_zipalign.apk && ${script}`
-                    );
+                let script = `${apksigner} sign -v --ks ${k.keystore} --ks-key-alias ${k.keyalias} --ks-pass pass:${k.keypasswd}`;
+                if (!this.output.rewrite) {
+                  if (!this.output.path) {
+                    ElMessage({
+                      message: this.i18n.CheckDeficiencies,
+                      type: "error",
+                      plain: true,
+                    });
+                    this.sign = false;
                     return;
-                  });
+                  } else {
+                    script += ` --out ${this.output.path}`;
+                  }
                 } else {
-                  script += ` ${result}`;
-                  this.shell(`${script}`);
+                  script += ` --out ${this.input_apk}`;
                 }
-              }
+                if (this.advancedSetting) {
+                  if (!this.api.auto.min) {
+                    script += ` --min-sdk-version ${this.api.min}`;
+                  }
+                  if (!this.api.auto.max) {
+                    script += ` --max-sdk-version ${this.api.max}`;
+                  }
+                  if (!this.signplan.auto) {
+                    script += ` --v1-signing-enabled ${this.signplan.plans.includes(
+                      "V1"
+                    )}`;
+                    script += ` --v2-signing-enabled ${this.signplan.plans.includes(
+                      "V2"
+                    )}`;
+                    script += ` --v3-signing-enabled ${this.signplan.plans.includes(
+                      "V3"
+                    )}`;
+                    script += ` --v4-signing-enabled ${this.signplan.plans.includes(
+                      "V4"
+                    )}`;
+                  }
+                  if (this.zipalign.status) {
+                    window.electronAPI.config
+                      .get("zipalign")
+                      .then((zipalign) => {
+                        if (!zipalign) {
+                          ElMessage({
+                            message: this.i18n.noZipalignLocation,
+                            type: "error",
+                            plain: true,
+                          });
+                          this.sign = false;
+                          return;
+                        }
+                        script += ` ${result}_zipalign.apk`;
+                        console.log(
+                          `${zipalign} -v -P ${this.zipalign.config.P} -f ${
+                            this.zipalign.config.Zopfli ? "-z" : ""
+                          } 4 ${result} ${result}_zipalign.apk && ${script}`
+                        );
+                        this.shell(
+                          `${zipalign} -v -P ${this.zipalign.config.P} -f ${
+                            this.zipalign.config.Zopfli ? "-z" : ""
+                          } 4 ${result} ${result}_zipalign.apk && ${script}`
+                        );
+                        return;
+                      });
+                  } else {
+                    script += ` ${result}`;
+                    this.shell(`${script}`);
+                  }
+                }
+              });
             });
           });
         });

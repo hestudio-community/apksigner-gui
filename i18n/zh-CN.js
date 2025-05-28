@@ -85,4 +85,7 @@ export default {
   sigalg: "签名算法",
   noApksignerLocation: "未设置 apksigner 位置",
   noZipalignLocation: "未设置 zipalign 位置",
+  fileNotExists: (filePath) => {
+    return `文件 ${filePath} 不存在，请检查路径是否正确`;
+  }
 };
