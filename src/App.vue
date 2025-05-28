@@ -426,13 +426,13 @@ export default {
         setInterval(async () => {
           const isFullScreen = await window.electronAPI.WindowsIsFullScreen();
           if (isFullScreen) {
-            document.querySelector(".toolbar").style.marginLeft = "4px";
+            document.querySelector(".toolbar").style.marginLeft = "0px";
           } else {
             document.querySelector(".toolbar").style.marginLeft = "64px";
           }
         }, 100);
       } else {
-        document.querySelector(".toolbar").style.marginLeft = "4px";
+        document.querySelector(".toolbar").style.marginLeft = "0px";
         setInterval(async () => {
           this.windows.isMaxmaximize =
             await window.electronAPI.WindowsIsMaximized();
