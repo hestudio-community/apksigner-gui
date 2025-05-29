@@ -31,7 +31,7 @@
    winget install "heStudioCommunity.APKSignerGUI(Machine-MSI)"
    ```
 
-   當然，你也可以通過 Microsoft Store 下載，目前，該下載方法僅適用於 `amd64`.
+   當然，你也可以通過 Microsoft Store 下載。
 
    <a href="https://apps.microsoft.com/detail/9n3q8bk8dp86?mode=direct">
    <img src="https://get.microsoft.com/images/zh-tw%20dark.svg" width="200"/>
