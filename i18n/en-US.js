@@ -8,7 +8,7 @@ export default {
     return `Are you sure you want to delete the key "${keyname}"?`;
   },
   AddKey: "Add key",
-  EditKey: "Edit key",
+  editKey: "Edit key",
   AddKeyTips:
     "Currently, only keystore (.jks) files are supported. Support for certificates with separate public and private keys will be added in future versions.",
   name: "Name",
@@ -65,4 +65,28 @@ export default {
   signFailed: "Signature failed",
   back: "Back",
   openAutoCheckUpdate: "Enable automatic update check",
+  createKey: "Create key",
+  saveKeyTo: "Location to save the key",
+  keyPasswdAgain: "Enter the certificate password again",
+  aliasPasswd: "Alias password",
+  aliasPasswdAgain: "Enter alias password again",
+  expireDay: "Validity period",
+  org: "Organization",
+  orgUnit: "Organizational unit",
+  locality: "City",
+  state: "State/Province",
+  country: "Country",
+  create: "Create",
+  NoSamePasswd: "The passwords entered twice do not match",
+  JavaHomeNotFound:
+    "JAVA_HOME not found, please check if Java is installed or the JAVA_HOME environment variable is set correctly",
+  keyalg: "Key algorithm",
+  keysize: "Key size",
+  sigalg: "Signature algorithm",
+  noApksignerLocation: "No apksigner location set",
+  noZipalignLocation: "No zipalign location set",
+  fileNotExists: (filePath) => {
+    return `The file ${filePath} does not exist, please check if the path is correct`;
+  },
+  atLeast6Chars: "The password must be at least 6 characters",
 };

@@ -2,62 +2,60 @@ import zhCN from "../../i18n/zh-CN";
 import zhHK from "../../i18n/zh-HK";
 import enUS from "../../i18n/en-US";
 
-const supportLangList = [
-  {
+const supportLangList = {
+  "zh-CN": {
     lang: "zh-CN",
     display: "简体中文",
     library: zhCN,
   },
-  {
+  "zh-HK": {
     lang: "zh-HK",
     display: "繁體中文",
     library: zhHK,
   },
-  {
+  "en-US": {
     lang: "en-US",
     display: "English (US)",
     library: enUS,
   },
-];
+};
 
 export { supportLangList };
 
-/**
- * Get User Language
- * @returns
- */
-function getLang() {
-  if (localStorage.getItem("lang") != null) {
-    return localStorage.getItem("lang");
-  } else {
+export class internationalization {
+  constructor() {
+    this.lang = null;
+    this.userLang = {};
+  }
+
+  async init() {
+    let lang = await window.electronAPI.config.get("lang");
+    if (lang != null && supportLangList[lang]) {
+      this.lang = lang;
+      this.userLang = supportLangList[lang].library;
+      return;
+    }
+
     for (let i = 0; i < navigator.languages.length; i++) {
-      for (let j = 0; j < supportLangList.length; j++) {
-        if (navigator.languages[i] == supportLangList[j].lang) {
-          localStorage.setItem("lang", navigator.languages[i]);
-          return localStorage.getItem("lang");
-        }
+      const navLang = navigator.languages[i];
+      if (supportLangList[navLang]) {
+        this.lang = navLang;
+        this.userLang = supportLangList[navLang].library;
+        await window.electronAPI.config.set("lang", navLang);
+        return;
       }
     }
-    localStorage.setItem("lang", "en-US");
-    return localStorage.getItem("lang");
+
+    this.lang = "en-US";
+    this.userLang = supportLangList[this.lang].library;
+    await window.electronAPI.config.set("lang", this.lang);
   }
-}
-
-export { getLang };
-
-const userLang = ((langName) => {
-  for (let i = 0; i < supportLangList.length; i++) {
-    if (langName == supportLangList[i].lang) {
-      return supportLangList[i].library;
-    }
+  /**
+   * Translation to user language
+   * @param {string} source
+   * @returns {string} Translated string
+   */
+  geti18n(source) {
+    return this.userLang[source];
   }
-})(getLang());
-
-/**
- * Translation to user language
- * @param {string} source
- * @returns {string} Translated string
- */
-export function geti18n(source) {
-  return userLang[source];
 }

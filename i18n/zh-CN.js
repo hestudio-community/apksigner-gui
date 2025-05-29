@@ -8,7 +8,7 @@ export default {
     return `确定要删除密钥 "${keyname}" 吗？`;
   },
   AddKey: "添加密钥",
-  EditKey: "修改密钥",
+  editKey: "修改密钥",
   AddKeyTips:
     "目前仅支持 密钥库 (.jks)文件。对于公私钥分离的证书将在后续版本支持。",
   name: "名称",
@@ -65,4 +65,28 @@ export default {
   signFailed: "签名失败",
   back: "返回",
   openAutoCheckUpdate: "开启自动检查更新",
+  createKey: "创建密钥",
+  saveKeyTo: "密钥保存的位置",
+  keyPasswdAgain: "再次输入证书密码",
+  aliasPasswd: "别名密码",
+  aliasPasswdAgain: "再次输入别名密码",
+  expireDay: "有效期",
+  org: "组织",
+  orgUnit: "组织单位",
+  locality: "城市",
+  state: "州/省",
+  country: "国家",
+  create: "创建",
+  NoSamePasswd: "两次输入的密码不一致",
+  JavaHomeNotFound:
+    "未找到 JAVA_HOME，请检查 Java 是否安装或 JAVA_HOME 环境变量是否设置正确",
+  keyalg: "密钥算法",
+  keysize: "密钥大小",
+  sigalg: "签名算法",
+  noApksignerLocation: "未设置 apksigner 位置",
+  noZipalignLocation: "未设置 zipalign 位置",
+  fileNotExists: (filePath) => {
+    return `文件 ${filePath} 不存在，请检查路径是否正确`;
+  },
+  atLeast6Chars: "密码至少需要 6 个字符",
 };

@@ -1,7 +1,9 @@
 import { app, BrowserWindow, dialog, ipcMain, Menu, shell } from "electron";
 import path from "node:path";
 import started from "electron-squirrel-startup";
-import { exec } from "node:child_process";
+import { spawn } from "node:child_process";
+import { CheckJavaHome, CreateKey } from "./utils/CreateKey";
+import { Config, Storage } from "./utils/storage";
 import fs from "node:fs";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -9,21 +11,26 @@ if (started) {
   app.quit();
 }
 
-let tmp = undefined;
+// Ensure only one instance of the application is running
+const gotTheLock = app.requestSingleInstanceLock();
 
-if (process.platform == "win32") {
-  tmp = path.join(process.env.TEMP, "APKSignerGUI");
-} else if (process.platform == "linux") {
-  tmp = path.join("/tmp", "APKSignerGUI");
-} else if (process.platform == "darwin") {
-  tmp = path.join(process.env.HOME, "/Library/Caches", "APKSignerGUI");
+if (!gotTheLock) {
+  console.log("Another instance is already running, exiting current instance");
+  app.quit();
+} else {
+  app.on("second-instance", (event, commandLine, workingDirectory) => {
+    // When a second instance is launched, focus on the main window
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+  });
 }
 
-if (!fs.existsSync(tmp)) {
-  fs.mkdirSync(tmp);
-}
+const storage = new Storage();
+const config = new Config();
 
-// 保存mainWindow的引用以便在IPC处理程序中使用
+// Save reference to mainWindow for use in IPC handlers
 let mainWindow = null;
 
 const CheckUpdate = (forceShow) => {
@@ -109,6 +116,25 @@ const CheckUpdate = (forceShow) => {
         dialog.showErrorBox("APKSignerGUI", "Failed to check for updates.");
       }
     });
+
+  if (app.runningUnderARM64Translation) {
+    dialog
+      .showMessageBox({
+        title: "APKSignerGUI",
+        message: "APKSignerGUI",
+        detail:
+          "You are running the x86_64 version of APKSignerGUI on an arm64 platform via translation, we provide native arm64 platforms, you can check it out on our Github.",
+        type: "warning",
+        buttons: ["OK", "View in Github"],
+      })
+      .then((response) => {
+        if (response.response == 1) {
+          shell.openExternal(
+            "https://github.com/hestudio-community/apksigner-gui/releases/latest"
+          );
+        }
+      });
+  }
 };
 
 const AboutPanel = () => {
@@ -119,7 +145,8 @@ const AboutPanel = () => {
       detail: `
 Version: ${app.getVersion()}
 Platform: ${process.platform}
-AppPATH: ${app.getAppPath()}
+Architecture: ${process.arch}
+WorkStatus: ${app.isPackaged ? "Product" : "Develop"}
 Copyright: Copyright © 2025 heStudio Community
     `,
       type: "none",
@@ -186,13 +213,13 @@ const createWindow = () => {
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
-    // 添加图标配置
+    // Add icon configuration
     icon: path.join(__dirname, "../icon.png"),
-    titleBarStyle: "hidden",
+    titleBarStyle: "hiddenInset",
     frame: false,
   });
 
-  // 为Mac设置Dock图标
+  // Set Dock icon for Mac
   if (process.platform === "darwin") {
     const { nativeImage } = require("electron");
     const image = nativeImage.createFromPath(
@@ -240,12 +267,16 @@ app.whenReady().then(() => {
     return process.platform;
   });
 
-  // 开发工具处理程序
+  // DevTools handler
   ipcMain.handle("devtools:open", async () => {
     if (mainWindow) mainWindow.webContents.openDevTools();
   });
 
-  // Windows控制处理程序
+  ipcMain.handle("system:isDevMode", async () => {
+    return !app.isPackaged;
+  });
+
+  // Windows control handlers
   if (process.platform != "darwin") {
     ipcMain.handle("windows:close", async () => {
       app.quit();
@@ -275,35 +306,162 @@ app.whenReady().then(() => {
     return mainWindow ? mainWindow.isMaximized() : false;
   });
 
+  ipcMain.handle("windows:isFullScreen", async () => {
+    return mainWindow ? mainWindow.isFullScreen() : false;
+  });
+
   ipcMain.handle("app:copyToTmp", async (event, file) => {
-    const tmpPath = path.join(tmp, path.basename(file));
-    fs.copyFileSync(file, tmpPath);
-    return tmpPath;
+    return new Promise((resolve, reject) => {
+      try {
+        const tmpFilePath = storage.copyToTmp(file);
+        resolve(tmpFilePath);
+      } catch (error) {
+        reject(error.message);
+      }
+    });
   });
 
   ipcMain.handle("app:clearTmpDir", async () => {
-    try {
-      fs.rmdirSync(tmp, { recursive: true });
-      fs.mkdirSync(tmp);
-      return true;
-    } catch (e) {
-      console.error(e);
-      return e;
-    }
+    return new Promise((resolve, reject) => {
+      try {
+        storage.clearTmpDir();
+        resolve(true);
+      } catch (error) {
+        reject(error.message);
+      }
+    });
+  });
+
+  ipcMain.handle("system:shell", (event, shellCommand) => {
+    return new Promise((resolve, reject) => {
+      const shell = spawn(shellCommand, {
+        shell: true,
+      });
+
+      let stdout = "";
+      let stderr = "";
+
+      shell.stdout.on("data", (data) => {
+        stdout += data.toString();
+      });
+
+      shell.stderr.on("data", (data) => {
+        stderr += data.toString();
+      });
+
+      shell.on("close", (code) => {
+        if (code === 0) {
+          resolve(stdout);
+        } else {
+          reject(stderr || `Process exited with code ${code}`);
+        }
+      });
+
+      shell.on("error", (err) => {
+        reject(`Failed to start command: ${err.message}`);
+      });
+    });
+  });
+
+  ipcMain.handle("config:get", (event, key) => {
+    return new Promise((resolve, reject) => {
+      try {
+        const value = config.get(key);
+        resolve(value);
+      } catch (error) {
+        reject(error.message);
+      }
+    });
+  });
+  ipcMain.handle("config:set", (event, key, value) => {
+    return new Promise((resolve, reject) => {
+      try {
+        config.set(key, value);
+        resolve(true);
+      } catch (error) {
+        reject(error.message);
+      }
+    });
+  });
+  ipcMain.handle("config:del", (event, key) => {
+    return new Promise((resolve, reject) => {
+      try {
+        config.del(key);
+        resolve(true);
+      } catch (error) {
+        reject(error.message);
+      }
+    });
+  });
+
+  ipcMain.handle("system:checkJavaHome", (event) => {
+    return new Promise((resolve, reject) => {
+      try {
+        const isJavaHomeValid = CheckJavaHome();
+        if (isJavaHomeValid) {
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      } catch (error) {
+        reject(error.message);
+      }
+    });
+  });
+
+  ipcMain.handle("system:checkFileExists", (event, filePath) => {
+    return new Promise((resolve, reject) => {
+      try {
+        resolve(fs.existsSync(filePath));
+      } catch (error) {
+        reject(error.message);
+      }
+    });
   });
 
   ipcMain.handle(
-    "system:shell",
-    (event, shell) =>
-      new Promise((resolve, reject) => {
-        exec(shell, (error, stdout, stderr) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(stdout);
-          }
-        });
-      })
+    "app:createKey",
+    (
+      event,
+      keyPath,
+      keyPasswd,
+      alias,
+      aliasPasswd,
+      expireDay,
+      name,
+      org,
+      orgUnit,
+      locality,
+      state,
+      country,
+      keyalg,
+      keysize,
+      sigalg
+    ) => {
+      return new Promise((resolve, reject) => {
+        try {
+          const result = CreateKey(
+            keyPath,
+            keyPasswd,
+            alias,
+            aliasPasswd,
+            expireDay,
+            name,
+            org,
+            orgUnit,
+            locality,
+            state,
+            country,
+            keyalg,
+            keysize,
+            sigalg
+          );
+          resolve(result);
+        } catch (error) {
+          reject(error.message);
+        }
+      });
+    }
   );
 
   createWindow();
@@ -315,7 +473,7 @@ app.whenReady().then(() => {
   });
 });
 
-// 其余代码保持不变
+// Remaining code stays unchanged
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();

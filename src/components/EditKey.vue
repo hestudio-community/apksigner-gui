@@ -1,5 +1,5 @@
 <template>
-  <h2>{{ i18n.EditKey }}</h2>
+  <h2>{{ i18n.editKey }}</h2>
   <el-scrollbar style="max-height: calc(100vh - 120px)">
     <el-card>
       <div>
@@ -53,7 +53,7 @@
 <script setup>
 import { FolderOpened } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
-import { geti18n } from "../utils/i18n.js";
+import { internationalization } from "../utils/i18n.js";
 </script>
 
 <script>
@@ -65,7 +65,7 @@ export default {
       keyalias: "",
       keypasswd: "",
       i18n: {
-        EditKey: undefined,
+        editKey: undefined,
         AddKeyTips: undefined,
         name: undefined,
         jksLocation: undefined,
@@ -77,6 +77,8 @@ export default {
         AllFiles: undefined,
         CheckDeficiencies: undefined,
         HadSameKeyName: undefined,
+        fileNotExists: undefined,
+        atLeast6Chars: undefined,
       },
     };
   },
@@ -111,38 +113,62 @@ export default {
           plain: true,
         });
       } else {
-        if (this.name != this.keyname) {
-          localStorage.removeItem(`key-${this.keyname}`);
+        if (this.keypasswd.length < 6) {
+          ElMessage({
+            message: this.i18n.atLeast6Chars,
+            type: "error",
+            plain: true,
+          });
+          return;
         }
-        localStorage.setItem(
-          `key-${this.name}`,
-          JSON.stringify({
-            type: 1,
-            keystore: this.keystore,
-            keyalias: this.keyalias,
-            keypasswd: this.keypasswd,
-          })
-        );
-        ElMessage({
-          message: this.i18n.saveSuccess,
-          type: "success",
-          plain: true,
+        window.electronAPI.checkFileExists(this.keystore).then((exists) => {
+          if (!exists) {
+            ElMessage({
+              message: this.i18n.fileNotExists(this.keystore),
+              type: "error",
+              plain: true,
+            });
+            return;
+          }
+          let keyList;
+          window.electronAPI.config.get("keys").then((res) => {
+            keyList = res;
+            if (this.name != this.keyname) {
+              delete keyList[this.keyname];
+            }
+            keyList[this.name] = {
+              type: 1,
+              keystore: this.keystore,
+              keyalias: this.keyalias,
+              keypasswd: this.keypasswd,
+            };
+            window.electronAPI.config.set("keys", keyList);
+            ElMessage({
+              message: this.i18n.saveSuccess,
+              type: "success",
+              plain: true,
+            });
+          });
         });
       }
     },
   },
-  created() {
+  async created() {
+    const i18n = new internationalization();
+    await i18n.init();
     for (let i = 0; i < Object.keys(this.i18n).length; i++) {
       const key = Object.keys(this.i18n)[i];
-      this.i18n[key] = geti18n(key);
+      this.i18n[key] = i18n.geti18n(key);
     }
   },
   mounted() {
-    const key = JSON.parse(localStorage.getItem(`key-${this.keyname}`));
-    this.name = this.keyname;
-    this.keystore = key.keystore;
-    this.keyalias = key.keyalias;
-    this.keypasswd = key.keypasswd;
+    window.electronAPI.config.get("keys").then((res) => {
+      const keyInfo = res[this.keyname];
+      this.name = this.keyname;
+      this.keystore = keyInfo.keystore;
+      this.keyalias = keyInfo.keyalias;
+      this.keypasswd = keyInfo.keypasswd;
+    });
   },
 };
 </script>

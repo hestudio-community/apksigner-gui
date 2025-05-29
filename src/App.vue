@@ -2,36 +2,11 @@
   <div style="max-height: calc(100vh)">
     <el-container>
       <el-aside class="aside">
-        <div class="buttonbox">
-          <el-button
-            text
-            style="height: 32px; width: 32px"
-            @click="openaddkey = true"
+        <div class="toolbar">
+          <el-button text class="toolbutton" @click="openaddkey = true"
             ><el-icon><Plus /></el-icon
           ></el-button>
-          <el-button
-            text
-            style="height: 32px; width: 32px"
-            @click="
-              keyRemoveStatus = !keyRemoveStatus;
-              openeditkey = false;
-            "
-            ><el-icon><Minus /></el-icon>
-          </el-button>
-          <el-button
-            text
-            style="height: 32px; width: 32px"
-            @click="
-              openeditkey = !openeditkey;
-              keyRemoveStatus = false;
-            "
-            ><el-icon><Edit /></el-icon>
-          </el-button>
-          <el-button
-            text
-            style="height: 32px; width: 32px"
-            @click="RefreshKey"
-            class="refresh"
+          <el-button text @click="RefreshKey" class="toolbutton refresh"
             ><el-icon><Refresh /></el-icon>
           </el-button>
           <div>
@@ -61,61 +36,54 @@
             </el-drawer>
           </div>
         </div>
-        <br />
-        <el-scrollbar style="max-height: calc(100vh - 100px)">
+        <el-scrollbar style="max-height: calc(100vh - 100px - 18px)">
           <div v-loading="keyLoading">
             <div
               class="keybutton"
               style="display: flex; flex-direction: column"
               v-for="item in keyList"
             >
-              <el-button
-                @click="openSign = item"
-                tag="div"
-                text
-                bg
-                style="
-                  width: 190px;
-                  display: flex;
-                  flex-direction: row;
-                  justify-content: space-between;
-                "
-              >
-                <div>
-                  <transition name="rotate-fade">
-                    <el-button
-                      text
-                      style="height: 32px; width: 32px"
-                      v-if="keyRemoveStatus"
-                      @click="RemoveKey(item)"
-                      ><el-icon><RemoveFilled /></el-icon
-                    ></el-button>
-                  </transition>
-                  <transition name="rotate-fade">
-                    <el-button
-                      text
-                      style="height: 32px; width: 32px"
-                      v-if="openeditkey"
-                      @click="
-                        editkey.status = true;
-                        editkey.keyname = item;
-                      "
-                      ><el-icon><EditPen /></el-icon
-                    ></el-button>
-                  </transition>
-                </div>
-                <div
+              <el-dropdown trigger="contextmenu" placement="bottom-end">
+                <el-button
+                  @click="openSign = item"
+                  tag="div"
+                  text
+                  bg
                   style="
-                    text-align: left;
-                    overflow: hidden;
-                    white-space: nowrap;
-                    text-overflow: ellipsis;
-                    width: 135px;
+                    width: 190px;
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
                   "
                 >
-                  <text>{{ item }}</text>
-                </div>
-              </el-button>
+                  <div
+                    style="
+                      text-align: left;
+                      overflow: hidden;
+                      white-space: nowrap;
+                      text-overflow: ellipsis;
+                      width: 135px;
+                    "
+                  >
+                    <text>{{ item }}</text>
+                  </div>
+                </el-button>
+                <template #dropdown>
+                  <el-dropdown-item
+                    :icon="Edit"
+                    @click="
+                      editkey.status = true;
+                      editkey.keyname = item;
+                    "
+                    >{{ i18n.editKey }}</el-dropdown-item
+                  >
+                  <el-dropdown-item
+                    :icon="RemoveFilled"
+                    @click="RemoveKey(item)"
+                    >{{ i18n.DeleteKey }}</el-dropdown-item
+                  >
+                </template>
+              </el-dropdown>
             </div>
           </div>
         </el-scrollbar>
@@ -127,7 +95,7 @@
             <div>
               <el-button
                 text
-                style="height: 32px; width: 32px"
+                style="height: 18px; width: 18px"
                 @click="opensetting = true"
               >
                 <el-icon><Setting /></el-icon>
@@ -136,7 +104,7 @@
             <div v-if="!darwin.isDarwin">
               <el-button
                 text
-                style="height: 32px; width: 32px"
+                style="height: 18px; width: 18px"
                 @click="WindowsMinimize"
               >
                 <el-icon
@@ -148,7 +116,7 @@
               </el-button>
               <el-button
                 text
-                style="height: 32px; width: 32px"
+                style="height: 18px; width: 18px"
                 @click="WindowsMaximize"
                 v-if="windows.isMaxmaximize"
               >
@@ -161,7 +129,7 @@
               </el-button>
               <el-button
                 text
-                style="height: 32px; width: 32px"
+                style="height: 18px; width: 18px"
                 @click="WindowsMaximize"
                 v-else
               >
@@ -174,7 +142,7 @@
               </el-button>
               <el-button
                 text
-                style="height: 32px; width: 32px"
+                style="height: 18px; width: 18px"
                 @click="WindowsClose"
               >
                 <el-icon
@@ -216,9 +184,19 @@
   height: calc(100vh - 20px);
 }
 
-.buttonbox {
+.toolbar {
   display: flex;
   flex-direction: row;
+  height: 18px;
+  margin-bottom: 8px;
+  align-items: center;
+  -webkit-app-region: drag;
+}
+
+.toolbutton {
+  height: 18px;
+  width: 18px;
+  -webkit-app-region: no-drag;
 }
 
 .keybutton {
@@ -227,14 +205,14 @@
 }
 
 .header {
-  justify-self: center;
-  height: 40px;
+  height: 18px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   background-color: #f2f3f5;
   -webkit-app-region: drag;
+  margin-bottom: 8px;
 }
 
 .headerbutton {
@@ -270,6 +248,18 @@
   border-bottom-right-radius: 10px;
 }
 
+.el-input-number__decrease {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  margin-top: 5.5px;
+}
+
+.el-input-number__increase {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  margin-top: 5.5px;
+}
+
 .el-button {
   border-radius: 10px;
 }
@@ -286,19 +276,8 @@
   border-radius: 15px;
 }
 
-.rotate-fade-enter-active,
-.rotate-fade-leave-active {
-  transition: opacity 0.309s ease, transform 0.618s ease;
-}
-
-.rotate-fade-enter-from {
-  opacity: 0;
-  transform: rotate(-90deg);
-}
-
-.rotate-fade-leave-to {
-  opacity: 0;
-  transform: rotate(90deg);
+.el-dialog {
+  border-radius: 15px;
 }
 
 .element-rotate {
@@ -315,6 +294,14 @@
   border-radius: 15px;
 }
 
+.el-dropdown-menu__item {
+  border-radius: 15px;
+}
+
+.el-popper__arrow {
+  left: 80% !important;
+}
+
 @media (prefers-color-scheme: dark) {
   .header {
     background-color: #141414;
@@ -329,12 +316,10 @@
 <script setup>
 import {
   Plus,
-  Minus,
   Setting,
   Refresh,
   RemoveFilled,
   Edit,
-  EditPen,
 } from "@element-plus/icons-vue";
 import { Icon } from "@iconify/vue";
 import SettingPage from "./components/Settings.vue";
@@ -342,7 +327,7 @@ import AddKey from "./components/AddKey.vue";
 import EditKey from "./components/EditKey.vue";
 import Sign from "./components/Sign.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { geti18n } from "./utils/i18n.js";
+import { internationalization } from "./utils/i18n.js";
 </script>
 
 <script>
@@ -351,7 +336,6 @@ export default {
     return {
       opensetting: false,
       openaddkey: false,
-      openeditkey: false,
       editkey: {
         status: false,
         keyname: "",
@@ -364,7 +348,6 @@ export default {
       },
       keyList: [],
       keyLoading: true,
-      keyRemoveStatus: false,
       openSign: "",
       i18n: {
         noKeyTip: undefined,
@@ -373,30 +356,28 @@ export default {
         DeleteSuccess: undefined,
         DeleteKey: undefined,
         DeleyeKeyTip: undefined,
+        editKey: undefined,
       },
     };
   },
   methods: {
     async RefreshKey() {
-      this.openeditkey = false;
-      this.keyRemoveStatus = false;
       this.keyLoading = true;
       document.querySelector(".refresh").classList.add("element-rotate");
       setTimeout(() => {
         document.querySelector(".refresh").classList.remove("element-rotate");
       }, 618);
       this.keyList = [];
-      const MyList = localStorage;
-      for (let i = 0; i < MyList.length; i++) {
-        if (MyList.key(i).substring(0, 4) == "key-") {
-          await this.keyList.push(
-            MyList.key(i).substring(4, MyList.key(i).length)
-          );
+      window.electronAPI.config.get("keys").then((data) => {
+        if (data) {
+          this.keyList = Object.keys(data);
+          if (!this.keyList.includes(this.openSign)) {
+            this.openSign = "";
+          }
+        } else {
+          this.openSign = "";
         }
-      }
-      if (localStorage.getItem(`key-${this.openSign}`) == null) {
-        this.openSign = "";
-      }
+      });
       this.keyLoading = false;
     },
     RemoveKey(keyname) {
@@ -409,13 +390,18 @@ export default {
           type: "warning",
         }
       ).then(() => {
-        localStorage.removeItem(`key-${keyname}`);
-        ElMessage({
-          message: this.i18n.DeleteSuccess,
-          type: "success",
-          plain: true,
+        window.electronAPI.config.get("keys").then((data) => {
+          if (data && data[keyname]) {
+            delete data[keyname];
+            window.electronAPI.config.set("keys", data);
+          }
+          ElMessage({
+            message: this.i18n.DeleteSuccess,
+            type: "success",
+            plain: true,
+          });
+          this.RefreshKey();
         });
-        this.RefreshKey();
       });
     },
     WindowsClose() {
@@ -428,31 +414,43 @@ export default {
       window.electronAPI.WindowsMaximize();
     },
   },
-  created() {
+  async created() {
+    const i18n = new internationalization();
+    await i18n.init();
     for (let i = 0; i < Object.keys(this.i18n).length; i++) {
       const key = Object.keys(this.i18n)[i];
-      this.i18n[key] = geti18n(key);
+      this.i18n[key] = i18n.geti18n(key);
     }
-  },
-  mounted() {
     window.electronAPI.SystemPlatfrom().then(async (result) => {
       if (result == "darwin") {
         this.darwin.isDarwin = true;
-        document.querySelector(".buttonbox").style.marginTop = "16px";
+        document.querySelector(".toolbar").style.marginLeft = "64px";
+        setInterval(async () => {
+          const isFullScreen = await window.electronAPI.WindowsIsFullScreen();
+          if (isFullScreen) {
+            document.querySelector(".toolbar").style.marginLeft = "0px";
+          } else {
+            document.querySelector(".toolbar").style.marginLeft = "64px";
+          }
+        }, 100);
       } else {
+        document.querySelector(".toolbar").style.marginLeft = "0px";
         setInterval(async () => {
           this.windows.isMaxmaximize =
             await window.electronAPI.WindowsIsMaximized();
         }, 100);
       }
     });
-
-    if (localStorage.getItem("checkUpdate") == null) {
-      localStorage.setItem("checkUpdate", "true");
-    }
-    if (localStorage.getItem("checkUpdate") == "true") {
-      window.electronAPI.AppCheckUpdate(false);
-    }
+  },
+  mounted() {
+    window.electronAPI.config.get("checkUpdate").then((data) => {
+      if (data == null) {
+        window.electronAPI.config.set("checkUpdate", true);
+        window.electronAPI.AppCheckUpdate(false);
+      } else if (data) {
+        window.electronAPI.AppCheckUpdate(false);
+      }
+    });
 
     setInterval(async () => {
       if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
@@ -462,17 +460,20 @@ export default {
       }
     }, 100);
     this.RefreshKey().then(() => {
-      const lastUseKey = localStorage.getItem("lastUseKey");
-      if (this.keyList.includes(lastUseKey)) {
-        this.openSign = lastUseKey;
-      }
+      window.electronAPI.config.get("lastUseKey").then((data) => {
+        if (data && this.keyList.includes(data)) {
+          this.openSign = data;
+        } else {
+          this.openSign = "";
+        }
+      });
     });
 
     setInterval(async () => {
       if (this.keyList.includes(this.openSign)) {
-        localStorage.setItem("lastUseKey", this.openSign);
+        window.electronAPI.config.set("lastUseKey", this.openSign);
       }
-    });
+    }, 100);
   },
 };
 </script>

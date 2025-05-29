@@ -26,15 +26,17 @@
 
 1. 前往 [Release](https://github.com/hestudio-community/apksigner-gui/releases/latest) 下载最新版本。
 2. Windows 用户可以使用 [WinGet](https://learn.microsoft.com/zh-cn/windows/package-manager/winget/) 安装。
+
    ```powershell
    winget install "heStudioCommunity.APKSignerGUI(Machine-MSI)"
    ```
-   
-   当然，你也可以通过 Microsoft Store 下载，目前，该下载方法仅适用于 `amd64`.
+
+   当然，你也可以通过 Microsoft Store 下载。
 
    <a href="https://apps.microsoft.com/detail/9n3q8bk8dp86?mode=direct">
    <img src="https://get.microsoft.com/images/zh-cn%20dark.svg" width="200"/>
    </a>
+
 3. 参考文末方式构建。
 
 ### 关于兼容性
@@ -79,6 +81,8 @@
 - 你也可以通过复制源代码的 `i18n` 目录下的其中一个你熟知的语言进行翻译，当你提交后，我们将会为你完成剩余操作。
 
 我们要求的语言代码以 [ISO 639-1](https://en.wikipedia.org/wiki/ISO_639-1) 为标准，国家或地区代码以 [ISO 3166-1](https://en.wikipedia.org/wiki/ISO_3166-1) 为标准。
+
+感谢 [Crowdin](https://crowdin.com/) 为本项目提供的开源许可证。
 
 ### 如何构建？
 

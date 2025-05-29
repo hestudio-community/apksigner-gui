@@ -9,6 +9,7 @@
               text
               style="height: 32px; width: 32px"
               @click="open_devtools"
+              v-if="isDevMode"
               ><Icon
                 icon="fluent:window-dev-tools-20-regular"
                 width="20"
@@ -215,7 +216,7 @@
 import { FolderOpened } from "@element-plus/icons-vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { Icon } from "@iconify/vue";
-import { geti18n, supportLangList } from "../utils/i18n.js";
+import { internationalization, supportLangList } from "../utils/i18n.js";
 </script>
 
 <script>
@@ -255,9 +256,11 @@ export default {
         isChangeLanguageTo: undefined,
         back: undefined,
         openAutoCheckUpdate: undefined,
+        fileNotExists: undefined,
       },
       transitionName: "slide-left",
       AutoCheckUpdate: true,
+      isDevMode: false,
     };
   },
   methods: {
@@ -300,12 +303,32 @@ export default {
         });
         return;
       } else {
-        localStorage.setItem("apksigner", this.apksigner);
-        localStorage.setItem("zipalign", this.zipalign);
-        ElMessage({
-          message: this.i18n.saveSuccess,
-          type: "success",
-          plain: true,
+        window.electronAPI.checkFileExists(this.apksigner).then((exists) => {
+          if (!exists) {
+            ElMessage({
+              message: this.i18n.fileNotExists(this.apksigner),
+              type: "error",
+              plain: true,
+            });
+            return;
+          }
+          window.electronAPI.config.set("apksigner", this.apksigner);
+          window.electronAPI.checkFileExists(this.zipalign).then((exists) => {
+            if (!exists) {
+              ElMessage({
+                message: this.i18n.fileNotExists(this.zipalign),
+                type: "error",
+                plain: true,
+              });
+              return;
+            }
+            window.electronAPI.config.set("zipalign", this.zipalign);
+            ElMessage({
+              message: this.i18n.saveSuccess,
+              type: "success",
+              plain: true,
+            });
+          });
         });
       }
     },
@@ -333,11 +356,10 @@ export default {
           }
         ).then(() => {
           this.advancedSetting = true;
-          localStorage.setItem("advancedSetting", 1);
-          window.electronAPI.openAdvancedSetting();
+          window.electronAPI.config.set("advancedSetting", true);
         });
       } else {
-        localStorage.setItem("advancedSetting", 0);
+        window.electronAPI.config.set("advancedSetting", false);
       }
     },
     clearTmpDir() {
@@ -361,59 +383,79 @@ export default {
       });
     },
     changelanguage() {
-      if (this.lang.chooseLang != localStorage.getItem("lang")) {
-        let display = null;
-        for (let index = 0; index < supportLangList.length; index++) {
-          const element = supportLangList[index];
-          if (element.lang == this.lang.chooseLang) {
-            display = element.display;
+      window.electronAPI.config.get("lang").then((result) => {
+        if (this.lang.chooseLang != result) {
+          let display = null;
+          for (
+            let index = 0;
+            index < Object.values(supportLangList).length;
+            index++
+          ) {
+            const element = Object.values(supportLangList)[index];
+            if (element.lang == this.lang.chooseLang) {
+              display = element.display;
+            }
           }
+          ElMessageBox.confirm(
+            this.i18n.isChangeLanguageTo(display),
+            this.i18n.chooseLanguage,
+            {
+              confirmButtonText: this.i18n.confirm,
+              cancelButtonText: this.i18n.cancel,
+              type: "warning",
+            }
+          )
+            .then(() => {
+              window.electronAPI.config
+                .set("lang", this.lang.chooseLang)
+                .then(() => {
+                  window.location.reload();
+                });
+            })
+            .catch(() => {
+              window.electronAPI.config.get("lang").then((result) => {
+                this.lang.chooseLang = result;
+              });
+            });
         }
-        ElMessageBox.confirm(
-          this.i18n.isChangeLanguageTo(display),
-          this.i18n.chooseLanguage,
-          {
-            confirmButtonText: this.i18n.confirm,
-            cancelButtonText: this.i18n.cancel,
-            type: "warning",
-          }
-        )
-          .then(() => {
-            localStorage.setItem("lang", this.lang.chooseLang);
-            window.location.reload();
-          })
-          .catch(() => {
-            this.lang.chooseLang = localStorage.getItem("lang");
-          });
-      }
+      });
     },
     ChangeAutoCheckUpdate() {
       if (this.AutoCheckUpdate) {
-        localStorage.setItem("checkUpdate", "true");
+        window.electronAPI.config.set("checkUpdate", true);
       } else {
-        localStorage.setItem("checkUpdate", "false");
+        window.electronAPI.config.set("checkUpdate", false);
       }
     },
   },
-  created() {
+  async created() {
+    const i18n = new internationalization();
+    await i18n.init();
     for (let i = 0; i < Object.keys(this.i18n).length; i++) {
       const key = Object.keys(this.i18n)[i];
-      this.i18n[key] = geti18n(key);
+      this.i18n[key] = i18n.geti18n(key);
     }
   },
   mounted() {
-    this.apksigner = localStorage.getItem("apksigner");
-    this.zipalign = localStorage.getItem("zipalign");
-    this.lang.langlist = supportLangList;
-    this.lang.chooseLang = localStorage.getItem("lang");
-    if (localStorage.getItem("advancedSetting") == 1) {
-      this.advancedSetting = true;
-    }
-    if (localStorage.getItem("checkUpdate") == "true") {
-      this.AutoCheckUpdate = true;
-    } else {
-      this.AutoCheckUpdate = false;
-    }
+    window.electronAPI.config.get("apksigner").then((result) => {
+      this.apksigner = result;
+    });
+    window.electronAPI.config.get("zipalign").then((result) => {
+      this.zipalign = result;
+    });
+    window.electronAPI.config.get("advancedSetting").then((result) => {
+      this.advancedSetting = result;
+    });
+    window.electronAPI.config.get("lang").then((result) => {
+      this.lang.chooseLang = result;
+    });
+    this.lang.langlist = Object.values(supportLangList);
+    window.electronAPI.config.get("checkUpdate").then((result) => {
+      this.AutoCheckUpdate = result;
+    });
+    window.electronAPI.isDevMode().then((result) => {
+      this.isDevMode = result;
+    });
   },
 };
 </script>

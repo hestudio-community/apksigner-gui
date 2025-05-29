@@ -1,3 +1,12 @@
 {
-    "editor.tabSize": 2
+    "editor.tabSize": 2,
+    "conventionalCommits.scopes": [
+        "Main",
+        "UI",
+        "Settings",
+        "KeyConsole",
+        "Sign",
+        "Service",
+        "i18n"
+    ]
 }

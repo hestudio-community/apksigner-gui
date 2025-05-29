@@ -8,7 +8,7 @@ export default {
     return `確定要刪除密鑰 "${keyname}" 嗎？`;
   },
   AddKey: "添加密鑰",
-  EditKey: "修改密鑰",
+  editKey: "修改密鑰",
   AddKeyTips:
     "目前僅支持 密鑰庫 (.jks)文件。對於公私鑰分離的證書將在後續版本支持。",
   name: "名稱",
@@ -65,4 +65,28 @@ export default {
   signFailed: "簽名失敗",
   back: "返回",
   openAutoCheckUpdate: "開啟自動檢查更新",
+  createKey: "創建密鑰",
+  saveKeyTo: "密鑰保存的位置",
+  keyPasswdAgain: "再次輸入證書密碼",
+  aliasPasswd: "別名密碼",
+  aliasPasswdAgain: "再次輸入別名密碼",
+  expireDay: "有效期",
+  org: "組織",
+  orgUnit: "組織單位",
+  locality: "城市",
+  state: "州/省",
+  country: "國家",
+  create: "創建",
+  NoSamePasswd: "兩次輸入的密碼不一致",
+  JavaHomeNotFound:
+    "找不到 JAVA_HOME，請檢查 Java 是否安裝或 JAVA_HOME 環境變量是否設置正確",
+  keyalg: "密鑰算法",
+  keysize: "密鑰大小",
+  sigalg: "簽名算法",
+  noApksignerLocation: "未設置 apksigner 位置",
+  noZipalignLocation: "未設置 zipalign 位置",
+  fileNotExists: (filePath) => {
+    return `文件 ${filePath} 不存在，請檢查路徑是否正確`;
+  },
+  atLeast6Chars: "密碼至少需要 6 個字元",
 };
