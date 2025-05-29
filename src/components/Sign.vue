@@ -161,7 +161,7 @@
     </div>
     <br />
     <div>
-      <el-input v-model="output.path" clearable :placeholder="i18n.exportApkTo">
+      <el-input v-model="output.path" clearable :placeholder="i18n.exportApkTo" disabled>
         <template #append>
           <el-button @click="save_apk">
             <el-icon><FolderOpened /></el-icon>

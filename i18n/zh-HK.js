@@ -88,4 +88,5 @@ export default {
   fileNotExists: (filePath) => {
     return `文件 ${filePath} 不存在，請檢查路徑是否正確`;
   },
+  atLeast6Chars: "密碼至少需要 6 個字元",
 };

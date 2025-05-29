@@ -88,4 +88,5 @@ export default {
   fileNotExists: (filePath) => {
     return `The file ${filePath} does not exist, please check if the path is correct`;
   },
+  atLeast6Chars: "The password must be at least 6 characters",
 };

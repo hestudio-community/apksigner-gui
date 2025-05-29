@@ -57,6 +57,7 @@
             <el-input
               v-model="create.saveLocation"
               :placeholder="i18n.jksLocation"
+              disabled
             >
               <template #append>
                 <el-button @click="save_keystone">
@@ -285,6 +286,7 @@ export default {
         keysize: undefined,
         sigalg: undefined,
         fileNotExists: undefined,
+        atLeast6Chars: undefined,
       },
       create: {
         open: false,
@@ -351,6 +353,14 @@ export default {
           plain: true,
         });
       } else {
+        if (this.keypasswd.length < 6) {
+          ElMessage({
+            message: this.i18n.atLeast6Chars,
+            type: "error",
+            plain: true,
+          });
+          return;
+        }
         window.electronAPI.checkFileExists(this.keystore).then((exists) => {
           if (!exists) {
             ElMessage({
@@ -418,6 +428,17 @@ export default {
         if (this.create.aliaspasswd != this.create.aliaspasswd2) {
           ElMessage({
             message: this.i18n.NoSamePasswd,
+            type: "error",
+            plain: true,
+          });
+          return;
+        }
+        if (
+          this.create.keypasswd.length < 6 ||
+          this.create.aliaspasswd.length < 6
+        ) {
+          ElMessage({
+            message: this.i18n.atLeast6Chars,
             type: "error",
             plain: true,
           });

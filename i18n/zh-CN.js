@@ -87,5 +87,6 @@ export default {
   noZipalignLocation: "未设置 zipalign 位置",
   fileNotExists: (filePath) => {
     return `文件 ${filePath} 不存在，请检查路径是否正确`;
-  }
+  },
+  atLeast6Chars: "密码至少需要 6 个字符",
 };

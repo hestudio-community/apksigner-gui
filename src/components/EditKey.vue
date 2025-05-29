@@ -78,6 +78,7 @@ export default {
         CheckDeficiencies: undefined,
         HadSameKeyName: undefined,
         fileNotExists: undefined,
+        atLeast6Chars: undefined,
       },
     };
   },
@@ -112,6 +113,14 @@ export default {
           plain: true,
         });
       } else {
+        if (this.keypasswd.length < 6) {
+          ElMessage({
+            message: this.i18n.atLeast6Chars,
+            type: "error",
+            plain: true,
+          });
+          return;
+        }
         window.electronAPI.checkFileExists(this.keystore).then((exists) => {
           if (!exists) {
             ElMessage({
