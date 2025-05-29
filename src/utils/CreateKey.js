@@ -46,11 +46,29 @@ export function CreateKey(
     );
   }
 
-  const command = `"${keytoolPath}" -genkeypair -v -keystore "${keyPath}" -storepass "${keyPasswd}" -alias "${alias}" -keypass "${aliasPasswd}" -validity ${expireDay} -dname "CN=${name}, OU=${orgUnit}, O=${org}, L=${locality}, ST=${state}, C=${country}" -keyalg ${keyalg} -keysize ${keysize} -sigalg ${sigalg}`;
+  const args = [
+    "-genkeypair",
+    "-v",
+    "-keystore", keyPath,
+    "-storepass", keyPasswd,
+    "-alias", alias,
+    "-keypass", aliasPasswd,
+    "-validity", expireDay,
+    "-dname", `CN=${name}, OU=${orgUnit}, O=${org}, L=${locality}, ST=${state}, C=${country}`,
+    "-keyalg", keyalg,
+    "-keysize", keysize,
+    "-sigalg", sigalg
+  ];
 
-  const execSync = require("child_process").execSync;
+  const { spawnSync } = require("child_process");
   try {
-    execSync(command, { stdio: "inherit" });
+    const result = spawnSync(keytoolPath, args, { stdio: "inherit" });
+    if (result.error) {
+      throw result.error;
+    }
+    if (result.status !== 0) {
+      throw new Error(`Keytool process exited with code ${result.status}`);
+    }
     return true;
   } catch (error) {
     throw new Error(`Failed to create key: ${error.message}`);
