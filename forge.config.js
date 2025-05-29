@@ -69,7 +69,11 @@ module.exports = {
         assets: "./icons/assets",
         publisher: "CN=73AC1CCD-0F7C-48FE-A64D-F404735487C1",
         packageDescription: "Simple but complete APK signing tool.",
-        manifest: "./AppXManifest.xml"
+        manifest: `${
+          process.arch === "arm64"
+            ? "./appxmanifests/AppXManifest_arm64.xml"
+            : "./appxmanifests/AppXManifest_x86_64.xml"
+        }`,
       },
       platfrom: ["win32"],
     },

@@ -4,9 +4,9 @@
    xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
    xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities">
   <Identity Name="heStudioCommunity.APKSignerGUI"
-    ProcessorArchitecture="x64"
+    ProcessorArchitecture="ARM64"
     Publisher="CN=73AC1CCD-0F7C-48FE-A64D-F404735487C1"
-    Version="1.1.2.0" />
+    Version="1.2.0.0" />
   <Properties>
     <DisplayName>APKSignerGUI</DisplayName>
     <PublisherDisplayName>heStudio Community</PublisherDisplayName>
@@ -14,6 +14,8 @@
     <Logo>assets\SampleAppx.50x50.png</Logo>
   </Properties>
   <Resources>
+    <Resource Language="zh-cn" />
+    <Resource Language="zh-hk" />
     <Resource Language="en-us" />
   </Resources>
   <Dependencies>
