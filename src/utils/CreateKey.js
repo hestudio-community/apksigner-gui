@@ -49,28 +49,38 @@ export function CreateKey(
   const args = [
     "-genkeypair",
     "-v",
-    "-keystore", keyPath,
-    "-storepass", keyPasswd,
-    "-alias", alias,
-    "-keypass", aliasPasswd,
-    "-validity", expireDay,
-    "-dname", `CN=${name}, OU=${orgUnit}, O=${org}, L=${locality}, ST=${state}, C=${country}`,
-    "-keyalg", keyalg,
-    "-keysize", keysize,
-    "-sigalg", sigalg
+    "-keystore",
+    keyPath,
+    "-storepass",
+    keyPasswd,
+    "-alias",
+    alias,
+    "-keypass",
+    aliasPasswd,
+    "-validity",
+    expireDay,
+    "-dname",
+    `CN=${name}, OU=${orgUnit}, O=${org}, L=${locality}, ST=${state}, C=${country}`,
+    "-keyalg",
+    keyalg,
+    "-keysize",
+    keysize,
+    "-sigalg",
+    sigalg,
   ];
 
   const { spawnSync } = require("child_process");
   try {
-    const result = spawnSync(keytoolPath, args, { stdio: "inherit" });
+    const result = spawnSync(keytoolPath, args, { stdio: "pipe" });
     if (result.error) {
-      throw result.error;
+      return result.error.message;
     }
     if (result.status !== 0) {
-      throw new Error(`Keytool process exited with code ${result.status}`);
+      const errorOutput = result.stderr?.toString() || result.stdout?.toString() || '';
+      return `Keytool process exited with code ${result.status}${errorOutput ? ': ' + errorOutput : ''}`;
     }
     return true;
   } catch (error) {
-    throw new Error(`Failed to create key: ${error.message}`);
+    return error.message;
   }
 }

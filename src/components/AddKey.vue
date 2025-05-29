@@ -464,13 +464,19 @@ export default {
                   this.create.advanceOptions.sigalg
                 )
                 .then((res) => {
-                  if (res) {
+                  if (res === true) {
                     ElMessage({
                       message: this.i18n.saveSuccess,
                       type: "success",
                       plain: true,
                     });
                     this.create.open = false;
+                  } else {
+                    ElMessage({
+                      message: res,
+                      type: "error",
+                      plain: true,
+                    });
                   }
                 })
                 .catch((err) => {
