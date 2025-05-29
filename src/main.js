@@ -272,6 +272,10 @@ app.whenReady().then(() => {
     if (mainWindow) mainWindow.webContents.openDevTools();
   });
 
+  ipcMain.handle("system:isDevMode", async () => {
+    return !app.isPackaged;
+  });
+
   // Windows control handlers
   if (process.platform != "darwin") {
     ipcMain.handle("windows:close", async () => {

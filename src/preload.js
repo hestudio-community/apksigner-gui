@@ -59,4 +59,5 @@ contextBridge.exposeInMainWorld("electronAPI", {
   },
   checkFileExists: (filePath) =>
     ipcRenderer.invoke("system:checkFileExists", filePath),
+  isDevMode: () => ipcRenderer.invoke("system:isDevMode"),
 });

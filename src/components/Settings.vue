@@ -9,6 +9,7 @@
               text
               style="height: 32px; width: 32px"
               @click="open_devtools"
+              v-if="isDevMode"
               ><Icon
                 icon="fluent:window-dev-tools-20-regular"
                 width="20"
@@ -259,6 +260,7 @@ export default {
       },
       transitionName: "slide-left",
       AutoCheckUpdate: true,
+      isDevMode: false,
     };
   },
   methods: {
@@ -450,6 +452,9 @@ export default {
     this.lang.langlist = Object.values(supportLangList);
     window.electronAPI.config.get("checkUpdate").then((result) => {
       this.AutoCheckUpdate = result;
+    });
+    window.electronAPI.isDevMode().then((result) => {
+      this.isDevMode = result;
     });
   },
 };
