@@ -9,7 +9,7 @@
               text
               style="height: 32px; width: 32px"
               @click="open_devtools"
-              v-if="isDevMode"
+              v-if="isDevMode || advancedSetting"
               ><Icon
                 icon="fluent:window-dev-tools-20-regular"
                 width="20"
