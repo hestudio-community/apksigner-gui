@@ -36,17 +36,11 @@ module.exports = {
       platform: ["linux"],
     },
     {
-      name: "@electron-forge/maker-rpm",
+      name: "@electron-forge/maker-zip",
       config: {
-        options: {
-          homepage: "https://www.hestudio.net",
-          bin: "APKSignerGUI",
-          name: "apksignergui",
-          icon: "./icons/icon.png",
-          description: "APKSignerGUI",
-          productDescription: "Simple but complete APK signing tool.",
-          categories: ["Development"],
-        },
+        platforms: ["linux"],
+        name: "APKSignerGUI",
+        icon: "./icons/icon.png",
       },
       platform: ["linux"],
     },
