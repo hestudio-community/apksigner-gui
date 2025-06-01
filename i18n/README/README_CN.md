@@ -1,7 +1,7 @@
 <div align="center">
-   <img src="./../../icons/icon.png" />
+   <img src="./../../icons/icon.png" width="128px" />
    <h1 style="text-align: center">APKSignerGUI</h1>
-   <img src="./../../images/apphome.png" />
+   <img src="./../../images/apphome.png" width="384px"/>
    <p style="text-align: center">简单又完整的APK签名图形化工具</p>
 </div>
 
@@ -44,7 +44,7 @@
 已知支持的平台 (由官方打包并经过测试)：
 
 - **Windows**: Windows 10/11 x86_64 (其中 Windows10 为最新版本), Windows 10/11 ARM64 (其中 Windows10 为最新版本)
-- **Linux**: Debian 12 及其衍生版本 x86_64 和 ARM64 平台， RedHat 9.5 及其衍生版本 x86_64 和 ARM64 平台
+- **Linux**: Debian 12 及其衍生版本 x86_64 和 ARM64 平台。
 - **macOS**: 所有采用了 Apple Silicon 的 macOS 10.11 以上设备
 
 其他的平台可能需要你自行编译。
@@ -86,10 +86,12 @@
 
 ### 如何构建？
 
+#### 不打包
+
 1. 安装 [NodeJS 22 LTS](https://nodejs.org/)
 2. 使用 `npm install` 安装依赖。
-3. 使用 `npm run make` 构建。
-4. 在 `./out/make` 目录中取得构建物。
+3. 使用 `npm run package` 构建。
+4. 在 `./out/` 目录中取得构建物。
 
 #### macOS
 
@@ -106,6 +108,7 @@
 2. 使用 `npm install` 安装依赖。
 3. 编辑 `forge.config.js`.
    将
+
    ```javascript
    {
       name: "@electron-forge/maker-wix",
@@ -115,13 +118,16 @@
       platfrom: ["win32"],
    },
    ```
+
    更换为
+
    ```javascript
    {
      name: "@electron-forge/maker-zip",
      platfrom: ["win32"],
    }
    ```
+
 4. 使用 `npm run make` 构建。
 5. 在 `./out/make` 目录中取得构建物。
 
@@ -138,13 +144,5 @@
 
 1. 安装 [NodeJS 22 LTS](https://nodejs.org/)
 2. 使用 `npm install` 安装依赖。
-3. 安装构建依赖
-   ```shell
-   sudo apt install fakeroot rpm
-   ```
-   或者
-   ```shell
-   sudo apt install fakeroot rpm-build
-   ```
-4. 使用 `npm run make` 构建。
-5. 在 `./out/make` 目录中取得构建物。
+3. 使用 `npm run make` 构建。
+4. 在 `./out/make` 目录中取得构建物。
