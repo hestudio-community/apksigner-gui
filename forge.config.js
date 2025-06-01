@@ -55,7 +55,7 @@ module.exports = {
         name: "APKSignerGUI",
         upgradeCode: "01956ab5-b521-74ae-9066-695e7dbe0999",
       },
-      platfroms: ["win32"],
+      platforms: ["win32"],
     },
     {
       name: "@electron-forge/maker-appx",
@@ -69,7 +69,7 @@ module.exports = {
             : "./appxmanifests/AppXManifest_x86_64.xml"
         }`,
       },
-      platfroms: ["win32"],
+      platforms: ["win32"],
     },
   ],
   plugins: [
