@@ -78,8 +78,8 @@ export default {
   country: "Country",
   create: "Create",
   NoSamePasswd: "The passwords entered twice do not match",
-  JavaHomeNotFound:
-    "JAVA_HOME not found, please check if Java is installed or the JAVA_HOME environment variable is set correctly",
+  keytoolNotFound:
+    "keytool not found, please ensure that the Java bin directory is added to PATH or set JAVA_HOME",
   keyalg: "Key algorithm",
   keysize: "Key size",
   sigalg: "Signature algorithm",

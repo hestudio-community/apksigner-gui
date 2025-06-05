@@ -281,7 +281,7 @@ export default {
         country: undefined,
         create: undefined,
         NoSamePasswd: undefined,
-        JavaHomeNotFound: undefined,
+        keytoolNotFound: undefined,
         keyalg: undefined,
         keysize: undefined,
         sigalg: undefined,
@@ -488,7 +488,7 @@ export default {
                 });
             } else {
               ElMessage({
-                message: this.i18n.JavaHomeNotFound,
+                message: this.i18n.keytoolNotFound,
                 type: "error",
                 plain: true,
               });
