@@ -165,12 +165,14 @@
             <SettingPage />
           </el-drawer>
         </el-header>
-        <el-main class="main">
-          <el-scrollbar style="max-height: calc(100vh - 100px)">
-            <el-empty v-if="!openSign" :description="i18n.noKeyTip" />
-            <Sign v-else :keyname="openSign" />
+        <div class="main">
+          <el-scrollbar style="max-height: calc(100vh - 46px)">
+            <div style="padding: 20px">
+              <el-empty v-if="!openSign" :description="i18n.noKeyTip" />
+              <Sign v-else :keyname="openSign" />
+            </div>
           </el-scrollbar>
-        </el-main>
+        </div>
       </el-container>
     </el-container>
   </div>
