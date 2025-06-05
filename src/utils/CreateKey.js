@@ -1,9 +1,10 @@
 import path from "node:path";
 import fs from "node:fs";
+import { spawnSync } from "node:child_process";
 
 export function CheckJavaHome() {
   const javaHome = process.env.JAVA_HOME;
-  if (!javaHome) {
+  if (!javaHome || !fs.existsSync(javaHome)) {
     try {
       const result = spawnSync("keytool", ["-version"], { stdio: "pipe" });
       if (result.status === 0) {
@@ -45,10 +46,12 @@ export function CreateKey(
   sigalg
 ) {
   let keytoolPath;
-  if (process.platform == "win32") {
-    keytoolPath = path.join(process.env.JAVA_HOME, "bin", "keytool.exe");
-  } else {
-    keytoolPath = path.join(process.env.JAVA_HOME, "bin", "keytool");
+  if (fs.existsSync(process.env.JAVA_HOME)) {
+    if (process.platform == "win32") {
+      keytoolPath = path.join(process.env.JAVA_HOME, "bin", "keytool.exe");
+    } else {
+      keytoolPath = path.join(process.env.JAVA_HOME, "bin", "keytool");
+    }
   }
   if (!fs.existsSync(keytoolPath)) {
     try {
@@ -86,7 +89,6 @@ export function CreateKey(
     sigalg,
   ];
 
-  const { spawnSync } = require("child_process");
   try {
     const result = spawnSync(keytoolPath, args, { stdio: "pipe" });
     if (result.error) {
