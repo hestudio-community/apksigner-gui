@@ -1,17 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Package
-   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
-   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
-   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities">
-  <Identity Name="heStudioCommunity.APKSignerGUI"
-    ProcessorArchitecture="arm64"
-    Publisher="CN=73AC1CCD-0F7C-48FE-A64D-F404735487C1"
-    Version="1.2.0.0" />
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities">
+  <Identity Name="heStudioCommunity.APKSignerGUI" ProcessorArchitecture="arm64" Publisher="CN=73AC1CCD-0F7C-48FE-A64D-F404735487C1" Version="1.2.1.0" />
   <Properties>
     <DisplayName>APKSignerGUI</DisplayName>
     <PublisherDisplayName>heStudio Community</PublisherDisplayName>
     <Description>Simple but complete APK signing tool.</Description>
-    <Logo>assets\SampleAppx.50x50.png</Logo>
+    <Logo>assets\StoreLogo.scale-400.png</Logo>
   </Properties>
   <Resources>
     <Resource Language="zh-cn" />
@@ -19,20 +15,15 @@
     <Resource Language="en-us" />
   </Resources>
   <Dependencies>
-    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.14316.0" MaxVersionTested="10.0.14316.0" />
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26100.0" />
   </Dependencies>
   <Capabilities>
     <rescap:Capability Name="runFullTrust"/>
   </Capabilities>
   <Applications>
     <Application Id="com.hestudio.apksigner" Executable="app\APKSignerGUI.exe" EntryPoint="Windows.FullTrustApplication">
-      <uap:VisualElements
-       BackgroundColor="#464646"
-       DisplayName="APKSignerGUI"
-       Square150x150Logo="assets\SampleAppx.150x150.png"
-       Square44x44Logo="assets\SampleAppx.44x44.png"
-       Description="Simple but complete APK signing tool.">
-        <uap:DefaultTile Wide310x150Logo="assets\SampleAppx.310x150.png" />
+      <uap:VisualElements BackgroundColor="transparent" DisplayName="APKSignerGUI" Square150x150Logo="assets\Square150x150Logo.scale-400.png" Square44x44Logo="assets\Square44x44Logo.scale-400.png" Description="Simple but complete APK signing tool.">
+        <uap:DefaultTile Wide310x150Logo="assets\Wide310x150Logo.scale-400.png" Square71x71Logo="assets\SmallTile.scale-400.png" Square310x310Logo="assets\LargeTile.scale-400.png" />
       </uap:VisualElements>
     </Application>
   </Applications>

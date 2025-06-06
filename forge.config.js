@@ -17,7 +17,7 @@ module.exports = {
         icon: "./icons/icon.icns",
         name: "APKSignerGUI",
       },
-      platform: ["darwin"],
+      platforms: ["darwin"],
     },
     {
       name: "@electron-forge/maker-deb",
@@ -33,22 +33,16 @@ module.exports = {
           section: ["utils"],
         },
       },
-      platform: ["linux"],
+      platforms: ["linux"],
     },
     {
-      name: "@electron-forge/maker-rpm",
+      name: "@electron-forge/maker-zip",
       config: {
-        options: {
-          homepage: "https://www.hestudio.net",
-          bin: "APKSignerGUI",
-          name: "apksignergui",
-          icon: "./icons/icon.png",
-          description: "APKSignerGUI",
-          productDescription: "Simple but complete APK signing tool.",
-          categories: ["Development"],
-        },
+        platforms: ["linux"],
+        name: "APKSignerGUI",
+        icon: "./icons/icon.png",
       },
-      platform: ["linux"],
+      platforms: ["linux"],
     },
     {
       name: "@electron-forge/maker-wix",
@@ -61,7 +55,7 @@ module.exports = {
         name: "APKSignerGUI",
         upgradeCode: "01956ab5-b521-74ae-9066-695e7dbe0999",
       },
-      platfrom: ["win32"],
+      platforms: ["win32"],
     },
     {
       name: "@electron-forge/maker-appx",
@@ -75,7 +69,7 @@ module.exports = {
             : "./appxmanifests/AppXManifest_x86_64.xml"
         }`,
       },
-      platfrom: ["win32"],
+      platforms: ["win32"],
     },
   ],
   plugins: [

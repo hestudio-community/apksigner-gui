@@ -78,8 +78,8 @@ export default {
   country: "國家",
   create: "創建",
   NoSamePasswd: "兩次輸入的密碼不一致",
-  JavaHomeNotFound:
-    "找不到 JAVA_HOME，請檢查 Java 是否安裝或 JAVA_HOME 環境變量是否設置正確",
+  keytoolNotFound:
+    "未找到keytool，請確保將Java的bin目錄添加到PATH或者設置JAVA_HOME",
   keyalg: "密鑰算法",
   keysize: "密鑰大小",
   sigalg: "簽名算法",
