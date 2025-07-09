@@ -39,7 +39,7 @@
         <el-scrollbar style="max-height: calc(100vh - 100px - 18px)">
           <div v-loading="keyLoading">
             <div
-              class="keybutton"
+              class="keybuttongroup"
               style="display: flex; flex-direction: column"
               v-for="item in keyList"
             >
@@ -49,12 +49,7 @@
                   tag="div"
                   text
                   bg
-                  style="
-                    width: 190px;
-                    display: flex;
-                    flex-direction: row;
-                    justify-content: space-between;
-                  "
+                  class="keybutton"
                 >
                   <div
                     style="
@@ -201,9 +196,16 @@
   -webkit-app-region: no-drag;
 }
 
-.keybutton {
+.keybuttongroup {
   width: 100%;
   margin-bottom: 10px;
+}
+
+.keybutton {
+  width: 190px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 .header {
@@ -212,7 +214,6 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  background-color: #f2f3f5;
   -webkit-app-region: drag;
   margin-bottom: 8px;
 }
@@ -306,7 +307,6 @@
 
 @media (prefers-color-scheme: dark) {
   .header {
-    background-color: #141414;
     color: #e5eaf3;
   }
   .main {
@@ -457,8 +457,22 @@ export default {
     setInterval(async () => {
       if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
         document.querySelector("html").classList.add("dark");
+        if (this.darwin.isDarwin) {
+          document.body.style.backgroundColor = "transparent";
+          const selectors = await document.querySelectorAll(".keybutton");
+          for (let i = 0; i < selectors.length; i++) {
+            selectors[i].style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+          }
+        }
       } else {
         document.querySelector("html").classList.remove("dark");
+        if (this.darwin.isDarwin) {
+          document.body.style.backgroundColor = "transparent";
+          const selectors = await document.querySelectorAll(".keybutton");
+          for (let i = 0; i < selectors.length; i++) {
+            selectors[i].style.backgroundColor = "rgba(255, 255, 255, 0.5)";
+          }
+        }
       }
     }, 100);
     this.RefreshKey().then(() => {

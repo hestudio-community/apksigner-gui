@@ -217,6 +217,7 @@ const createWindow = () => {
     icon: path.join(__dirname, "../icon.png"),
     titleBarStyle: "hiddenInset",
     frame: false,
+    transparent: process.platform === "darwin",
   });
 
   // Set Dock icon for Mac
@@ -227,6 +228,7 @@ const createWindow = () => {
     );
     app.dock.setIcon(image);
     console.log(path.join(__dirname, "../build/icon.icns"));
+    mainWindow.setVibrancy("under-window")
   }
 
   // and load the index.html of the app.
