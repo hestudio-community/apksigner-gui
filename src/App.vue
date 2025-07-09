@@ -457,8 +457,8 @@ export default {
     setInterval(async () => {
       if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
         document.querySelector("html").classList.add("dark");
-        document.body.style.backgroundColor = "transparent";
         if (this.darwin.isDarwin) {
+          document.body.style.backgroundColor = "transparent";
           const selectors = await document.querySelectorAll(".keybutton");
           for (let i = 0; i < selectors.length; i++) {
             selectors[i].style.backgroundColor = "rgba(0, 0, 0, 0.5)";
@@ -466,8 +466,8 @@ export default {
         }
       } else {
         document.querySelector("html").classList.remove("dark");
-        document.body.style.backgroundColor = "transparent";
         if (this.darwin.isDarwin) {
+          document.body.style.backgroundColor = "transparent";
           const selectors = await document.querySelectorAll(".keybutton");
           for (let i = 0; i < selectors.length; i++) {
             selectors[i].style.backgroundColor = "rgba(255, 255, 255, 0.5)";
