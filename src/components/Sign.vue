@@ -161,7 +161,12 @@
     </div>
     <br />
     <div>
-      <el-input v-model="output.path" clearable :placeholder="i18n.exportApkTo" disabled>
+      <el-input
+        v-model="output.path"
+        clearable
+        :placeholder="i18n.exportApkTo"
+        disabled
+      >
         <template #append>
           <el-button @click="save_apk">
             <el-icon><FolderOpened /></el-icon>
@@ -436,6 +441,9 @@ export default {
                     script += ` ${result}`;
                     this.shell(`${script}`);
                   }
+                } else {
+                  script += ` ${result}`;
+                  this.shell(`${script}`);
                 }
               });
             });
