@@ -464,8 +464,8 @@ export default {
             selectors[i].style.backgroundColor = "rgba(0, 0, 0, 0.15)";
             selectors[i].style.color = "#E5EAF3";
             if (selectors[i].textContent === this.openSign) {
-              selectors[i].style.backgroundColor = "rgba(255, 255, 255, 0.85)";
-              selectors[i].style.color = "#303133";
+              selectors[i].style.backgroundColor = "rgba(209, 136, 3, 0.85)";
+              selectors[i].style.color = "#ffffff";
             }
           }
         } else {
@@ -488,8 +488,8 @@ export default {
             selectors[i].style.backgroundColor = "rgba(255, 255, 255, 0.15)";
             selectors[i].style.color = "#303133";
             if (selectors[i].textContent === this.openSign) {
-              selectors[i].style.backgroundColor = "rgba(0, 0, 0, 0.85)";
-              selectors[i].style.color = "#E5EAF3";
+              selectors[i].style.backgroundColor = "rgba(251, 164, 20, 0.85)";
+              selectors[i].style.color = "#ffffff";
             }
           }
         } else {
