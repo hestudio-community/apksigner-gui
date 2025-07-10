@@ -461,7 +461,22 @@ export default {
           document.body.style.backgroundColor = "transparent";
           const selectors = await document.querySelectorAll(".keybutton");
           for (let i = 0; i < selectors.length; i++) {
-            selectors[i].style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+            selectors[i].style.backgroundColor = "rgba(0, 0, 0, 0.15)";
+            selectors[i].style.color = "#E5EAF3";
+            if (selectors[i].textContent === this.openSign) {
+              selectors[i].style.backgroundColor = "rgba(255, 255, 255, 0.85)";
+              selectors[i].style.color = "#303133";
+            }
+          }
+        } else {
+          const selectors = await document.querySelectorAll(".keybutton");
+          for (let i = 0; i < selectors.length; i++) {
+            selectors[i].style.backgroundColor = "rgba(0, 0, 0, 0.0)";
+            selectors[i].style.color = "#E5EAF3";
+            if (selectors[i].textContent === this.openSign) {
+              selectors[i].style.backgroundColor = "rgba(255, 255, 255, 1.0)";
+              selectors[i].style.color = "#303133";
+            }
           }
         }
       } else {
@@ -470,7 +485,22 @@ export default {
           document.body.style.backgroundColor = "transparent";
           const selectors = await document.querySelectorAll(".keybutton");
           for (let i = 0; i < selectors.length; i++) {
-            selectors[i].style.backgroundColor = "rgba(255, 255, 255, 0.5)";
+            selectors[i].style.backgroundColor = "rgba(255, 255, 255, 0.15)";
+            selectors[i].style.color = "#303133";
+            if (selectors[i].textContent === this.openSign) {
+              selectors[i].style.backgroundColor = "rgba(0, 0, 0, 0.85)";
+              selectors[i].style.color = "#E5EAF3";
+            }
+          }
+        } else {
+          const selectors = await document.querySelectorAll(".keybutton");
+          for (let i = 0; i < selectors.length; i++) {
+            selectors[i].style.backgroundColor = "rgba(255, 255, 255, 0.0)";
+            selectors[i].style.color = "#303133";
+            if (selectors[i].textContent === this.openSign) {
+              selectors[i].style.backgroundColor = "rgba(0, 0, 0, 1.0)";
+              selectors[i].style.color = "#E5EAF3";
+            }
           }
         }
       }

@@ -1,7 +1,7 @@
 {
   "name": "com.hestudio.apksigner",
   "productName": "APKSignerGUI",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Simple but complete APK signing tool.",
   "main": ".vite/build/main.js",
   "scripts": {
