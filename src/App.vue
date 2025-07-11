@@ -36,7 +36,9 @@
             </el-drawer>
           </div>
         </div>
-        <el-scrollbar style="max-height: calc(100vh - 100px - 18px)">
+        <el-scrollbar
+          style="max-height: calc(100vh - 48px); -webkit-app-region: no-drag"
+        >
           <div v-loading="keyLoading">
             <div
               class="keybuttongroup"
@@ -179,6 +181,7 @@
   max-width: 200px;
   min-width: 50px;
   height: calc(100vh - 20px);
+  -webkit-app-region: drag;
 }
 
 .toolbar {
@@ -187,7 +190,6 @@
   height: 18px;
   margin-bottom: 8px;
   align-items: center;
-  -webkit-app-region: drag;
 }
 
 .toolbutton {
@@ -238,6 +240,7 @@
 .addkey {
   border-top-right-radius: 15px;
   border-bottom-right-radius: 15px;
+  -webkit-app-region: no-drag;
 }
 .el-card {
   border-radius: 15px;
@@ -461,10 +464,10 @@ export default {
           document.body.style.backgroundColor = "transparent";
           const selectors = await document.querySelectorAll(".keybutton");
           for (let i = 0; i < selectors.length; i++) {
-            selectors[i].style.backgroundColor = "rgba(0, 0, 0, 0.15)";
+            selectors[i].style.backgroundColor = "rgba(0, 0, 0, 0.3)";
             selectors[i].style.color = "#E5EAF3";
             if (selectors[i].textContent === this.openSign) {
-              selectors[i].style.backgroundColor = "rgba(209, 136, 3, 0.85)";
+              selectors[i].style.backgroundColor = "rgba(209, 136, 3, 1.0)";
               selectors[i].style.color = "#ffffff";
             }
           }
@@ -485,10 +488,10 @@ export default {
           document.body.style.backgroundColor = "transparent";
           const selectors = await document.querySelectorAll(".keybutton");
           for (let i = 0; i < selectors.length; i++) {
-            selectors[i].style.backgroundColor = "rgba(255, 255, 255, 0.15)";
+            selectors[i].style.backgroundColor = "rgba(255, 255, 255, 0.3)";
             selectors[i].style.color = "#303133";
             if (selectors[i].textContent === this.openSign) {
-              selectors[i].style.backgroundColor = "rgba(251, 164, 20, 0.85)";
+              selectors[i].style.backgroundColor = "rgba(251, 164, 20, 1.0)";
               selectors[i].style.color = "#ffffff";
             }
           }
