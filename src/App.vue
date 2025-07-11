@@ -3,12 +3,20 @@
     <el-container>
       <el-aside class="aside">
         <div class="toolbar">
-          <el-button text class="toolbutton" @click="openaddkey = true"
-            ><el-icon><Plus /></el-icon
-          ></el-button>
-          <el-button text @click="RefreshKey" class="toolbutton refresh"
-            ><el-icon><Refresh /></el-icon>
-          </el-button>
+          <el-button
+            text
+            type="text"
+            class="toolbutton"
+            @click="openaddkey = true"
+            :icon="Plus"
+          />
+          <el-button
+            text
+            type="text"
+            @click="RefreshKey"
+            class="toolbutton refresh"
+            :icon="Refresh"
+          />
           <div>
             <el-drawer
               v-model="openaddkey"
@@ -92,6 +100,7 @@
             <div>
               <el-button
                 text
+                type="text"
                 style="height: 18px; width: 18px"
                 @click="opensetting = true"
               >
@@ -101,6 +110,7 @@
             <div v-if="!darwin.isDarwin">
               <el-button
                 text
+                type="text"
                 style="height: 18px; width: 18px"
                 @click="WindowsMinimize"
               >
@@ -113,6 +123,7 @@
               </el-button>
               <el-button
                 text
+                type="text"
                 style="height: 18px; width: 18px"
                 @click="WindowsMaximize"
                 v-if="windows.isMaxmaximize"
@@ -126,6 +137,7 @@
               </el-button>
               <el-button
                 text
+                type="text"
                 style="height: 18px; width: 18px"
                 @click="WindowsMaximize"
                 v-else
@@ -139,6 +151,7 @@
               </el-button>
               <el-button
                 text
+                type="text"
                 style="height: 18px; width: 18px"
                 @click="WindowsClose"
               >
