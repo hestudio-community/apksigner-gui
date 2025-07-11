@@ -183,14 +183,6 @@ const createWindow = () => {
                 CheckUpdate(true);
               },
             },
-            {
-              label: "View in Github",
-              click: () => {
-                shell.openExternal(
-                  "https://github.com/hestudio-community/apksigner-gui"
-                );
-              },
-            },
             { type: "separator" },
             { role: "services" },
             { type: "separator" },
@@ -199,6 +191,34 @@ const createWindow = () => {
             { role: "unhide" },
             { type: "separator" },
             { role: "quit" },
+          ],
+        },
+        {
+          label: "File",
+          submenu: [{ role: "close" }],
+        },
+        { role: "editMenu" },
+        { role: "viewMenu" },
+        { role: "windowMenu" },
+        {
+          role: "help",
+          submenu: [
+            {
+              label: "Report Issue",
+              click: () => {
+                shell.openExternal(
+                  "https://github.com/hestudio-community/apksigner-gui/issues"
+                );
+              },
+            },
+            {
+              label: "View in Github",
+              click: () => {
+                shell.openExternal(
+                  "https://github.com/hestudio-community/apksigner-gui"
+                );
+              },
+            },
           ],
         },
       ])
@@ -210,14 +230,21 @@ const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    center: true,
+    minWidth: 640,
+    minHeight: 480,
+    title: "APKSignerGUI",
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
+      backgroundThrottling: false,
     },
     // Add icon configuration
     icon: path.join(__dirname, "../icon.png"),
     titleBarStyle: "hiddenInset",
+    show: true,
     frame: false,
     transparent: process.platform === "darwin",
+    vibrancy: process.platform === "darwin" ? "under-window" : undefined,
   });
 
   // Set Dock icon for Mac
@@ -228,7 +255,6 @@ const createWindow = () => {
     );
     app.dock.setIcon(image);
     console.log(path.join(__dirname, "../build/icon.icns"));
-    mainWindow.setVibrancy("under-window")
   }
 
   // and load the index.html of the app.
@@ -239,7 +265,6 @@ const createWindow = () => {
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
     );
   }
-  mainWindow.setMinimumSize(640, 480);
   mainWindow.setHasShadow(true);
 };
 
