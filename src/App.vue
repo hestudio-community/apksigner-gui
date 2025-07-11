@@ -107,7 +107,7 @@
                 <el-icon><Setting /></el-icon>
               </el-button>
             </div>
-            <div v-if="!darwin.isDarwin">
+            <div v-if="!darwin.isDarwin" style="margin-left: 8px;">
               <el-button
                 text
                 type="text"
