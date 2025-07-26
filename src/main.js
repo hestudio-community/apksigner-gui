@@ -240,13 +240,11 @@ const createWindow = () => {
     },
     // Add icon configuration
     icon: path.join(__dirname, "../icon.png"),
-    titleBarStyle: process.platform === "darwin" ? "hiddenInset" : "hidden",
+    titleBarStyle: "hiddenInset",
     show: true,
     frame: false,
-    roundedCorners: true,
     transparent: process.platform === "darwin",
     vibrancy: process.platform === "darwin" ? "under-window" : undefined,
-    backgroundMaterial: "mica",
   });
 
   // Set Dock icon for Mac

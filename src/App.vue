@@ -484,19 +484,6 @@ export default {
               selectors[i].style.color = "#ffffff";
             }
           }
-        } else if (navigator.platform === "Win32") {
-          document.body.style.backgroundColor = "rgba(0, 0, 0, 0.05)";
-          document.querySelector(".main").style.backgroundColor =
-            "rgba(0, 0, 0, 0.2)";
-          const selectors = await document.querySelectorAll(".keybutton");
-          for (let i = 0; i < selectors.length; i++) {
-            selectors[i].style.backgroundColor = "rgba(0, 0, 0, 0.3)";
-            selectors[i].style.color = "#E5EAF3";
-            if (selectors[i].textContent === this.openSign) {
-              selectors[i].style.backgroundColor = "rgba(209, 136, 3, 1.0)";
-              selectors[i].style.color = "#ffffff";
-            }
-          }
         } else {
           const selectors = await document.querySelectorAll(".keybutton");
           for (let i = 0; i < selectors.length; i++) {
@@ -512,19 +499,6 @@ export default {
         document.querySelector("html").classList.remove("dark");
         if (this.darwin.isDarwin) {
           document.body.style.backgroundColor = "transparent";
-          const selectors = await document.querySelectorAll(".keybutton");
-          for (let i = 0; i < selectors.length; i++) {
-            selectors[i].style.backgroundColor = "rgba(255, 255, 255, 0.3)";
-            selectors[i].style.color = "#303133";
-            if (selectors[i].textContent === this.openSign) {
-              selectors[i].style.backgroundColor = "rgba(251, 164, 20, 1.0)";
-              selectors[i].style.color = "#ffffff";
-            }
-          }
-        } else if (navigator.platform === "Win32") {
-          document.body.style.backgroundColor = "rgba(255, 255, 255, 0.05)";
-          document.querySelector(".main").style.backgroundColor =
-            "rgba(255, 255, 255, 0.2)";
           const selectors = await document.querySelectorAll(".keybutton");
           for (let i = 0; i < selectors.length; i++) {
             selectors[i].style.backgroundColor = "rgba(255, 255, 255, 0.3)";
