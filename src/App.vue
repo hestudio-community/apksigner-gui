@@ -115,11 +115,13 @@
                 @click="WindowsMinimize"
               >
                 <el-icon
-                  ><Icon
-                    icon="qlementine-icons:windows-minimize-16"
-                    width="16"
-                    height="16"
-                /></el-icon>
+                  ><span
+                    class="material-symbols-outlined"
+                    style="font-size: 18px"
+                  >
+                    remove
+                  </span></el-icon
+                >
               </el-button>
               <el-button
                 text
@@ -129,11 +131,13 @@
                 v-if="windows.isMaxmaximize"
               >
                 <el-icon
-                  ><Icon
-                    icon="qlementine-icons:windows-unmaximize-16"
-                    width="16"
-                    height="16"
-                /></el-icon>
+                  ><span
+                    class="material-symbols-outlined"
+                    style="font-size: 18px"
+                  >
+                    collapse_content
+                  </span></el-icon
+                >
               </el-button>
               <el-button
                 text
@@ -143,11 +147,13 @@
                 v-else
               >
                 <el-icon
-                  ><Icon
-                    icon="qlementine-icons:windows-maximize-16"
-                    width="16"
-                    height="16"
-                /></el-icon>
+                  ><span
+                    class="material-symbols-outlined"
+                    style="font-size: 18px"
+                  >
+                    expand_content
+                  </span></el-icon
+                >
               </el-button>
               <el-button
                 text
@@ -156,11 +162,13 @@
                 @click="WindowsClose"
               >
                 <el-icon
-                  ><Icon
-                    icon="qlementine-icons:close-16"
-                    width="16"
-                    height="16"
-                /></el-icon>
+                  ><span
+                    class="material-symbols-outlined"
+                    style="font-size: 18px"
+                  >
+                    close
+                  </span></el-icon
+                >
               </el-button>
             </div>
           </div>
@@ -339,7 +347,6 @@ import {
   RemoveFilled,
   Edit,
 } from "@element-plus/icons-vue";
-import { Icon } from "@iconify/vue";
 import SettingPage from "./components/Settings.vue";
 import AddKey from "./components/AddKey.vue";
 import EditKey from "./components/EditKey.vue";

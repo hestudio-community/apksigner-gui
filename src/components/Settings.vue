@@ -4,23 +4,25 @@
       <div v-if="!openAdvancedSettings" class="mainPage" key="main">
         <h2 style="display: flex; justify-content: space-between">
           <text>{{ i18n.Setting }}</text>
-          <div style="display: flex; flex-direction: row">
+          <div style="display: flex; flex-direction: row; margin-right: 2px">
             <el-button
               text
               style="height: 32px; width: 32px"
               @click="open_devtools"
               v-if="isDevMode || advancedSetting"
-              ><Icon
-                icon="fluent:window-dev-tools-20-regular"
-                width="20"
-                height="20"
-            /></el-button>
+              ><span class="material-symbols-outlined" style="font-size: 20px">
+                code
+              </span></el-button
+            >
             <el-button
               text
               style="height: 32px; width: 32px"
               @click="open_about"
-              ><Icon icon="mdi:about-circle-outline" width="20" height="20"
-            /></el-button>
+            >
+              <span class="material-symbols-outlined" style="font-size: 20px">
+                info
+              </span></el-button
+            >
           </div>
         </h2>
         <el-scrollbar style="max-height: calc(100vh - 120px)">
@@ -215,7 +217,6 @@
 <script setup>
 import { FolderOpened } from "@element-plus/icons-vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { Icon } from "@iconify/vue";
 import { internationalization, supportLangList } from "../utils/i18n.js";
 </script>
 
