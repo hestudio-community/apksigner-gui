@@ -1,7 +1,7 @@
 <template>
   <div style="max-height: calc(100vh)">
     <el-container>
-      <el-aside class="aside" :style="{ width: sidebarWidth + 'px' }">
+      <el-aside class="aside" :style="{ width: actualSidebarWidth + 'px' }">
         <div class="resize-handle-left" @mousedown="startResize('left', $event)"></div>
         <div class="resize-handle-right" @mousedown="startResize('right', $event)"></div>
         <div class="toolbar">
@@ -63,17 +63,9 @@
                   bg
                   class="keybutton"
                 >
-                  <div
-                    :style="{
-                      textAlign: 'left',
-                      overflow: 'hidden',
-                      whiteSpace: 'nowrap',
-                      textOverflow: 'ellipsis',
-                      width: (sidebarWidth - 40) + 'px'
-                    }"
-                  >
-                    <text>{{ item }}</text>
-                  </div>
+                  <span
+                    :style="keyTextStyle"
+                  >{{ item }}</span>
                 </el-button>
                 <template #dropdown>
                   <el-dropdown-item
@@ -97,7 +89,9 @@
       </el-aside>
       <el-container>
         <el-header class="header">
-          <text>{{ openSign }}</text>
+          <div class="header-title">
+            <text>{{ openSign }}</text>
+          </div>
           <div class="headerbutton">
             <div>
               <el-button
@@ -252,10 +246,21 @@
 }
 
 .keybutton {
-  width: calc(100% - 20px);
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  width: calc(100% - 20px) !important;
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: flex-start !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+.keybutton span {
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+  flex: 1 !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
 }
 
 .header {
@@ -266,6 +271,14 @@
   align-items: center;
   -webkit-app-region: drag;
   margin-bottom: 8px;
+}
+
+.header-title {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  margin-right: 10px;
 }
 
 .headerbutton {
@@ -401,7 +414,7 @@ export default {
       keyList: [],
       keyLoading: true,
       openSign: "",
-      sidebarWidth: 200,
+      sidebarWidth: 30, // 相对百分比，0%=128px，100%=50%页面宽度
       isResizing: false,
       resizeDirection: null,
       i18n: {
@@ -415,12 +428,41 @@ export default {
       },
     };
   },
+  computed: {
+    // 将相对百分比转换为实际像素值
+    actualSidebarWidth() {
+      const minWidth = 128; // 最小宽度128px (对应0%)
+      const maxWidth = window.innerWidth * 0.5; // 最大宽度50%页面宽度 (对应100%)
+      const range = maxWidth - minWidth;
+      return minWidth + (this.sidebarWidth / 100) * range;
+    },
+    
+    keyTextStyle() {
+      return {
+        textAlign: 'left',
+        overflow: 'hidden',
+        whiteSpace: 'nowrap',
+        textOverflow: 'ellipsis',
+        flex: '1',
+        minWidth: '0'
+      };
+    }
+  },
   methods: {
     startResize(direction, event) {
       this.isResizing = true;
       this.resizeDirection = direction;
       this.startX = event.clientX;
-      this.startWidth = this.sidebarWidth;
+      
+      // 记录当前的窗口宽度和范围，防止窗口大小改变后的瞬移
+      const minWidth = 128;
+      const maxWidth = window.innerWidth * 0.5;
+      this.resizeRange = maxWidth - minWidth;
+      this.resizeMinWidth = minWidth;
+      
+      // 计算当前实际像素宽度对应的百分比
+      const currentActualWidth = this.actualSidebarWidth;
+      this.startWidthPercent = ((currentActualWidth - minWidth) / this.resizeRange) * 100;
       
       document.addEventListener('mousemove', this.doResize);
       document.addEventListener('mouseup', this.stopResize);
@@ -432,19 +474,44 @@ export default {
       if (!this.isResizing) return;
       
       const deltaX = event.clientX - this.startX;
-      let newWidth;
+      
+      // 使用在startResize时记录的固定范围
+      const deltaPercent = (deltaX / this.resizeRange) * 100;
+      let newWidthPercent;
       
       if (this.resizeDirection === 'right') {
-        newWidth = this.startWidth + deltaX;
+        newWidthPercent = this.startWidthPercent + deltaPercent;
       } else {
-        newWidth = this.startWidth - deltaX;
+        newWidthPercent = this.startWidthPercent - deltaPercent;
       }
       
-      const maxWidth = window.innerWidth * 0.5;
-      const minWidth = 128;
+      // 限制相对百分比范围：0% 到 100%
+      newWidthPercent = Math.max(0, Math.min(100, newWidthPercent));
       
-      newWidth = Math.max(minWidth, Math.min(maxWidth, newWidth));
-      this.sidebarWidth = newWidth;
+      // 计算对应的实际像素宽度
+      const newActualWidth = this.resizeMinWidth + (newWidthPercent / 100) * this.resizeRange;
+      
+      // 重新计算在当前窗口尺寸下的百分比
+      const currentMinWidth = 128;
+      const currentMaxWidth = window.innerWidth * 0.5;
+      const currentRange = currentMaxWidth - currentMinWidth;
+      
+      // 确保实际宽度在当前窗口的合理范围内
+      const clampedActualWidth = Math.max(currentMinWidth, Math.min(currentMaxWidth, newActualWidth));
+      
+      // 更新sidebarWidth为在当前窗口尺寸下的百分比
+      this.sidebarWidth = ((clampedActualWidth - currentMinWidth) / currentRange) * 100;
+      
+      // 延迟更新文字宽度，确保DOM已更新
+      this.$nextTick(() => {
+        this.updateKeyTextWidth();
+      });
+    },
+    
+    updateKeyTextWidth() {
+      // 由于使用了百分比布局，文字宽度会自动跟随侧边栏调整
+      // 这个方法现在主要用于强制重新渲染，确保样式同步
+      this.$forceUpdate();
     },
     
     stopResize() {
@@ -473,6 +540,10 @@ export default {
         } else {
           this.openSign = "";
         }
+        // 更新密钥文字容器宽度
+        this.$nextTick(() => {
+          this.updateKeyTextWidth();
+        });
       });
       this.keyLoading = false;
     },
@@ -606,6 +677,10 @@ export default {
         } else {
           this.openSign = "";
         }
+        // 初始化时也需要更新文字宽度
+        this.$nextTick(() => {
+          this.updateKeyTextWidth();
+        });
       });
     });
 
