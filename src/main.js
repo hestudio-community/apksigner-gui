@@ -28,7 +28,12 @@ if (!gotTheLock) {
 }
 
 const storage = new Storage();
-const config = new Config();
+let config = null;
+
+const initializeConfig = async () => {
+  config = new Config();
+  return await config.checkVersionCompatibility();
+};
 
 // Save reference to mainWindow for use in IPC handlers
 let mainWindow = null;
@@ -270,7 +275,13 @@ const createWindow = () => {
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+  // Initialize config and check version compatibility
+  const canProceed = await initializeConfig();
+  if (!canProceed) {
+    return; // App will quit if version check fails
+  }
+
   ipcMain.handle("dialog:openFile", async (event, filters) => {
     const { canceled, filePaths } = await dialog.showOpenDialog({
       title: "APKSignerGUI",
@@ -415,6 +426,52 @@ app.whenReady().then(() => {
       try {
         config.del(key);
         resolve(true);
+      } catch (error) {
+        reject(error.message);
+      }
+    });
+  });
+
+  ipcMain.handle("config:backup", async (event) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { canceled, filePath } = await dialog.showSaveDialog({
+          title: "Backup Configuration",
+          defaultPath: `config-backup-${new Date().toISOString().split('T')[0]}.json`,
+          filters: [
+            { name: "JSON Files", extensions: ["json"] },
+            { name: "All Files", extensions: ["*"] }
+          ]
+        });
+        if (!canceled && filePath) {
+          config.backup(filePath);
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      } catch (error) {
+        reject(error.message);
+      }
+    });
+  });
+
+  ipcMain.handle("config:restore", async (event) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { canceled, filePaths } = await dialog.showOpenDialog({
+          title: "Restore Configuration",
+          properties: ["openFile"],
+          filters: [
+            { name: "JSON Files", extensions: ["json"] },
+            { name: "All Files", extensions: ["*"] }
+          ]
+        });
+        if (!canceled && filePaths.length > 0) {
+          const success = await config.restore(filePaths[0]);
+          resolve(success);
+        } else {
+          resolve(false);
+        }
       } catch (error) {
         reject(error.message);
       }
