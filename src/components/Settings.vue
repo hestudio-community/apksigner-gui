@@ -8,7 +8,7 @@
             text
             style="height: 32px; width: 32px"
             @click="open_devtools"
-            v-if="isDevMode || advancedSetting"
+            v-if="isDevMode"
             ><span class="material-symbols-outlined" style="font-size: 20px">
               code
             </span></el-button

@@ -203,7 +203,20 @@ const createWindow = () => {
           submenu: [{ role: "close" }],
         },
         { role: "editMenu" },
-        { role: "viewMenu" },
+        {
+          label: "View",
+          submenu: [
+            { role: "reload" },
+            { role: "forceReload" },
+            ...(app.isPackaged ? [] : [{ role: "toggleDevTools" }]),
+            { type: "separator" },
+            { role: "resetZoom" },
+            { role: "zoomIn" },
+            { role: "zoomOut" },
+            { type: "separator" },
+            { role: "togglefullscreen" }
+          ],
+        },
         { role: "windowMenu" },
         {
           role: "help",
@@ -242,6 +255,7 @@ const createWindow = () => {
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       backgroundThrottling: false,
+      devTools: !app.isPackaged, // Disable devtools in production
     },
     // Add icon configuration
     icon: path.join(__dirname, "../icon.png"),
@@ -305,9 +319,11 @@ app.whenReady().then(async () => {
     return process.platform;
   });
 
-  // DevTools handler
+  // DevTools handler - only allowed in development mode
   ipcMain.handle("devtools:open", async () => {
-    if (mainWindow) mainWindow.webContents.openDevTools();
+    if (mainWindow && !app.isPackaged) {
+      mainWindow.webContents.openDevTools();
+    }
   });
 
   ipcMain.handle("system:isDevMode", async () => {
