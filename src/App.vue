@@ -1,7 +1,9 @@
 <template>
   <div style="max-height: calc(100vh)">
     <el-container>
-      <el-aside class="aside">
+      <el-aside class="aside" :style="{ width: sidebarWidth + 'px' }">
+        <div class="resize-handle-left" @mousedown="startResize('left', $event)"></div>
+        <div class="resize-handle-right" @mousedown="startResize('right', $event)"></div>
         <div class="toolbar">
           <el-button
             text
@@ -62,13 +64,13 @@
                   class="keybutton"
                 >
                   <div
-                    style="
-                      text-align: left;
-                      overflow: hidden;
-                      white-space: nowrap;
-                      text-overflow: ellipsis;
-                      width: 135px;
-                    "
+                    :style="{
+                      textAlign: 'left',
+                      overflow: 'hidden',
+                      whiteSpace: 'nowrap',
+                      textOverflow: 'ellipsis',
+                      width: (sidebarWidth - 40) + 'px'
+                    }"
                   >
                     <text>{{ item }}</text>
                   </div>
@@ -198,11 +200,36 @@
 
 <style>
 .aside {
-  width: 100%;
-  max-width: 200px;
-  min-width: 50px;
+  width: 200px;
+  min-width: 128px;
+  max-width: 50%;
   height: calc(100vh - 20px);
   -webkit-app-region: drag;
+  position: relative;
+}
+
+.resize-handle-left,
+.resize-handle-right {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  cursor: col-resize;
+  -webkit-app-region: no-drag;
+  z-index: 10;
+}
+
+.resize-handle-left {
+  left: 0;
+}
+
+.resize-handle-right {
+  right: 0;
+}
+
+.resize-handle-left:hover,
+.resize-handle-right:hover {
+  background-color: rgba(64, 158, 255, 0.3);
 }
 
 .toolbar {
@@ -225,7 +252,7 @@
 }
 
 .keybutton {
-  width: 190px;
+  width: calc(100% - 20px);
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -374,6 +401,9 @@ export default {
       keyList: [],
       keyLoading: true,
       openSign: "",
+      sidebarWidth: 200,
+      isResizing: false,
+      resizeDirection: null,
       i18n: {
         noKeyTip: undefined,
         confirm: undefined,
@@ -386,6 +416,47 @@ export default {
     };
   },
   methods: {
+    startResize(direction, event) {
+      this.isResizing = true;
+      this.resizeDirection = direction;
+      this.startX = event.clientX;
+      this.startWidth = this.sidebarWidth;
+      
+      document.addEventListener('mousemove', this.doResize);
+      document.addEventListener('mouseup', this.stopResize);
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+    },
+    
+    doResize(event) {
+      if (!this.isResizing) return;
+      
+      const deltaX = event.clientX - this.startX;
+      let newWidth;
+      
+      if (this.resizeDirection === 'right') {
+        newWidth = this.startWidth + deltaX;
+      } else {
+        newWidth = this.startWidth - deltaX;
+      }
+      
+      const maxWidth = window.innerWidth * 0.5;
+      const minWidth = 128;
+      
+      newWidth = Math.max(minWidth, Math.min(maxWidth, newWidth));
+      this.sidebarWidth = newWidth;
+    },
+    
+    stopResize() {
+      this.isResizing = false;
+      this.resizeDirection = null;
+      
+      document.removeEventListener('mousemove', this.doResize);
+      document.removeEventListener('mouseup', this.stopResize);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    },
+    
     async RefreshKey() {
       this.keyLoading = true;
       document.querySelector(".refresh").classList.add("element-rotate");
