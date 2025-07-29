@@ -13,11 +13,7 @@
               code
             </span></el-button
           >
-          <el-button
-            text
-            style="height: 32px; width: 32px"
-            @click="open_about"
-          >
+          <el-button text style="height: 32px; width: 32px" @click="open_about">
             <span class="material-symbols-outlined" style="font-size: 20px">
               info
             </span></el-button
@@ -69,7 +65,9 @@
           <h3>{{ i18n.advancedSettings }}</h3>
         </template>
       </el-page-header>
-      <el-scrollbar style="max-height: calc(100vh - 120px); height: calc(100vh - 120px)">
+      <el-scrollbar
+        style="max-height: calc(100vh - 120px); height: calc(100vh - 120px)"
+      >
         <el-card>
           <div
             style="
@@ -162,13 +160,9 @@
               <text style="margin: 3px">{{ i18n.backupConfig }}</text>
             </div>
             <div>
-              <el-button
-                text
-                bg
-                type="primary"
-                @click="backupConfig"
-                >{{ i18n.backup }}</el-button
-              >
+              <el-button text bg type="primary" @click="backupConfig">{{
+                i18n.backup
+              }}</el-button>
             </div>
           </div>
           <br />
@@ -184,13 +178,9 @@
               <text style="margin: 3px">{{ i18n.restoreConfig }}</text>
             </div>
             <div>
-              <el-button
-                text
-                bg
-                type="warning"
-                @click="restoreConfig"
-                >{{ i18n.restore }}</el-button
-              >
+              <el-button text bg type="primary" @click="restoreConfig">{{
+                i18n.restore
+              }}</el-button>
             </div>
           </div>
         </el-card>
@@ -219,7 +209,6 @@
   height: 100%;
   overflow: hidden;
 }
-
 </style>
 
 <script setup>
