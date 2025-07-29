@@ -32,7 +32,15 @@ let config = null;
 
 const initializeConfig = async () => {
   config = new Config();
-  return await config.checkVersionCompatibility();
+  const versionCheckResult = await config.checkVersionCompatibility();
+  if (!versionCheckResult) {
+    return false;
+  }
+  
+  // Validate and restore defaults for out-of-range values
+  config.validateAndRestoreDefaults();
+  
+  return true;
 };
 
 // Save reference to mainWindow for use in IPC handlers
@@ -244,13 +252,47 @@ const createWindow = () => {
   } else {
     Menu.setApplicationMenu(null);
   }
+  
+  // Get saved window size or use defaults
+  const windowConfig = config.get("windowSize") || {};
+  const defaultWidth = 800;
+  const defaultHeight = 600;
+  const minWidth = 640;
+  const minHeight = 480;
+  const maxWidth = 2560;
+  const maxHeight = 1440;
+  
+  // Validate and apply constraints with default restoration
+  let width = windowConfig.width || defaultWidth;
+  let height = windowConfig.height || defaultHeight;
+  let needsReset = false;
+  
+  // Check if values exceed expected ranges and restore defaults
+  if (width < minWidth || width > maxWidth) {
+    width = defaultWidth;
+    needsReset = true;
+  }
+  if (height < minHeight || height > maxHeight) {
+    height = defaultHeight;
+    needsReset = true;
+  }
+  
+  // Apply minimum constraints
+  width = Math.max(minWidth, width);
+  height = Math.max(minHeight, height);
+  
+  // Reset to defaults if values were out of range
+  if (needsReset) {
+    config.set("windowSize", { width: defaultWidth, height: defaultHeight });
+  }
+  
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: width,
+    height: height,
     center: true,
-    minWidth: 640,
-    minHeight: 480,
+    minWidth: minWidth,
+    minHeight: minHeight,
     title: "APKSignerGUI",
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
@@ -264,6 +306,17 @@ const createWindow = () => {
     frame: false,
     transparent: process.platform === "darwin",
     vibrancy: process.platform === "darwin" ? "under-window" : undefined,
+  });
+  
+  // Save window size when it changes
+  mainWindow.on('resize', () => {
+    if (!mainWindow.isMaximized() && !mainWindow.isMinimized()) {
+      const [currentWidth, currentHeight] = mainWindow.getSize();
+      config.set("windowSize", {
+        width: currentWidth,
+        height: currentHeight
+      });
+    }
   });
 
   // Set Dock icon for Mac

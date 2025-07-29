@@ -64,9 +64,17 @@ export class Config extends Storage {
   constructor() {
     super();
     this.configPath = path.join(this.appdata, "config.json");
+    this.defaults = {
+      sidebarWidth: 30,
+      windowSize: { width: 800, height: 600 },
+      checkUpdate: true,
+      advancedSetting: false
+    };
+    
     if (!fs.existsSync(this.configPath)) {
       const defaultConfig = {
-        version: app.getVersion()
+        version: app.getVersion(),
+        ...this.defaults
       };
       fs.writeFileSync(this.configPath, JSON.stringify(defaultConfig));
     }
@@ -74,11 +82,47 @@ export class Config extends Storage {
       this.config = JSON.parse(fs.readFileSync(this.configPath, "utf-8"));
     } catch (error) {
       const defaultConfig = {
-        version: app.getVersion()
+        version: app.getVersion(),
+        ...this.defaults
       };
       fs.writeFileSync(this.configPath, JSON.stringify(defaultConfig));
       this.config = JSON.parse(fs.readFileSync(this.configPath, "utf-8"));
     }
+  }
+
+  validateAndRestoreDefaults() {
+    let needsSave = false;
+    
+    // Validate sidebar width (0-100)
+    if (this.config.sidebarWidth !== undefined) {
+      if (this.config.sidebarWidth < 0 || this.config.sidebarWidth > 100 || isNaN(this.config.sidebarWidth)) {
+        console.warn(`Invalid sidebar width ${this.config.sidebarWidth}, restoring default`);
+        this.config.sidebarWidth = this.defaults.sidebarWidth;
+        needsSave = true;
+      }
+    }
+    
+    // Validate window size (minimum 640x480)
+    if (this.config.windowSize) {
+      const { width, height } = this.config.windowSize;
+      const minWidth = 640;
+      const minHeight = 480;
+      const maxWidth = 2560;
+      const maxHeight = 1440;
+      
+      if (width < minWidth || width > maxWidth || height < minHeight || height > maxHeight || 
+          isNaN(width) || isNaN(height)) {
+        console.warn(`Invalid window size ${width}x${height}, restoring default`);
+        this.config.windowSize = this.defaults.windowSize;
+        needsSave = true;
+      }
+    }
+    
+    if (needsSave) {
+      fs.writeFileSync(this.configPath, JSON.stringify(this.config));
+    }
+    
+    return needsSave;
   }
 
   async checkVersionCompatibility() {

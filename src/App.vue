@@ -432,9 +432,20 @@ export default {
     // 将相对百分比转换为实际像素值
     actualSidebarWidth() {
       const minWidth = 128; // 最小宽度128px (对应0%)
-      const maxWidth = window.innerWidth * 0.5; // 最大宽度50%页面宽度 (对应100%)
+      const maxWidth = Math.min(window.innerWidth * 0.5, window.innerWidth); // 最大宽度50%页面宽度 (对应100%)
       const range = maxWidth - minWidth;
-      return minWidth + (this.sidebarWidth / 100) * range;
+      
+      // 确保范围有效
+      if (range <= 0) {
+        return minWidth;
+      }
+      
+      // 验证sidebarWidth在0-100范围内
+      const validatedPercent = Math.max(0, Math.min(100, this.sidebarWidth));
+      const calculatedWidth = minWidth + (validatedPercent / 100) * range;
+      
+      // 再次验证结果在合理范围内
+      return Math.max(minWidth, Math.min(maxWidth, calculatedWidth));
     },
     
     keyTextStyle() {
@@ -456,13 +467,17 @@ export default {
       
       // 记录当前的窗口宽度和范围，防止窗口大小改变后的瞬移
       const minWidth = 128;
-      const maxWidth = window.innerWidth * 0.5;
-      this.resizeRange = maxWidth - minWidth;
+      const maxWidth = Math.min(window.innerWidth * 0.5, window.innerWidth);
+      this.resizeRange = Math.max(0, maxWidth - minWidth);
       this.resizeMinWidth = minWidth;
       
       // 计算当前实际像素宽度对应的百分比
       const currentActualWidth = this.actualSidebarWidth;
-      this.startWidthPercent = ((currentActualWidth - minWidth) / this.resizeRange) * 100;
+      if (this.resizeRange > 0) {
+        this.startWidthPercent = ((currentActualWidth - minWidth) / this.resizeRange) * 100;
+      } else {
+        this.startWidthPercent = 0;
+      }
       
       document.addEventListener('mousemove', this.doResize);
       document.addEventListener('mouseup', this.stopResize);
@@ -493,14 +508,18 @@ export default {
       
       // 重新计算在当前窗口尺寸下的百分比
       const currentMinWidth = 128;
-      const currentMaxWidth = window.innerWidth * 0.5;
+      const currentMaxWidth = Math.min(window.innerWidth * 0.5, window.innerWidth);
       const currentRange = currentMaxWidth - currentMinWidth;
       
       // 确保实际宽度在当前窗口的合理范围内
       const clampedActualWidth = Math.max(currentMinWidth, Math.min(currentMaxWidth, newActualWidth));
       
       // 更新sidebarWidth为在当前窗口尺寸下的百分比
-      this.sidebarWidth = ((clampedActualWidth - currentMinWidth) / currentRange) * 100;
+      if (currentRange > 0) {
+        this.sidebarWidth = ((clampedActualWidth - currentMinWidth) / currentRange) * 100;
+      } else {
+        this.sidebarWidth = 0;
+      }
       
       // 延迟更新文字宽度，确保DOM已更新
       this.$nextTick(() => {
@@ -522,6 +541,9 @@ export default {
       document.removeEventListener('mouseup', this.stopResize);
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
+      
+      // 保存侧边栏宽度到配置
+      window.electronAPI.config.set("sidebarWidth", this.sidebarWidth);
     },
     
     async RefreshKey() {
@@ -610,6 +632,26 @@ export default {
     });
   },
   mounted() {
+    // 读取保存的侧边栏宽度
+    window.electronAPI.config.get("sidebarWidth").then((savedWidth) => {
+      const defaultSidebarWidth = 30;
+      
+      if (savedWidth !== null && savedWidth !== undefined) {
+        // 验证侧边栏宽度范围 (0-100%)，超出范围则恢复默认值
+        if (savedWidth < 0 || savedWidth > 100 || isNaN(savedWidth)) {
+          console.warn(`Sidebar width ${savedWidth} is out of range (0-100), restoring default value ${defaultSidebarWidth}`);
+          this.sidebarWidth = defaultSidebarWidth;
+          window.electronAPI.config.set("sidebarWidth", defaultSidebarWidth);
+        } else {
+          this.sidebarWidth = savedWidth;
+        }
+      } else {
+        // 使用默认值并保存
+        this.sidebarWidth = defaultSidebarWidth;
+        window.electronAPI.config.set("sidebarWidth", defaultSidebarWidth);
+      }
+    });
+
     window.electronAPI.config.get("checkUpdate").then((data) => {
       if (data == null) {
         window.electronAPI.config.set("checkUpdate", true);
