@@ -39,6 +39,17 @@
 
 3. Or build it yourself as described below.
 
+### macOS Installation Issues
+
+When installing on macOS, you may encounter the error `“APKSignerGUI.app” is damaged and can't be opened. You should move it to the Trash.` This is usually not because the file is actually damaged. To completely avoid this issue, we'd need to pay Apple $99 annually for a trusted certificate, which we cannot afford. To use the software, you'll need to perform some additional steps:
+
+1. Download and move the app to your Applications folder.
+2. Open Terminal and run:
+   ```shell
+   xattr -d com.apple.quarantine /Applications/APKSignerGUI.app
+   ```
+3. Open the application and start using it.
+
 ### Compatibility
 
 Officially supported platforms (prebuilt and tested):
