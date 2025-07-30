@@ -89,4 +89,12 @@ export default {
     return `文件 ${filePath} 不存在，請檢查路徑是否正確`;
   },
   atLeast6Chars: "密碼至少需要 6 個字元",
+  backupConfig: "備份配置文件",
+  restoreConfig: "還原配置文件",
+  backup: "備份",
+  restore: "還原",
+  backupSuccess: "配置文件備份成功",
+  restoreSuccess: "配置文件還原成功",
+  restoreError: "配置文件還原失敗",
+  backupError: "配置文件備份失敗",
 };

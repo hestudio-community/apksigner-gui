@@ -57,6 +57,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
     set: (key, value) => ipcRenderer.invoke("config:set", key, value),
     del: (key) => ipcRenderer.invoke("config:del", key),
   },
+  backupConfig: () => ipcRenderer.invoke("config:backup"),
+  restoreConfig: () => ipcRenderer.invoke("config:restore"),
   checkFileExists: (filePath) =>
     ipcRenderer.invoke("system:checkFileExists", filePath),
   isDevMode: () => ipcRenderer.invoke("system:isDevMode"),

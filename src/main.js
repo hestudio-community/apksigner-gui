@@ -28,7 +28,20 @@ if (!gotTheLock) {
 }
 
 const storage = new Storage();
-const config = new Config();
+let config = null;
+
+const initializeConfig = async () => {
+  config = new Config();
+  const versionCheckResult = await config.checkVersionCompatibility();
+  if (!versionCheckResult) {
+    return false;
+  }
+  
+  // Validate and restore defaults for out-of-range values
+  config.validateAndRestoreDefaults();
+  
+  return true;
+};
 
 // Save reference to mainWindow for use in IPC handlers
 let mainWindow = null;
@@ -183,14 +196,6 @@ const createWindow = () => {
                 CheckUpdate(true);
               },
             },
-            {
-              label: "View in Github",
-              click: () => {
-                shell.openExternal(
-                  "https://github.com/hestudio-community/apksigner-gui"
-                );
-              },
-            },
             { type: "separator" },
             { role: "services" },
             { type: "separator" },
@@ -201,23 +206,117 @@ const createWindow = () => {
             { role: "quit" },
           ],
         },
+        {
+          label: "File",
+          submenu: [{ role: "close" }],
+        },
+        { role: "editMenu" },
+        {
+          label: "View",
+          submenu: [
+            { role: "reload" },
+            { role: "forceReload" },
+            ...(app.isPackaged ? [] : [{ role: "toggleDevTools" }]),
+            { type: "separator" },
+            { role: "resetZoom" },
+            { role: "zoomIn" },
+            { role: "zoomOut" },
+            { type: "separator" },
+            { role: "togglefullscreen" }
+          ],
+        },
+        { role: "windowMenu" },
+        {
+          role: "help",
+          submenu: [
+            {
+              label: "Report Issue",
+              click: () => {
+                shell.openExternal(
+                  "https://github.com/hestudio-community/apksigner-gui/issues"
+                );
+              },
+            },
+            {
+              label: "View in Github",
+              click: () => {
+                shell.openExternal(
+                  "https://github.com/hestudio-community/apksigner-gui"
+                );
+              },
+            },
+          ],
+        },
       ])
     );
   } else {
     Menu.setApplicationMenu(null);
   }
+  
+  // Get saved window size or use defaults
+  const windowConfig = config.get("windowSize") || {};
+  const defaultWidth = 800;
+  const defaultHeight = 600;
+  const minWidth = 640;
+  const minHeight = 480;
+  const maxWidth = 2560;
+  const maxHeight = 1440;
+  
+  // Validate and apply constraints with default restoration
+  let width = windowConfig.width || defaultWidth;
+  let height = windowConfig.height || defaultHeight;
+  let needsReset = false;
+  
+  // Check if values exceed expected ranges and restore defaults
+  if (width < minWidth || width > maxWidth) {
+    width = defaultWidth;
+    needsReset = true;
+  }
+  if (height < minHeight || height > maxHeight) {
+    height = defaultHeight;
+    needsReset = true;
+  }
+  
+  // Apply minimum constraints
+  width = Math.max(minWidth, width);
+  height = Math.max(minHeight, height);
+  
+  // Reset to defaults if values were out of range
+  if (needsReset) {
+    config.set("windowSize", { width: defaultWidth, height: defaultHeight });
+  }
+  
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: width,
+    height: height,
+    center: true,
+    minWidth: minWidth,
+    minHeight: minHeight,
+    title: "APKSignerGUI",
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
+      backgroundThrottling: false,
+      devTools: !app.isPackaged, // Disable devtools in production
     },
     // Add icon configuration
     icon: path.join(__dirname, "../icon.png"),
     titleBarStyle: "hiddenInset",
+    show: true,
     frame: false,
     transparent: process.platform === "darwin",
+    vibrancy: process.platform === "darwin" ? "under-window" : undefined,
+  });
+  
+  // Save window size when it changes
+  mainWindow.on('resize', () => {
+    if (!mainWindow.isMaximized() && !mainWindow.isMinimized()) {
+      const [currentWidth, currentHeight] = mainWindow.getSize();
+      config.set("windowSize", {
+        width: currentWidth,
+        height: currentHeight
+      });
+    }
   });
 
   // Set Dock icon for Mac
@@ -228,7 +327,6 @@ const createWindow = () => {
     );
     app.dock.setIcon(image);
     console.log(path.join(__dirname, "../build/icon.icns"));
-    mainWindow.setVibrancy("under-window")
   }
 
   // and load the index.html of the app.
@@ -239,13 +337,18 @@ const createWindow = () => {
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
     );
   }
-  mainWindow.setMinimumSize(640, 480);
   mainWindow.setHasShadow(true);
 };
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+  // Initialize config and check version compatibility
+  const canProceed = await initializeConfig();
+  if (!canProceed) {
+    return; // App will quit if version check fails
+  }
+
   ipcMain.handle("dialog:openFile", async (event, filters) => {
     const { canceled, filePaths } = await dialog.showOpenDialog({
       title: "APKSignerGUI",
@@ -269,9 +372,11 @@ app.whenReady().then(() => {
     return process.platform;
   });
 
-  // DevTools handler
+  // DevTools handler - only allowed in development mode
   ipcMain.handle("devtools:open", async () => {
-    if (mainWindow) mainWindow.webContents.openDevTools();
+    if (mainWindow && !app.isPackaged) {
+      mainWindow.webContents.openDevTools();
+    }
   });
 
   ipcMain.handle("system:isDevMode", async () => {
@@ -390,6 +495,52 @@ app.whenReady().then(() => {
       try {
         config.del(key);
         resolve(true);
+      } catch (error) {
+        reject(error.message);
+      }
+    });
+  });
+
+  ipcMain.handle("config:backup", async (event) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { canceled, filePath } = await dialog.showSaveDialog({
+          title: "Backup Configuration",
+          defaultPath: `config-backup-${new Date().toISOString().split('T')[0]}.json`,
+          filters: [
+            { name: "JSON Files", extensions: ["json"] },
+            { name: "All Files", extensions: ["*"] }
+          ]
+        });
+        if (!canceled && filePath) {
+          config.backup(filePath);
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      } catch (error) {
+        reject(error.message);
+      }
+    });
+  });
+
+  ipcMain.handle("config:restore", async (event) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { canceled, filePaths } = await dialog.showOpenDialog({
+          title: "Restore Configuration",
+          properties: ["openFile"],
+          filters: [
+            { name: "JSON Files", extensions: ["json"] },
+            { name: "All Files", extensions: ["*"] }
+          ]
+        });
+        if (!canceled && filePaths.length > 0) {
+          const success = await config.restore(filePaths[0]);
+          resolve(success);
+        } else {
+          resolve(false);
+        }
       } catch (error) {
         reject(error.message);
       }

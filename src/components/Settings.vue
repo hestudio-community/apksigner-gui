@@ -1,156 +1,191 @@
 <template>
-  <div class="transition-container">
-    <Transition :name="transitionName">
-      <div v-if="!openAdvancedSettings" class="mainPage" key="main">
-        <h2 style="display: flex; justify-content: space-between">
-          <text>{{ i18n.Setting }}</text>
-          <div style="display: flex; flex-direction: row">
-            <el-button
-              text
-              style="height: 32px; width: 32px"
-              @click="open_devtools"
-              v-if="isDevMode || advancedSetting"
-              ><Icon
-                icon="fluent:window-dev-tools-20-regular"
-                width="20"
-                height="20"
-            /></el-button>
-            <el-button
-              text
-              style="height: 32px; width: 32px"
-              @click="open_about"
-              ><Icon icon="mdi:about-circle-outline" width="20" height="20"
-            /></el-button>
+  <div>
+    <div v-if="!openAdvancedSettings" class="mainPage">
+      <h2 style="display: flex; justify-content: space-between">
+        <text>{{ i18n.Setting }}</text>
+        <div style="display: flex; flex-direction: row; margin-right: 2px">
+          <el-button
+            text
+            style="height: 32px; width: 32px"
+            @click="open_devtools"
+            v-if="isDevMode"
+            ><span class="material-symbols-outlined" style="font-size: 20px">
+              code
+            </span></el-button
+          >
+          <el-button text style="height: 32px; width: 32px" @click="open_about">
+            <span class="material-symbols-outlined" style="font-size: 20px">
+              info
+            </span></el-button
+          >
+        </div>
+      </h2>
+      <el-scrollbar style="max-height: calc(100vh - 120px)">
+        <el-card style="display: flex; flex-direction: column">
+          <div>
+            <text>{{ i18n.apksignerLocation }}</text>
+            <el-input v-model="apksigner" placeholder="apksigner">
+              <template #append>
+                <el-button @click="open_apksigner">
+                  <el-icon><FolderOpened /></el-icon
+                ></el-button>
+              </template>
+            </el-input>
           </div>
-        </h2>
-        <el-scrollbar style="max-height: calc(100vh - 120px)">
-          <el-card style="display: flex; flex-direction: column">
+          <br />
+          <div>
+            <text>{{ i18n.zipalignLocation }}</text>
+            <el-input v-model="zipalign" placeholder="zipalign">
+              <template #append>
+                <el-button @click="open_zipalign">
+                  <el-icon><FolderOpened /></el-icon
+                ></el-button>
+              </template>
+            </el-input>
+          </div>
+          <br />
+          <div style="justify-self: end">
+            <el-button text bg type="primary" @click="save_filepath">
+              {{ i18n.save }}
+            </el-button>
+          </div>
+        </el-card>
+        <el-card>
+          <div style="justify-self: end">
+            <el-button text bg type="primary" @click="open_advancedSetting">{{
+              i18n.advancedSettings
+            }}</el-button>
+          </div>
+        </el-card>
+      </el-scrollbar>
+    </div>
+    <div v-else class="advancedSetting">
+      <el-page-header @back="close_advancedSetting" :title="i18n.back">
+        <template #content>
+          <h3>{{ i18n.advancedSettings }}</h3>
+        </template>
+      </el-page-header>
+      <el-scrollbar
+        style="max-height: calc(100vh - 120px); height: calc(100vh - 120px)"
+      >
+        <el-card>
+          <div
+            style="
+              display: flex;
+              flex-direction: row;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
             <div>
-              <text>{{ i18n.apksignerLocation }}</text>
-              <el-input v-model="apksigner" placeholder="apksigner">
-                <template #append>
-                  <el-button @click="open_apksigner">
-                    <el-icon><FolderOpened /></el-icon
-                  ></el-button>
-                </template>
-              </el-input>
+              <text style="margin: 3px">{{ i18n.signAdvancedOptions }}</text>
             </div>
-            <br />
             <div>
-              <text>{{ i18n.zipalignLocation }}</text>
-              <el-input v-model="zipalign" placeholder="zipalign">
-                <template #append>
-                  <el-button @click="open_zipalign">
-                    <el-icon><FolderOpened /></el-icon
-                  ></el-button>
-                </template>
-              </el-input>
+              <el-switch
+                v-model="advancedSetting"
+                @change="openSignAdvancedSetting"
+                style="margin: 3px"
+              />
             </div>
-            <br />
-            <div style="justify-self: end">
-              <el-button text bg type="primary" @click="save_filepath">
-                {{ i18n.save }}
-              </el-button>
+          </div>
+        </el-card>
+        <el-card>
+          <div>
+            <text>{{ i18n.chooseLanguage }}</text>
+          </div>
+          <br />
+          <el-select v-model="lang.chooseLang" @change="changelanguage">
+            <el-option
+              v-for="item in lang.langlist"
+              :key="item.lang"
+              :label="item.display"
+              :value="item.lang"
+            />
+          </el-select>
+        </el-card>
+        <el-card>
+          <div
+            style="
+              display: flex;
+              flex-direction: row;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <div>
+              <text style="margin: 3px">{{ i18n.cacheCleanup }}</text>
             </div>
-          </el-card>
-          <el-card>
-            <div style="justify-self: end">
-              <el-button text bg type="primary" @click="open_advancedSetting">{{
-                i18n.advancedSettings
+            <div>
+              <el-button
+                text
+                bg
+                type="primary"
+                :loading="cleaningTmpDir"
+                @click="clearTmpDir"
+                >{{ i18n.clean }}</el-button
+              >
+            </div>
+          </div>
+          <br />
+          <div
+            style="
+              display: flex;
+              flex-direction: row;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <div>
+              <text style="margin: 3px">{{ i18n.openAutoCheckUpdate }}</text>
+            </div>
+            <div>
+              <el-switch
+                v-model="AutoCheckUpdate"
+                @change="ChangeAutoCheckUpdate"
+                style="margin: 3px"
+              />
+            </div>
+          </div>
+        </el-card>
+        <el-card>
+          <div
+            style="
+              display: flex;
+              flex-direction: row;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <div>
+              <text style="margin: 3px">{{ i18n.backupConfig }}</text>
+            </div>
+            <div>
+              <el-button text bg type="primary" @click="backupConfig">{{
+                i18n.backup
               }}</el-button>
             </div>
-          </el-card>
-        </el-scrollbar>
-      </div>
-      <div v-else class="advancedSetting" key="advanced">
-        <el-page-header @back="close_advancedSetting" :title="i18n.back">
-          <template #content>
-            <h3>{{ i18n.advancedSettings }}</h3>
-          </template>
-        </el-page-header>
-        <el-scrollbar style="max-height: calc(100vh - 120px)">
-          <el-card>
-            <div
-              style="
-                display: flex;
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-              "
-            >
-              <div>
-                <text style="margin: 3px">{{ i18n.signAdvancedOptions }}</text>
-              </div>
-              <div>
-                <el-switch
-                  v-model="advancedSetting"
-                  @change="openSignAdvancedSetting"
-                  style="margin: 3px"
-                />
-              </div>
-            </div>
-          </el-card>
-          <el-card>
+          </div>
+          <br />
+          <div
+            style="
+              display: flex;
+              flex-direction: row;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
             <div>
-              <text>{{ i18n.chooseLanguage }}</text>
+              <text style="margin: 3px">{{ i18n.restoreConfig }}</text>
             </div>
-            <br />
-            <el-select v-model="lang.chooseLang" @change="changelanguage">
-              <el-option
-                v-for="item in lang.langlist"
-                :key="item.lang"
-                :label="item.display"
-                :value="item.lang"
-              />
-            </el-select>
-          </el-card>
-          <el-card>
-            <div
-              style="
-                display: flex;
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-              "
-            >
-              <div>
-                <text style="margin: 3px">{{ i18n.cacheCleanup }}</text>
-              </div>
-              <div>
-                <el-button
-                  text
-                  bg
-                  type="primary"
-                  :loading="cleaningTmpDir"
-                  @click="clearTmpDir"
-                  >{{ i18n.clean }}</el-button
-                >
-              </div>
+            <div>
+              <el-button text bg type="primary" @click="restoreConfig">{{
+                i18n.restore
+              }}</el-button>
             </div>
-            <br />
-            <div
-              style="
-                display: flex;
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-              "
-            >
-              <div>
-                <text style="margin: 3px">{{ i18n.openAutoCheckUpdate }}</text>
-              </div>
-              <div>
-                <el-switch
-                  v-model="AutoCheckUpdate"
-                  @change="ChangeAutoCheckUpdate"
-                  style="margin: 3px"
-                />
-              </div>
-            </div>
-          </el-card>
-        </el-scrollbar>
-      </div>
-    </Transition>
+          </div>
+        </el-card>
+      </el-scrollbar>
+    </div>
   </div>
 </template>
 
@@ -163,59 +198,22 @@
   color: gray;
 }
 
-/* 容器样式 */
-.transition-container {
-  position: relative;
+/* 卡片样式 */
+.el-card {
+  border-radius: 8px;
+}
+
+/* 主页面和高级设置页面样式 */
+.mainPage,
+.advancedSetting {
+  height: 100%;
   overflow: hidden;
-  min-height: calc(100vh - 120px);
-}
-
-/* 共用的过渡效果设置 - 优化动画体验 */
-.slide-left-enter-active,
-.slide-left-leave-active,
-.slide-right-enter-active,
-.slide-right-leave-active {
-  transition: all 0.25s ease-in-out;
-  position: absolute;
-  width: 100%;
-  left: 0;
-  right: 0;
-}
-
-/* 从主页到高级设置(向左滑动) */
-.slide-left-leave-to {
-  transform: translateX(-100%);
-  opacity: 0;
-}
-.slide-left-enter-from {
-  transform: translateX(100%);
-  opacity: 0;
-}
-
-/* 从高级设置返回主页(向右滑动) */
-.slide-right-leave-to {
-  transform: translateX(100%);
-  opacity: 0;
-}
-.slide-right-enter-from {
-  transform: translateX(-100%);
-  opacity: 0;
-}
-
-/* 共用的静态状态 */
-.slide-left-enter-to,
-.slide-left-leave-from,
-.slide-right-enter-to,
-.slide-right-leave-from {
-  transform: translateX(0);
-  opacity: 1;
 }
 </style>
 
 <script setup>
 import { FolderOpened } from "@element-plus/icons-vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { Icon } from "@iconify/vue";
 import { internationalization, supportLangList } from "../utils/i18n.js";
 </script>
 
@@ -227,9 +225,7 @@ export default {
       zipalign: "",
       advancedSetting: false,
       cleaningTmpDir: false,
-      mainPage: true,
       openAdvancedSettings: false,
-      transitionName: "slide-left",
       lang: {
         chooseLang: "",
         langlist: [],
@@ -257,8 +253,15 @@ export default {
         back: undefined,
         openAutoCheckUpdate: undefined,
         fileNotExists: undefined,
+        backupConfig: undefined,
+        restoreConfig: undefined,
+        backup: undefined,
+        restore: undefined,
+        backupSuccess: undefined,
+        restoreSuccess: undefined,
+        restoreError: undefined,
+        backupError: undefined,
       },
-      transitionName: "slide-left",
       AutoCheckUpdate: true,
       isDevMode: false,
     };
@@ -333,14 +336,10 @@ export default {
       }
     },
     open_advancedSetting() {
-      this.transitionName = "slide-left";
-      this.mainPage = false;
       this.openAdvancedSettings = true;
     },
     close_advancedSetting() {
-      this.transitionName = "slide-right";
       this.openAdvancedSettings = false;
-      this.mainPage = true;
     },
     openSignAdvancedSetting() {
       if (this.advancedSetting) {
@@ -425,6 +424,37 @@ export default {
         window.electronAPI.config.set("checkUpdate", true);
       } else {
         window.electronAPI.config.set("checkUpdate", false);
+      }
+    },
+    async backupConfig() {
+      try {
+        const success = await window.electronAPI.backupConfig();
+        if (success) {
+          ElMessage({
+            message: this.i18n.backupSuccess,
+            type: "success",
+          });
+        } else {
+          ElMessage.error(this.i18n.backupError);
+        }
+      } catch (error) {
+        ElMessage.error(this.i18n.backupError);
+      }
+    },
+    async restoreConfig() {
+      try {
+        const success = await window.electronAPI.restoreConfig();
+        if (success) {
+          ElMessage({
+            message: this.i18n.restoreSuccess,
+            type: "success",
+          });
+          // Optionally reload the app or refresh settings
+        } else {
+          ElMessage.error(this.i18n.restoreError);
+        }
+      } catch (error) {
+        ElMessage.error(this.i18n.restoreError);
       }
     },
   },

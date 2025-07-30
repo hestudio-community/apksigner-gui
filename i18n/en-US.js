@@ -89,4 +89,12 @@ export default {
     return `The file ${filePath} does not exist, please check if the path is correct`;
   },
   atLeast6Chars: "The password must be at least 6 characters",
+  backupConfig: "Backup configuration file",
+  restoreConfig: "Restore configuration file",
+  backup: "Backup",
+  restore: "Restore",
+  backupSuccess: "Configuration backup successful",
+  restoreSuccess: "Configuration restore successful",
+  restoreError: "Configuration restore failed",
+  backupError: "Configuration backup failed",
 };
