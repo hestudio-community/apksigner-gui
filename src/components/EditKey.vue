@@ -94,7 +94,7 @@ export default {
         .openFile([
           {
             name: this.i18n.keyStore,
-            extensions: ["jks"],
+            extensions: ["jks", "keystore"],
           },
           {
             name: this.i18n.AllFiles,
