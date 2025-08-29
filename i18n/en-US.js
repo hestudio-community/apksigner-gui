@@ -10,9 +10,9 @@ export default {
   AddKey: "Add key",
   editKey: "Edit key",
   AddKeyTips:
-    "Currently, only keystore (.jks) files are supported. Support for certificates with separate public and private keys will be added in future versions.",
+    "Currently, only keystore files are supported. Support for certificates with separate public and private keys will be added in future versions.",
   name: "Name",
-  jksLocation: "Keystore location (.jks)",
+  jksLocation: "Keystore location",
   keyAlias: "Certificate alias",
   keyPasswd: "Certificate password",
   save: "Save",
