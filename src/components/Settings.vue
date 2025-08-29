@@ -433,12 +433,21 @@ export default {
           ElMessage({
             message: this.i18n.backupSuccess,
             type: "success",
+            plain: true,
           });
         } else {
-          ElMessage.error(this.i18n.backupError);
+          ElMessage({
+            message: this.i18n.backupError,
+            type: "error",
+            plain: true,
+          });
         }
       } catch (error) {
-        ElMessage.error(this.i18n.backupError);
+        ElMessage({
+          message: this.i18n.backupError,
+          type: "error",
+          plain: true,
+        });
       }
     },
     async restoreConfig() {
@@ -448,13 +457,21 @@ export default {
           ElMessage({
             message: this.i18n.restoreSuccess,
             type: "success",
+            plain: true,
           });
-          // Optionally reload the app or refresh settings
         } else {
-          ElMessage.error(this.i18n.restoreError);
+          ElMessage({
+            message: this.i18n.restoreError,
+            type: "error",
+            plain: true,
+          });
         }
       } catch (error) {
-        ElMessage.error(this.i18n.restoreError);
+        ElMessage({
+          message: this.i18n.restoreError,
+          type: "error",
+          plain: true,
+        });
       }
     },
   },
