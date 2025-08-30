@@ -1,0 +1,94 @@
+name: Build Multi-Platform
+
+on:
+  push:
+    branches: [ main, master ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          # Windows builds
+          - os: windows-latest
+            platform: win32
+            arch: x64
+            name: Windows x64
+            platform_name: windows
+          - os: windows-11-arm
+            platform: win32
+            arch: arm64
+            name: Windows ARM64
+            platform_name: windows
+          
+          # macOS builds
+          - os: macos-13
+            platform: darwin
+            arch: x64
+            name: macOS Intel
+            platform_name: macos
+          - os: macos-latest
+            platform: darwin
+            arch: arm64
+            name: macOS Apple Silicon
+            platform_name: macos
+          
+          # Linux builds
+          - os: ubuntu-latest
+            platform: linux
+            arch: x64
+            name: Linux x64
+            platform_name: linux
+          - os: ubuntu-24.04-arm
+            platform: linux
+            arch: arm64
+            name: Linux ARM64
+            platform_name: linux
+
+    runs-on: ${{ matrix.os }}
+    name: Build ${{ matrix.name }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install WiX Toolset (Windows only)
+        if: matrix.platform == 'win32'
+        run: |
+          # Download and install WiX Toolset v3
+          Invoke-WebRequest -Uri "https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314-binaries.zip" -OutFile "wix314-binaries.zip"
+          Expand-Archive -Path "wix314-binaries.zip" -DestinationPath "C:\wix"
+          echo "C:\wix" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Build application
+        run: npm run make
+        env:
+          ELECTRON_BUILDER_ARCH: ${{ matrix.arch }}
+
+      - name: List output files (Debug)
+        run: |
+          echo "Contents of ./out/make:"
+          ls -la ./out/make/ || dir ./out/make/ || echo "No make directory found"
+        shell: bash
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: apksignergui_${{ github.ref_name || 'dev' }}_${{ matrix.arch == 'x64' && 'amd64' || matrix.arch }}_${{ matrix.platform_name }}
+          path: |
+            ./out/make/**/*
+          retention-days: 30
+
