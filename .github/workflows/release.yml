@@ -18,7 +18,7 @@ jobs:
           - arch: x64
             os: windows-latest
           - arch: arm64
-            os: windows-latest
+            os: windows-11-arm
     runs-on: ${{ matrix.os }}
     
     steps:
@@ -35,6 +35,7 @@ jobs:
         run: npm ci
 
       - name: Install WiX Toolset
+        if: matrix.os == 'windows-latest' || matrix.os == 'windows-11-arm'
         run: |
           Invoke-WebRequest -Uri "https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314-binaries.zip" -OutFile "wix314-binaries.zip"
           Expand-Archive -Path "wix314-binaries.zip" -DestinationPath "C:\wix"
@@ -92,7 +93,7 @@ jobs:
           - arch: x64
             os: ubuntu-latest
           - arch: arm64
-            os: ubuntu-latest
+            os: ubuntu-24.04-arm
     runs-on: ${{ matrix.os }}
     
     steps:
@@ -118,20 +119,85 @@ jobs:
         with:
           name: apksignergui_${{ github.ref_name || 'dev' }}_${{ matrix.arch == 'x64' && 'amd64' || matrix.arch }}_linux
           path: ./out/make/**/*
++++++++ REPLACE</div>
+</replace_in_file>
 
-  release:
-    if: github.event_name == 'release'
-    needs: [build-windows, build-macos, build-linux]
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        
-      - name: Upload release assets
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            **/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+让我也更新一下 build.yml 中的 matrix 配置，使 artifact 名称更加清晰：
+
+<replace_in_file>
+<path>.github/workflows/build.yml</path>
+<diff>------- SEARCH
+        include:
+          # Windows builds
+          - os: windows-latest
+            platform: win32
+            arch: x64
+            name: Windows x64
+            artifact_name: windows-x64
+          - os: windows-latest
+            platform: win32
+            arch: arm64
+            name: Windows ARM64
+            artifact_name: windows-arm64
+          
+          # macOS builds
+          - os: macos-latest
+            platform: darwin
+            arch: x64
+            name: macOS Intel
+            artifact_name: macos-x64
+          - os: macos-latest
+            platform: darwin
+            arch: arm64
+            name: macOS Apple Silicon
+            artifact_name: macos-arm64
+          
+          # Linux builds
+          - os: ubuntu-latest
+            platform: linux
+            arch: x64
+            name: Linux x64
+            artifact_name: linux-x64
+          - os: ubuntu-latest
+            platform: linux
+            arch: arm64
+            name: Linux ARM64
+            artifact_name: linux-arm64
+=======
+        include:
+          # Windows builds
+          - os: windows-latest
+            platform: win32
+            arch: x64
+            name: Windows x64
+            platform_name: windows
+          - os: windows-latest
+            platform: win32
+            arch: arm64
+            name: Windows ARM64
+            platform_name: windows
+          
+          # macOS builds
+          - os: macos-latest
+            platform: darwin
+            arch: x64
+            name: macOS Intel
+            platform_name: macos
+          - os: macos-latest
+            platform: darwin
+            arch: arm64
+            name: macOS Apple Silicon
+            platform_name: macos
+          
+          # Linux builds
+          - os: ubuntu-latest
+            platform: linux
+            arch: x64
+            name: Linux x64
+            platform_name: linux
+          - os: ubuntu-latest
+            platform: linux
+            arch: arm64
+            name: Linux ARM64
+            platform_name: linux
+
