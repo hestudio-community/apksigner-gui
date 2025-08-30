@@ -41,18 +41,9 @@ jobs:
           echo "C:\wix" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Build Windows ${{ matrix.arch }}
-        run: |
-          # Use PowerShell script for build, handling APPX interaction issues
-          if (Test-Path "scripts/build-windows-ci.ps1") {
-            .\scripts\build-windows-ci.ps1 -Arch ${{ matrix.arch }}
-          } else {
-            # Fallback to direct build
-            $env:CI = "true"
-            $env:ELECTRON_BUILDER_ARCH = "${{ matrix.arch }}"
-            $env:ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES = "true"
-            npm run make
-          }
-        shell: pwsh
+        run: npm run make
+        env:
+          ELECTRON_BUILDER_ARCH: ${{ matrix.arch }}
 
       - name: Upload Windows ${{ matrix.arch }} artifacts
         uses: actions/upload-artifact@v4
@@ -87,7 +78,6 @@ jobs:
         run: npm run make
         env:
           ELECTRON_BUILDER_ARCH: ${{ matrix.arch }}
-          CI: true
 
       - name: Upload macOS ${{ matrix.arch }} artifacts
         uses: actions/upload-artifact@v4
@@ -122,7 +112,6 @@ jobs:
         run: npm run make
         env:
           ELECTRON_BUILDER_ARCH: ${{ matrix.arch }}
-          CI: true
 
       - name: Upload Linux ${{ matrix.arch }} artifacts
         uses: actions/upload-artifact@v4
