@@ -71,18 +71,21 @@ module.exports = {
         // CI environment optimization - avoid interactive dialogs
         makeVersionWinStoreCompatible: false,
         devCert: false,
-        // Disable signing in CI environment to avoid interaction
+        // Complete non-interactive configuration for CI
         ...(process.env.CI ? {
-          // Non-interactive configuration for CI environment
-          windowsKit: "10.0.22000.0",
+          // Skip all certificate operations in CI
           makeappxParams: [
             "/v",  // Verbose output
-            "/nv", // No validation
-            "/l"   // No compression
+            "/nv"  // No validation
           ],
-          // Disable auto-signing to avoid certificate dialogs
+          // Disable all signing operations
+          createCertificate: false,
+          signWithParams: false,
           skipMachineArchCheck: true,
-          skipUpdateCheck: true
+          skipUpdateCheck: true,
+          // Force no certificate prompts
+          certificateFile: null,
+          certificatePassword: null
         } : {
           // Development environment configuration
           certificateFile: process.env.WINDOWS_CERTIFICATE_FILE,

@@ -40,6 +40,18 @@ jobs:
           Expand-Archive -Path "wix314-binaries.zip" -DestinationPath "C:\wix"
           echo "C:\wix" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
+      - name: Setup Windows SDK
+        run: |
+          # Ensure Windows SDK is available for APPX builds
+          $sdkPath = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" -Directory | Sort-Object Name -Descending | Select-Object -First 1
+          if ($sdkPath) {
+            $sdkBinPath = Join-Path $sdkPath.FullName "x64"
+            echo "$sdkBinPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+            Write-Host "Added Windows SDK to PATH: $sdkBinPath"
+          } else {
+            Write-Host "Windows SDK not found"
+          }
+
       - name: Build Windows ${{ matrix.arch }}
         run: |
           # Use PowerShell script for build, handling APPX interaction issues
