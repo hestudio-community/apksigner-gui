@@ -1,6 +1,9 @@
 const { FusesPlugin } = require("@electron-forge/plugin-fuses");
 const { FuseV1Options, FuseVersion } = require("@electron/fuses");
 
+// 检查是否在CI环境中
+const isCI = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
+
 module.exports = {
   packagerConfig: {
     asar: true,
@@ -57,7 +60,8 @@ module.exports = {
       },
       platforms: ["win32"],
     },
-    {
+    // 只在非CI环境下包含appx maker
+    ...(isCI ? [] : [{
       name: "@electron-forge/maker-appx",
       config: {
         assets: "./icons/assets",
@@ -70,7 +74,7 @@ module.exports = {
         }`,
       },
       platforms: ["win32"],
-    },
+    }]),
   ],
   plugins: [
     {
