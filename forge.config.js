@@ -68,15 +68,26 @@ module.exports = {
             ? "./appxmanifests/AppXManifest_arm64.xml"
             : "./appxmanifests/AppXManifest_x86_64.xml"
         }`,
-        // 在 CI 环境中使用临时证书
-        ...(process.env.CI && process.env.WINDOWS_CERTIFICATE_FILE ? {
-          certificateFile: process.env.WINDOWS_CERTIFICATE_FILE,
-          certificatePassword: process.env.WINDOWS_CERTIFICATE_PASSWORD,
-          makeVersionWinStoreCompatible: false,
+        // CI environment optimization - avoid interactive dialogs
+        makeVersionWinStoreCompatible: false,
+        devCert: false,
+        // Disable signing in CI environment to avoid interaction
+        ...(process.env.CI ? {
+          // Non-interactive configuration for CI environment
+          windowsKit: "10.0.22000.0",
+          makeappxParams: [
+            "/v",  // Verbose output
+            "/nv", // No validation
+            "/l"   // No compression
+          ],
+          // Disable auto-signing to avoid certificate dialogs
+          skipMachineArchCheck: true,
+          skipUpdateCheck: true
         } : {
-          makeVersionWinStoreCompatible: false,
-          devCert: false,
-        }),
+          // Development environment configuration
+          certificateFile: process.env.WINDOWS_CERTIFICATE_FILE,
+          certificatePassword: process.env.WINDOWS_CERTIFICATE_PASSWORD
+        })
       },
       platforms: ["win32"],
     },
