@@ -10,8 +10,7 @@ jobs:
   test-build:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    
+        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, windows-11-arm, macos-13, macos-latest]
     runs-on: ${{ matrix.os }}
     name: Test on ${{ matrix.os }}
 
@@ -29,7 +28,7 @@ jobs:
         run: npm ci
 
       - name: Install WiX Toolset (Windows only)
-        if: matrix.os == 'windows-latest'
+        if: matrix.os == 'windows-latest' || matrix.os == 'windows-11-arm'
         run: |
           Invoke-WebRequest -Uri "https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314-binaries.zip" -OutFile "wix314-binaries.zip"
           Expand-Archive -Path "wix314-binaries.zip" -DestinationPath "C:\wix"
