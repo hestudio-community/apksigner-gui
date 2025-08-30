@@ -68,6 +68,15 @@ module.exports = {
             ? "./appxmanifests/AppXManifest_arm64.xml"
             : "./appxmanifests/AppXManifest_x86_64.xml"
         }`,
+        // 在 CI 环境中使用临时证书
+        ...(process.env.CI && process.env.WINDOWS_CERTIFICATE_FILE ? {
+          certificateFile: process.env.WINDOWS_CERTIFICATE_FILE,
+          certificatePassword: process.env.WINDOWS_CERTIFICATE_PASSWORD,
+          makeVersionWinStoreCompatible: false,
+        } : {
+          makeVersionWinStoreCompatible: false,
+          devCert: false,
+        }),
       },
       platforms: ["win32"],
     },
