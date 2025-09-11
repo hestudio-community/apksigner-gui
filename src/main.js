@@ -27,6 +27,11 @@ if (!gotTheLock) {
   });
 }
 
+let allowDevtools = false;
+if (process.argv.includes("--allow-devtools") || !app.isPackaged) {
+  allowDevtools = true;
+}
+
 const storage = new Storage();
 let config = null;
 
@@ -36,10 +41,10 @@ const initializeConfig = async () => {
   if (!versionCheckResult) {
     return false;
   }
-  
+
   // Validate and restore defaults for out-of-range values
   config.validateAndRestoreDefaults();
-  
+
   return true;
 };
 
@@ -159,7 +164,7 @@ const AboutPanel = () => {
 Version: ${app.getVersion()}
 Platform: ${process.platform}
 Architecture: ${process.arch}
-WorkStatus: ${app.isPackaged ? "Product" : "Develop"}
+WorkStatus: ${app.isPackaged ? "Product" : "Develop"} ${app.isPackaged & allowDevtools ? "with DevTools" : ""}
 Copyright: Copyright © 2025 heStudio Community
     `,
       type: "none",
@@ -216,13 +221,13 @@ const createWindow = () => {
           submenu: [
             { role: "reload" },
             { role: "forceReload" },
-            ...(app.isPackaged ? [] : [{ role: "toggleDevTools" }]),
+            ...(allowDevtools ? [] : [{ role: "toggleDevTools" }]),
             { type: "separator" },
             { role: "resetZoom" },
             { role: "zoomIn" },
             { role: "zoomOut" },
             { type: "separator" },
-            { role: "togglefullscreen" }
+            { role: "togglefullscreen" },
           ],
         },
         { role: "windowMenu" },
@@ -252,7 +257,7 @@ const createWindow = () => {
   } else {
     Menu.setApplicationMenu(null);
   }
-  
+
   // Get saved window size or use defaults
   const windowConfig = config.get("windowSize") || {};
   const defaultWidth = 800;
@@ -261,12 +266,12 @@ const createWindow = () => {
   const minHeight = 480;
   const maxWidth = 2560;
   const maxHeight = 1440;
-  
+
   // Validate and apply constraints with default restoration
   let width = windowConfig.width || defaultWidth;
   let height = windowConfig.height || defaultHeight;
   let needsReset = false;
-  
+
   // Check if values exceed expected ranges and restore defaults
   if (width < minWidth || width > maxWidth) {
     width = defaultWidth;
@@ -276,16 +281,16 @@ const createWindow = () => {
     height = defaultHeight;
     needsReset = true;
   }
-  
+
   // Apply minimum constraints
   width = Math.max(minWidth, width);
   height = Math.max(minHeight, height);
-  
+
   // Reset to defaults if values were out of range
   if (needsReset) {
     config.set("windowSize", { width: defaultWidth, height: defaultHeight });
   }
-  
+
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: width,
@@ -297,7 +302,7 @@ const createWindow = () => {
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       backgroundThrottling: false,
-      devTools: !app.isPackaged, // Disable devtools in production
+      devTools: allowDevtools,
     },
     // Add icon configuration
     icon: path.join(__dirname, "../icon.png"),
@@ -307,14 +312,14 @@ const createWindow = () => {
     transparent: process.platform === "darwin",
     vibrancy: process.platform === "darwin" ? "under-window" : undefined,
   });
-  
+
   // Save window size when it changes
-  mainWindow.on('resize', () => {
+  mainWindow.on("resize", () => {
     if (!mainWindow.isMaximized() && !mainWindow.isMinimized()) {
       const [currentWidth, currentHeight] = mainWindow.getSize();
       config.set("windowSize", {
         width: currentWidth,
-        height: currentHeight
+        height: currentHeight,
       });
     }
   });
@@ -374,13 +379,13 @@ app.whenReady().then(async () => {
 
   // DevTools handler - only allowed in development mode
   ipcMain.handle("devtools:open", async () => {
-    if (mainWindow && !app.isPackaged) {
+    if (mainWindow && allowDevtools) {
       mainWindow.webContents.openDevTools();
     }
   });
 
   ipcMain.handle("system:isDevMode", async () => {
-    return !app.isPackaged;
+    return allowDevtools;
   });
 
   // Windows control handlers
@@ -506,11 +511,11 @@ app.whenReady().then(async () => {
       try {
         const { canceled, filePath } = await dialog.showSaveDialog({
           title: "Backup Configuration",
-          defaultPath: `config-backup-${new Date().toISOString().split('T')[0]}.json`,
+          defaultPath: `config-backup-${new Date().toISOString().split("T")[0]}.json`,
           filters: [
             { name: "JSON Files", extensions: ["json"] },
-            { name: "All Files", extensions: ["*"] }
-          ]
+            { name: "All Files", extensions: ["*"] },
+          ],
         });
         if (!canceled && filePath) {
           config.backup(filePath);
@@ -532,8 +537,8 @@ app.whenReady().then(async () => {
           properties: ["openFile"],
           filters: [
             { name: "JSON Files", extensions: ["json"] },
-            { name: "All Files", extensions: ["*"] }
-          ]
+            { name: "All Files", extensions: ["*"] },
+          ],
         });
         if (!canceled && filePaths.length > 0) {
           const success = await config.restore(filePaths[0]);
