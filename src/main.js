@@ -264,8 +264,6 @@ const createWindow = () => {
   const defaultHeight = 600;
   const minWidth = 640;
   const minHeight = 480;
-  const maxWidth = 2560;
-  const maxHeight = 1440;
 
   // Validate and apply constraints with default restoration
   let width = windowConfig.width || defaultWidth;
@@ -273,11 +271,11 @@ const createWindow = () => {
   let needsReset = false;
 
   // Check if values exceed expected ranges and restore defaults
-  if (width < minWidth || width > maxWidth) {
+  if (width < minWidth) {
     width = defaultWidth;
     needsReset = true;
   }
-  if (height < minHeight || height > maxHeight) {
+  if (height < minHeight) {
     height = defaultHeight;
     needsReset = true;
   }
