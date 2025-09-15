@@ -373,7 +373,7 @@ app.whenReady().then(async () => {
       return filePath;
     }
   });
-  ipcMain.handle("system:platfrom", async () => {
+  ipcMain.handle("system:platform", async () => {
     return process.platform;
   });
 
@@ -552,10 +552,10 @@ app.whenReady().then(async () => {
     });
   });
 
-  ipcMain.handle("system:checkJavaHome", (event) => {
+  ipcMain.handle("system:checkJavaHome", (event, javapath) => {
     return new Promise((resolve, reject) => {
       try {
-        const isJavaHomeValid = CheckJavaHome();
+        const isJavaHomeValid = CheckJavaHome(javapath);
         if (isJavaHomeValid) {
           resolve(true);
         } else {

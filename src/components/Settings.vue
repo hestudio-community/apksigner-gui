@@ -78,14 +78,49 @@
             "
           >
             <div>
-              <text style="margin: 3px">{{ i18n.signAdvancedOptions }}</text>
+              <text>{{ i18n.signAdvancedOptions }}</text>
             </div>
             <div>
               <el-switch
                 v-model="advancedSetting"
                 @change="openSignAdvancedSetting"
-                style="margin: 3px"
               />
+            </div>
+          </div>
+        </el-card>
+        <el-card>
+          <div
+            style="
+              display: flex;
+              flex-direction: row;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <div>
+              <text>Java环境配置</text>
+            </div>
+            <div>
+              <el-button text bg type="primary" @click="checkJavaEnv"
+                >检查并保存</el-button
+              >
+            </div>
+          </div>
+          <br />
+          <div style="display: flex; flex-direction: column">
+            <el-checkbox
+              v-model="JavaHome.AutoCheckJavaHome"
+              @change="loadJavaHome"
+              >自动从系统中读取Java环境</el-checkbox
+            >
+            <div v-show="!JavaHome.AutoCheckJavaHome">
+              <el-input v-model="JavaHome.javapath" placeholder="Java路径">
+                <template #append>
+                  <el-button @click="open_java">
+                    <el-icon><FolderOpened /></el-icon
+                  ></el-button>
+                </template>
+              </el-input>
             </div>
           </div>
         </el-card>
@@ -113,7 +148,7 @@
             "
           >
             <div>
-              <text style="margin: 3px">{{ i18n.cacheCleanup }}</text>
+              <text>{{ i18n.cacheCleanup }}</text>
             </div>
             <div>
               <el-button
@@ -136,13 +171,12 @@
             "
           >
             <div>
-              <text style="margin: 3px">{{ i18n.openAutoCheckUpdate }}</text>
+              <text>{{ i18n.openAutoCheckUpdate }}</text>
             </div>
             <div>
               <el-switch
                 v-model="AutoCheckUpdate"
                 @change="ChangeAutoCheckUpdate"
-                style="margin: 3px"
               />
             </div>
           </div>
@@ -157,7 +191,7 @@
             "
           >
             <div>
-              <text style="margin: 3px">{{ i18n.backupConfig }}</text>
+              <text>{{ i18n.backupConfig }}</text>
             </div>
             <div>
               <el-button text bg type="primary" @click="backupConfig">{{
@@ -175,7 +209,7 @@
             "
           >
             <div>
-              <text style="margin: 3px">{{ i18n.restoreConfig }}</text>
+              <text>{{ i18n.restoreConfig }}</text>
             </div>
             <div>
               <el-button text bg type="primary" @click="restoreConfig">{{
@@ -264,6 +298,10 @@ export default {
       },
       AutoCheckUpdate: true,
       isDevMode: false,
+      JavaHome: {
+        AutoCheckJavaHome: true,
+        javapath: "",
+      },
     };
   },
   methods: {
@@ -295,6 +333,21 @@ export default {
         ])
         .then((result) => {
           this.zipalign = result;
+        });
+    },
+    async open_java() {
+      window.electronAPI
+        .openFile([
+          {
+            name: "java",
+            extensions:
+              (await window.electronAPI.SystemPlatform()) === "win32"
+                ? ["exe"]
+                : ["*"],
+          },
+        ])
+        .then((result) => {
+          this.JavaHome.javapath = result;
         });
     },
     save_filepath() {
@@ -474,6 +527,76 @@ export default {
         });
       }
     },
+    loadJavaHome() {
+      if (this.JavaHome.AutoCheckJavaHome) {
+        this.JavaHome.javapath = "";
+      } else {
+        window.electronAPI.config.get("JavaHome").then((result) => {
+          this.JavaHome.javapath = result;
+        });
+      }
+    },
+    async checkJavaEnv() {
+      window.electronAPI
+        .CheckJavaHome(this.JavaHome.javapath)
+        .then(async (data) => {
+          if (data) {
+            window.electronAPI.config.set("JavaHome", this.JavaHome.javapath);
+            const platform = await window.electronAPI.SystemPlatform();
+            if (platform === "win32") {
+              let javapath;
+              let keytoolpath;
+              if (!this.JavaHome.javapath) {
+                javapath = await window.electronAPI.SystemShell("where java");
+                keytoolpath =
+                  await window.electronAPI.SystemShell("where keytool");
+              } else {
+                javapath = this.JavaHome.javapath;
+                keytoolpath = this.JavaHome.javapath.replace(
+                  /\/java.exe$/,
+                  "keytool.exe"
+                );
+              }
+              ElMessageBox({
+                message: `<p>环境配置正常</p><p>Java路径: ${javapath}</p><p>keytool路径: ${keytoolpath}</p>`,
+                type: "success",
+                dangerouslyUseHTMLString: true,
+              });
+            } else if (platform === "darwin") {
+              let javapath;
+              let keytoolpath;
+              if (!this.JavaHome.javapath) {
+                javapath = await window.electronAPI.SystemShell("which java");
+                keytoolpath =
+                  await window.electronAPI.SystemShell("which keytool");
+              } else {
+                javapath = this.JavaHome.javapath;
+                keytoolpath = this.JavaHome.javapath.replace(
+                  /\/java$/,
+                  "/keytool"
+                );
+              }
+              ElMessageBox({
+                message: `<p>环境配置正常</p><p>Java路径: ${javapath}</p><p>keytool路径: ${keytoolpath}</p>`,
+                type: "success",
+                dangerouslyUseHTMLString: true,
+              });
+            } else {
+              ElMessage({
+                message: "环境配置正常",
+                type: "success",
+                plain: true,
+              });
+            }
+          } else {
+            ElMessage({
+              message: "Java环境异常,请检查Java是否存在或者是否附带keytool",
+              type: "error",
+              plain: true,
+            });
+          }
+        });
+    },
   },
   async created() {
     const i18n = new internationalization();
@@ -502,6 +625,15 @@ export default {
     });
     window.electronAPI.isDevMode().then((result) => {
       this.isDevMode = result;
+    });
+    window.electronAPI.config.get("JavaHome").then((result) => {
+      if (result) {
+        this.JavaHome.AutoCheckJavaHome = false;
+        this.JavaHome.javapath = result;
+      } else {
+        this.JavaHome.AutoCheckJavaHome = true;
+        this.JavaHome.javapath = "";
+      }
     });
   },
 };

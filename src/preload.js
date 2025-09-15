@@ -11,14 +11,14 @@ contextBridge.exposeInMainWorld("electronAPI", {
   WindowsMinimize: () => ipcRenderer.invoke("windows:minimize"),
   WindowsIsMaximized: () => ipcRenderer.invoke("windows:isMaximized"),
   WindowsIsFullScreen: () => ipcRenderer.invoke("windows:isFullScreen"),
-  SystemPlatfrom: () => ipcRenderer.invoke("system:platfrom"),
+  SystemPlatform: () => ipcRenderer.invoke("system:platform"),
   CopyToTmp: (file) => ipcRenderer.invoke("app:copyToTmp", file),
   ClearTmpDir: () => ipcRenderer.invoke("app:clearTmpDir"),
   SystemShell: (shell) => ipcRenderer.invoke("system:shell", shell),
   AppAbout: () => ipcRenderer.invoke("app:about"),
   AppCheckUpdate: (forceShow) =>
     ipcRenderer.invoke("app:checkUpdate", forceShow),
-  CheckJavaHome: () => ipcRenderer.invoke("system:checkJavaHome"),
+  CheckJavaHome: (javapath) => ipcRenderer.invoke("system:checkJavaHome", javapath),
   CreateKey: (
     keyPath,
     keyPasswd,

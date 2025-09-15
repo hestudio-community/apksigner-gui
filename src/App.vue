@@ -610,7 +610,7 @@ export default {
       const key = Object.keys(this.i18n)[i];
       this.i18n[key] = i18n.geti18n(key);
     }
-    window.electronAPI.SystemPlatfrom().then(async (result) => {
+    window.electronAPI.SystemPlatform().then(async (result) => {
       if (result == "darwin") {
         this.darwin.isDarwin = true;
         document.querySelector(".toolbar").style.marginLeft = "64px";

@@ -126,7 +126,7 @@
       config: {
         // ...
       },
-      platfrom: ["win32"],
+      platform: ["win32"],
    },
    ```
 
@@ -135,7 +135,7 @@
    ```javascript
    {
      name: "@electron-forge/maker-zip",
-     platfrom: ["win32"],
+     platform: ["win32"],
    }
    ```
 
