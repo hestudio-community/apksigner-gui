@@ -109,12 +109,12 @@
           <br />
           <div style="display: flex; flex-direction: column">
             <el-checkbox
-              v-model="JavaHome.AutoCheckJavaHome"
-              @change="loadJavaHome"
+              v-model="JavaPath.AutoCheckJavaPath"
+              @change="loadJavaPath"
               >自动从系统中读取Java环境</el-checkbox
             >
-            <div v-show="!JavaHome.AutoCheckJavaHome">
-              <el-input v-model="JavaHome.javapath" placeholder="Java路径">
+            <div v-show="!JavaPath.AutoCheckJavaPath">
+              <el-input v-model="JavaPath.javapath" placeholder="Java路径">
                 <template #append>
                   <el-button @click="open_java">
                     <el-icon><FolderOpened /></el-icon
@@ -298,8 +298,8 @@ export default {
       },
       AutoCheckUpdate: true,
       isDevMode: false,
-      JavaHome: {
-        AutoCheckJavaHome: true,
+      JavaPath: {
+        AutoCheckJavaPath: true,
         javapath: "",
       },
     };
@@ -347,7 +347,7 @@ export default {
           },
         ])
         .then((result) => {
-          this.JavaHome.javapath = result;
+          this.JavaPath.javapath = result;
         });
     },
     save_filepath() {
@@ -527,32 +527,32 @@ export default {
         });
       }
     },
-    loadJavaHome() {
-      if (this.JavaHome.AutoCheckJavaHome) {
-        this.JavaHome.javapath = "";
+    loadJavaPath() {
+      if (this.JavaPath.AutoCheckJavaPath) {
+        this.JavaPath.javapath = "";
       } else {
-        window.electronAPI.config.get("JavaHome").then((result) => {
-          this.JavaHome.javapath = result;
+        window.electronAPI.config.get("JavaPath").then((result) => {
+          this.JavaPath.javapath = result;
         });
       }
     },
     async checkJavaEnv() {
       window.electronAPI
-        .CheckJavaHome(this.JavaHome.javapath)
+        .CheckJavaPath(this.JavaPath.javapath)
         .then(async (data) => {
           if (data) {
-            window.electronAPI.config.set("JavaHome", this.JavaHome.javapath);
+            window.electronAPI.config.set("JavaPath", this.JavaPath.javapath);
             const platform = await window.electronAPI.SystemPlatform();
             if (platform === "win32") {
               let javapath;
               let keytoolpath;
-              if (!this.JavaHome.javapath) {
+              if (!this.JavaPath.javapath) {
                 javapath = await window.electronAPI.SystemShell("where java");
                 keytoolpath =
                   await window.electronAPI.SystemShell("where keytool");
               } else {
-                javapath = this.JavaHome.javapath;
-                keytoolpath = this.JavaHome.javapath.replace(
+                javapath = this.JavaPath.javapath;
+                keytoolpath = this.JavaPath.javapath.replace(
                   /\/java.exe$/,
                   "keytool.exe"
                 );
@@ -565,13 +565,13 @@ export default {
             } else if (platform === "darwin") {
               let javapath;
               let keytoolpath;
-              if (!this.JavaHome.javapath) {
+              if (!this.JavaPath.javapath) {
                 javapath = await window.electronAPI.SystemShell("which java");
                 keytoolpath =
                   await window.electronAPI.SystemShell("which keytool");
               } else {
-                javapath = this.JavaHome.javapath;
-                keytoolpath = this.JavaHome.javapath.replace(
+                javapath = this.JavaPath.javapath;
+                keytoolpath = this.JavaPath.javapath.replace(
                   /\/java$/,
                   "/keytool"
                 );
@@ -626,13 +626,13 @@ export default {
     window.electronAPI.isDevMode().then((result) => {
       this.isDevMode = result;
     });
-    window.electronAPI.config.get("JavaHome").then((result) => {
+    window.electronAPI.config.get("JavaPath").then((result) => {
       if (result) {
-        this.JavaHome.AutoCheckJavaHome = false;
-        this.JavaHome.javapath = result;
+        this.JavaPath.AutoCheckJavaPath = false;
+        this.JavaPath.javapath = result;
       } else {
-        this.JavaHome.AutoCheckJavaHome = true;
-        this.JavaHome.javapath = "";
+        this.JavaPath.AutoCheckJavaPath = true;
+        this.JavaPath.javapath = "";
       }
     });
   },
