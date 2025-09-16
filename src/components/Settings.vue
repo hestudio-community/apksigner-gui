@@ -248,7 +248,8 @@
 <script setup>
 import { FolderOpened } from "@element-plus/icons-vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { internationalization, supportLangList } from "../utils/i18n.js";
+import { internationalization } from "../utils/i18nServices/client.js";
+import { supportLangList } from "../utils/i18nServices/config.js";
 </script>
 
 <script>

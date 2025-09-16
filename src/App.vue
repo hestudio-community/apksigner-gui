@@ -392,7 +392,7 @@ import AddKey from "./components/AddKey.vue";
 import EditKey from "./components/EditKey.vue";
 import Sign from "./components/Sign.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { internationalization } from "./utils/i18n.js";
+import { internationalization } from "./utils/i18nServices/client.js";
 </script>
 
 <script>

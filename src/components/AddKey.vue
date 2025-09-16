@@ -243,7 +243,7 @@
 <script setup>
 import { FolderOpened } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
-import { internationalization } from "../utils/i18n.js";
+import { internationalization } from "../utils/i18nServices/client.js";
 </script>
 
 <script>
