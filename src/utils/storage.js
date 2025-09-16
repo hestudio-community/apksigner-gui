@@ -161,14 +161,14 @@ export class Config extends Storage {
     const versionComparison = compareVersions(currentVersion, configVersion);
 
     if (versionComparison < 0) {
-      const result = await dialog.showMessageBox({
-        type: "warning",
+      const result = await dialog.showMessageBoxSync({
+        type: "error",
         title: "Version Compatibility Warning",
         message: "Configuration File Version Compatibility Issue",
         detail: `Current application version (${currentVersion}) is lower than configuration file version (${configVersion}). This may cause compatibility issues.`,
         buttons: ["Cancel", "Open Anyway"],
-        defaultId: 0,
         cancelId: 0,
+        defaultId: 0,
       });
 
       if (result.response === 0) {
