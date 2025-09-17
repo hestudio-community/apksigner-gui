@@ -4,6 +4,14 @@ export class internationalization {
   constructor() {
     this.lang = null;
     this.userLang = {};
+    let lang = window.electronAPI.config.get("lang");
+    if (lang != null && supportLangList[lang]) {
+      this.lang = lang;
+      this.userLang = supportLangList[lang].library;
+      return;
+    } else {
+      this.init();
+    }
   }
 
   init() {
