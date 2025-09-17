@@ -9,8 +9,7 @@ export default {
   },
   AddKey: "添加密鑰",
   editKey: "修改密鑰",
-  AddKeyTips:
-    "目前僅支持 密鑰庫 文件。對於公私鑰分離的證書將在後續版本支持。",
+  AddKeyTips: "目前僅支持 密鑰庫 文件。對於公私鑰分離的證書將在後續版本支持。",
   name: "名稱",
   jksLocation: "密鑰庫位置",
   keyAlias: "證書別名",

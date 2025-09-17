@@ -16,8 +16,7 @@
           <el-input v-model="keystore" :placeholder="i18n.jksLocation">
             <template #append>
               <el-button @click="open_keystore">
-                <el-icon>
-                  <FolderOpened /> </el-icon
+                <el-icon> <FolderOpened /> </el-icon
               ></el-button>
             </template>
           </el-input>
@@ -62,8 +61,7 @@
             >
               <template #append>
                 <el-button @click="save_keystone">
-                  <el-icon>
-                    <FolderOpened /> </el-icon
+                  <el-icon> <FolderOpened /> </el-icon
                 ></el-button>
               </template>
             </el-input>
@@ -373,7 +371,7 @@ export default {
             return;
           }
           let keyList;
-          const keys = window.electronAPI.config.get("keys")
+          const keys = window.electronAPI.config.get("keys");
           if (keys) {
             keyList = keys;
           } else {
@@ -462,7 +460,7 @@ export default {
                   this.create.advanceOptions.country,
                   this.create.advanceOptions.keyalg,
                   this.create.advanceOptions.keysize,
-                  this.create.advanceOptions.sigalg
+                  this.create.advanceOptions.sigalg,
                 )
                 .then((res) => {
                   if (res === true) {
@@ -508,7 +506,7 @@ export default {
     }
   },
   mounted() {
-    const advancedSetting = window.electronAPI.config.get("advancedSetting")
+    const advancedSetting = window.electronAPI.config.get("advancedSetting");
     if (advancedSetting) {
       this.create.advancedSetting = advancedSetting;
     }

@@ -5,7 +5,7 @@ import "./element.scss";
 import App from "./App.vue";
 import { internationalization } from "./utils/i18nServices/client";
 
-new internationalization()
+new internationalization();
 
 const app = createApp(App);
 

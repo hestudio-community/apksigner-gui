@@ -27,8 +27,7 @@
             <el-input v-model="apksigner" placeholder="apksigner">
               <template #append>
                 <el-button @click="open_apksigner">
-                  <el-icon>
-                    <FolderOpened /> </el-icon
+                  <el-icon> <FolderOpened /> </el-icon
                 ></el-button>
               </template>
             </el-input>
@@ -39,8 +38,7 @@
             <el-input v-model="zipalign" placeholder="zipalign">
               <template #append>
                 <el-button @click="open_zipalign">
-                  <el-icon>
-                    <FolderOpened /> </el-icon
+                  <el-icon> <FolderOpened /> </el-icon
                 ></el-button>
               </template>
             </el-input>
@@ -119,8 +117,7 @@
               <el-input v-model="JavaPath.javapath" placeholder="Java路径">
                 <template #append>
                   <el-button @click="open_java">
-                    <el-icon>
-                      <FolderOpened /> </el-icon
+                    <el-icon> <FolderOpened /> </el-icon
                   ></el-button>
                 </template>
               </el-input>

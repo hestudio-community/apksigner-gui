@@ -398,16 +398,16 @@ export default {
               }
               if (!this.signplan.auto) {
                 script += ` --v1-signing-enabled ${this.signplan.plans.includes(
-                  "V1"
+                  "V1",
                 )}`;
                 script += ` --v2-signing-enabled ${this.signplan.plans.includes(
-                  "V2"
+                  "V2",
                 )}`;
                 script += ` --v3-signing-enabled ${this.signplan.plans.includes(
-                  "V3"
+                  "V3",
                 )}`;
                 script += ` --v4-signing-enabled ${this.signplan.plans.includes(
-                  "V4"
+                  "V4",
                 )}`;
               }
               if (this.zipalign.status) {
@@ -425,12 +425,12 @@ export default {
                 console.log(
                   `${zipalign} -v -P ${this.zipalign.config.P} -f ${
                     this.zipalign.config.Zopfli ? "-z" : ""
-                  } 4 ${result} ${result}_zipalign.apk && ${script}`
+                  } 4 ${result} ${result}_zipalign.apk && ${script}`,
                 );
                 this.shell(
                   `${zipalign} -v -P ${this.zipalign.config.P} -f ${
                     this.zipalign.config.Zopfli ? "-z" : ""
-                  } 4 ${result} ${result}_zipalign.apk && ${script}`
+                  } 4 ${result} ${result}_zipalign.apk && ${script}`,
                 );
                 return;
               } else {

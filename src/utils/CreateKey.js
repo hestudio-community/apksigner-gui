@@ -65,7 +65,7 @@ export function CreateKey(
   country,
   keyalg,
   keysize,
-  sigalg
+  sigalg,
 ) {
   let keytoolPath;
   if (fs.existsSync(process.env.JAVA_HOME)) {

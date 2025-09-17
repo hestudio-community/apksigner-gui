@@ -2,7 +2,7 @@ const { FusesPlugin } = require("@electron-forge/plugin-fuses");
 const { FuseV1Options, FuseVersion } = require("@electron/fuses");
 
 // 检查是否在CI环境中
-const isCI = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
+const isCI = process.env.CI === "true" || process.env.GITHUB_ACTIONS === "true";
 
 module.exports = {
   packagerConfig: {
@@ -61,20 +61,24 @@ module.exports = {
       platforms: ["win32"],
     },
     // 只在非CI环境下包含appx maker
-    ...(isCI ? [] : [{
-      name: "@electron-forge/maker-appx",
-      config: {
-        assets: "./icons/assets",
-        publisher: "CN=73AC1CCD-0F7C-48FE-A64D-F404735487C1",
-        packageDescription: "Simple but complete APK signing tool.",
-        manifest: `${
-          process.arch === "arm64"
-            ? "./appxmanifests/AppXManifest_arm64.xml"
-            : "./appxmanifests/AppXManifest_x86_64.xml"
-        }`,
-      },
-      platforms: ["win32"],
-    }]),
+    ...(isCI
+      ? []
+      : [
+          {
+            name: "@electron-forge/maker-appx",
+            config: {
+              assets: "./icons/assets",
+              publisher: "CN=73AC1CCD-0F7C-48FE-A64D-F404735487C1",
+              packageDescription: "Simple but complete APK signing tool.",
+              manifest: `${
+                process.arch === "arm64"
+                  ? "./appxmanifests/AppXManifest_arm64.xml"
+                  : "./appxmanifests/AppXManifest_x86_64.xml"
+              }`,
+            },
+            platforms: ["win32"],
+          },
+        ]),
   ],
   plugins: [
     {

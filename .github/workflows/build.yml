@@ -2,10 +2,10 @@ name: Build Multi-Platform
 
 on:
   push:
-    branches: [ main, master ]
-    tags: [ 'v*' ]
+    branches: [main, master]
+    tags: ["v*"]
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
   workflow_dispatch:
 
 jobs:
@@ -36,7 +36,7 @@ jobs:
             arch: arm64
             name: Windows ARM64
             platform_name: windows
-          
+
           # macOS builds
           - os: macos-13
             platform: darwin
@@ -48,7 +48,7 @@ jobs:
             arch: arm64
             name: macOS Apple Silicon
             platform_name: macos
-          
+
           # Linux builds
           - os: ubuntu-latest
             platform: linux
@@ -71,8 +71,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'npm'
+          node-version: "22"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -103,4 +103,3 @@ jobs:
           path: |
             ./out/make/**/*
           retention-days: 30
-

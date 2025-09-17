@@ -9,8 +9,7 @@ export default {
   },
   AddKey: "添加密钥",
   editKey: "修改密钥",
-  AddKeyTips:
-    "目前仅支持 密钥库 文件。对于公私钥分离的证书将在后续版本支持。",
+  AddKeyTips: "目前仅支持 密钥库 文件。对于公私钥分离的证书将在后续版本支持。",
   name: "名称",
   jksLocation: "密钥库位置",
   keyAlias: "证书别名",

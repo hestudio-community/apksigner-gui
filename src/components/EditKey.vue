@@ -13,8 +13,7 @@
           <el-input v-model="keystore" :placeholder="i18n.jksLocation">
             <template #append>
               <el-button @click="open_keystore">
-                <el-icon>
-                  <FolderOpened /> </el-icon
+                <el-icon> <FolderOpened /> </el-icon
               ></el-button>
             </template>
           </el-input>
