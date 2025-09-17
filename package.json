@@ -9,7 +9,7 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "echo \"No linting configured\""
+    "lint": "prettier . --write"
   },
   "keywords": [],
   "author": {
@@ -19,9 +19,9 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@electron-forge/cli": "^7.9.0",
+    "@electron-forge/maker-appx": "^7.9.0",
     "@electron-forge/maker-deb": "^7.9.0",
     "@electron-forge/maker-dmg": "^7.9.0",
-    "@electron-forge/maker-appx": "^7.9.0",
     "@electron-forge/maker-wix": "^7.9.0",
     "@electron-forge/maker-zip": "^7.9.0",
     "@electron-forge/plugin-auto-unpack-natives": "^7.9.0",
@@ -29,6 +29,7 @@
     "@electron-forge/plugin-vite": "^7.9.0",
     "@electron/fuses": "^1.8.0",
     "electron": "^38.1.0",
+    "prettier": "^3.6.2",
     "sass-embedded": "^1.85.1",
     "vite": "^7.1.5"
   },

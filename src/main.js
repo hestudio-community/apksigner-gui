@@ -3,7 +3,7 @@ import path from "node:path";
 import started from "electron-squirrel-startup";
 import { spawn } from "node:child_process";
 import { CheckJavaHome, CreateKey } from "./utils/CreateKey";
-import { Config, Storage } from "./utils/storage";
+import { Config, Storage, importhandler } from "./utils/storage";
 import fs from "node:fs";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -53,7 +53,7 @@ let mainWindow = null;
 
 const CheckUpdate = (forceShow) => {
   fetch(
-    "https://api.github.com/repos/hestudio-community/apksigner-gui/releases/latest"
+    "https://api.github.com/repos/hestudio-community/apksigner-gui/releases/latest",
   )
     .then(async (response) => {
       const data = await response.json();
@@ -70,7 +70,7 @@ const CheckUpdate = (forceShow) => {
             .then((response) => {
               if (response.response == 1) {
                 shell.openExternal(
-                  "https://github.com/hestudio-community/apksigner-gui/releases/latest"
+                  "https://github.com/hestudio-community/apksigner-gui/releases/latest",
                 );
               }
             });
@@ -92,8 +92,8 @@ const CheckUpdate = (forceShow) => {
                     data.name
                   }/apksignergui_${String(data.name).replace(
                     "v",
-                    ""
-                  )}_arm64.dmg`
+                    "",
+                  )}_arm64.dmg`,
                 );
               } else if (process.platform == "win32" && process.arch == "x64") {
                 shell.openExternal(
@@ -101,8 +101,8 @@ const CheckUpdate = (forceShow) => {
                     data.name
                   }/apksignergui_${String(data.name).replace(
                     "v",
-                    ""
-                  )}_amd64.msi`
+                    "",
+                  )}_amd64.msi`,
                 );
               } else if (
                 process.platform == "win32" &&
@@ -113,17 +113,17 @@ const CheckUpdate = (forceShow) => {
                     data.name
                   }/apksignergui_${String(data.name).replace(
                     "v",
-                    ""
-                  )}_arm64.msi`
+                    "",
+                  )}_arm64.msi`,
                 );
               } else {
                 shell.openExternal(
-                  "https://github.com/hestudio-community/apksigner-gui/releases/latest"
+                  "https://github.com/hestudio-community/apksigner-gui/releases/latest",
                 );
               }
             } else if (response.response == 2) {
               shell.openExternal(
-                "https://github.com/hestudio-community/apksigner-gui/releases/latest"
+                "https://github.com/hestudio-community/apksigner-gui/releases/latest",
               );
             }
           });
@@ -148,7 +148,7 @@ const CheckUpdate = (forceShow) => {
       .then((response) => {
         if (response.response == 1) {
           shell.openExternal(
-            "https://github.com/hestudio-community/apksigner-gui/releases/latest"
+            "https://github.com/hestudio-community/apksigner-gui/releases/latest",
           );
         }
       });
@@ -176,7 +176,7 @@ Copyright: Copyright © 2025 heStudio Community
         CheckUpdate(true);
       } else if (response.response == 2) {
         shell.openExternal(
-          "https://github.com/hestudio-community/apksigner-gui"
+          "https://github.com/hestudio-community/apksigner-gui",
         );
       }
     });
@@ -238,7 +238,7 @@ const createWindow = () => {
               label: "Report Issue",
               click: () => {
                 shell.openExternal(
-                  "https://github.com/hestudio-community/apksigner-gui/issues"
+                  "https://github.com/hestudio-community/apksigner-gui/issues",
                 );
               },
             },
@@ -246,13 +246,13 @@ const createWindow = () => {
               label: "View in Github",
               click: () => {
                 shell.openExternal(
-                  "https://github.com/hestudio-community/apksigner-gui"
+                  "https://github.com/hestudio-community/apksigner-gui",
                 );
               },
             },
           ],
         },
-      ])
+      ]),
     );
   } else {
     Menu.setApplicationMenu(null);
@@ -326,7 +326,7 @@ const createWindow = () => {
   if (process.platform === "darwin") {
     const { nativeImage } = require("electron");
     const image = nativeImage.createFromPath(
-      path.join(__dirname, "../build/icon.icns")
+      path.join(__dirname, "../build/icon.icns"),
     );
     app.dock.setIcon(image);
     console.log(path.join(__dirname, "../build/icon.icns"));
@@ -337,7 +337,7 @@ const createWindow = () => {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
     mainWindow.loadFile(
-      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
+      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
     );
   }
   mainWindow.setHasShadow(true);
@@ -473,82 +473,7 @@ app.whenReady().then(async () => {
     });
   });
 
-  ipcMain.handle("config:get", (event, key) => {
-    return new Promise((resolve, reject) => {
-      try {
-        const value = config.get(key);
-        resolve(value);
-      } catch (error) {
-        reject(error.message);
-      }
-    });
-  });
-  ipcMain.handle("config:set", (event, key, value) => {
-    return new Promise((resolve, reject) => {
-      try {
-        config.set(key, value);
-        resolve(true);
-      } catch (error) {
-        reject(error.message);
-      }
-    });
-  });
-  ipcMain.handle("config:del", (event, key) => {
-    return new Promise((resolve, reject) => {
-      try {
-        config.del(key);
-        resolve(true);
-      } catch (error) {
-        reject(error.message);
-      }
-    });
-  });
-
-  ipcMain.handle("config:backup", async (event) => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const { canceled, filePath } = await dialog.showSaveDialog({
-          title: "Backup Configuration",
-          defaultPath: `config-backup-${new Date().toISOString().split("T")[0]}.json`,
-          filters: [
-            { name: "JSON Files", extensions: ["json"] },
-            { name: "All Files", extensions: ["*"] },
-          ],
-        });
-        if (!canceled && filePath) {
-          config.backup(filePath);
-          resolve(true);
-        } else {
-          resolve(false);
-        }
-      } catch (error) {
-        reject(error.message);
-      }
-    });
-  });
-
-  ipcMain.handle("config:restore", async (event) => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const { canceled, filePaths } = await dialog.showOpenDialog({
-          title: "Restore Configuration",
-          properties: ["openFile"],
-          filters: [
-            { name: "JSON Files", extensions: ["json"] },
-            { name: "All Files", extensions: ["*"] },
-          ],
-        });
-        if (!canceled && filePaths.length > 0) {
-          const success = await config.restore(filePaths[0]);
-          resolve(success);
-        } else {
-          resolve(false);
-        }
-      } catch (error) {
-        reject(error.message);
-      }
-    });
-  });
+  importhandler();
 
   ipcMain.handle("system:checkJavaHome", (event, javapath) => {
     return new Promise((resolve, reject) => {
@@ -592,7 +517,7 @@ app.whenReady().then(async () => {
       country,
       keyalg,
       keysize,
-      sigalg
+      sigalg,
     ) => {
       return new Promise((resolve, reject) => {
         try {
@@ -610,14 +535,14 @@ app.whenReady().then(async () => {
             country,
             keyalg,
             keysize,
-            sigalg
+            sigalg,
           );
           resolve(result);
         } catch (error) {
           reject(error.message);
         }
       });
-    }
+    },
   );
 
   createWindow();

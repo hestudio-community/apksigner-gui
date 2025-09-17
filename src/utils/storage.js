@@ -1,6 +1,7 @@
 import path from "node:path";
 import fs from "node:fs";
-import { app, dialog } from "electron";
+import { app, dialog, ipcMain } from "electron";
+import { warn } from "./alert";
 
 function compareVersions(v1, v2) {
   const parts1 = v1.split(".").map(Number);
@@ -29,7 +30,7 @@ export class Storage {
       this.appdata = path.join(
         process.env.HOME,
         "/Library/Application Support",
-        "APKSignerGUI"
+        "APKSignerGUI",
       );
     }
 
@@ -106,7 +107,7 @@ export class Config extends Storage {
         isNaN(this.config.sidebarWidth)
       ) {
         console.warn(
-          `Invalid sidebar width ${this.config.sidebarWidth}, restoring default`
+          `Invalid sidebar width ${this.config.sidebarWidth}, restoring default`,
         );
         this.config.sidebarWidth = this.defaults.sidebarWidth;
         needsSave = true;
@@ -130,7 +131,7 @@ export class Config extends Storage {
         isNaN(height)
       ) {
         console.warn(
-          `Invalid window size ${width}x${height}, restoring default`
+          `Invalid window size ${width}x${height}, restoring default`,
         );
         this.config.windowSize = this.defaults.windowSize;
         needsSave = true;
@@ -270,7 +271,7 @@ export class Config extends Storage {
       } catch (error) {
         dialog.showErrorBox(
           "Restore Error",
-          `Failed to restore configuration: ${error.message}`
+          `Failed to restore configuration: ${error.message}`,
         );
         return false;
       }
@@ -279,4 +280,82 @@ export class Config extends Storage {
       return false;
     }
   }
+}
+
+export function importhandler() {
+  const config = new Config();
+
+  ipcMain.on("config:get", (event, key) => {
+    try {
+      const value = config.get(key);
+      event.returnValue = value;
+    } catch (error) {
+      event.returnValue = null;
+      warn(`Failed to get config key: ${error.message}`, error.message);
+    }
+  });
+  ipcMain.on("config:set", (event, key, value) => {
+    try {
+      config.set(key, value);
+      event.returnValue = true;
+    } catch (error) {
+      event.returnValue = false;
+      warn(`Failed to set config key: ${error.message}`, error.message);
+    }
+  });
+  ipcMain.on("config:del", (event, key) => {
+    try {
+      config.del(key);
+      event.returnValue = true;
+    } catch (error) {
+      event.returnValue = false;
+      warn(`Failed to delete config key: ${error.message}`, error.message);
+    }
+  });
+
+  ipcMain.handle("config:backup", async (event) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { canceled, filePath } = await dialog.showSaveDialog({
+          title: "Backup Configuration",
+          defaultPath: `config-backup-${new Date().toISOString().split("T")[0]}.json`,
+          filters: [
+            { name: "JSON Files", extensions: ["json"] },
+            { name: "All Files", extensions: ["*"] },
+          ],
+        });
+        if (!canceled && filePath) {
+          config.backup(filePath);
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      } catch (error) {
+        reject(error.message);
+      }
+    });
+  });
+
+  ipcMain.handle("config:restore", async (event) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { canceled, filePaths } = await dialog.showOpenDialog({
+          title: "Restore Configuration",
+          properties: ["openFile"],
+          filters: [
+            { name: "JSON Files", extensions: ["json"] },
+            { name: "All Files", extensions: ["*"] },
+          ],
+        });
+        if (!canceled && filePaths.length > 0) {
+          const success = await config.restore(filePaths[0]);
+          resolve(success);
+        } else {
+          resolve(false);
+        }
+      } catch (error) {
+        reject(error.message);
+      }
+    });
+  });
 }

@@ -16,7 +16,8 @@
           <el-input v-model="keystore" :placeholder="i18n.jksLocation">
             <template #append>
               <el-button @click="open_keystore">
-                <el-icon><FolderOpened /></el-icon
+                <el-icon>
+                  <FolderOpened /> </el-icon
               ></el-button>
             </template>
           </el-input>
@@ -61,7 +62,8 @@
             >
               <template #append>
                 <el-button @click="save_keystone">
-                  <el-icon><FolderOpened /></el-icon
+                  <el-icon>
+                    <FolderOpened /> </el-icon
                 ></el-button>
               </template>
             </el-input>
@@ -371,35 +373,34 @@ export default {
             return;
           }
           let keyList;
-          window.electronAPI.config.get("keys").then((res) => {
-            if (res) {
-              keyList = res;
-            } else {
-              keyList = {};
-            }
+          const keys = window.electronAPI.config.get("keys")
+          if (keys) {
+            keyList = keys;
+          } else {
+            keyList = {};
+          }
 
-            if (Object.keys(keyList).includes(this.name)) {
-              ElMessage({
-                message: this.i18n.HadSameKeyName,
-                type: "error",
-                plain: true,
-              });
-              return;
-            } else {
-              keyList[this.name] = {
-                type: 1,
-                keystore: this.keystore,
-                keyalias: this.keyalias,
-                keypasswd: this.keypasswd,
-              };
-              window.electronAPI.config.set("keys", keyList);
-              ElMessage({
-                message: this.i18n.saveSuccess,
-                type: "success",
-                plain: true,
-              });
-            }
-          });
+          if (Object.keys(keyList).includes(this.name)) {
+            ElMessage({
+              message: this.i18n.HadSameKeyName,
+              type: "error",
+              plain: true,
+            });
+            return;
+          } else {
+            keyList[this.name] = {
+              type: 1,
+              keystore: this.keystore,
+              keyalias: this.keyalias,
+              keypasswd: this.keypasswd,
+            };
+            window.electronAPI.config.set("keys", keyList);
+            ElMessage({
+              message: this.i18n.saveSuccess,
+              type: "success",
+              plain: true,
+            });
+          }
         });
       }
     },
@@ -507,11 +508,10 @@ export default {
     }
   },
   mounted() {
-    window.electronAPI.config.get("advancedSetting").then((res) => {
-      if (res) {
-        this.create.advancedSetting = res;
-      }
-    });
+    const advancedSetting = window.electronAPI.config.get("advancedSetting")
+    if (advancedSetting) {
+      this.create.advancedSetting = advancedSetting;
+    }
   },
 };
 </script>

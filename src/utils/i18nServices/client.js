@@ -6,8 +6,8 @@ export class internationalization {
     this.userLang = {};
   }
 
-  async init() {
-    let lang = await window.electronAPI.config.get("lang");
+  init() {
+    let lang = window.electronAPI.config.get("lang");
     if (lang != null && supportLangList[lang]) {
       this.lang = lang;
       this.userLang = supportLangList[lang].library;
@@ -19,14 +19,14 @@ export class internationalization {
       if (supportLangList[navLang]) {
         this.lang = navLang;
         this.userLang = supportLangList[navLang].library;
-        await window.electronAPI.config.set("lang", navLang);
+        window.electronAPI.config.set("lang", navLang);
         return;
       }
     }
 
     this.lang = "en-US";
     this.userLang = supportLangList[this.lang].library;
-    await window.electronAPI.config.set("lang", this.lang);
+    window.electronAPI.config.set("lang", this.lang);
   }
   /**
    * Translation to user language

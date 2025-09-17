@@ -18,7 +18,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
   AppAbout: () => ipcRenderer.invoke("app:about"),
   AppCheckUpdate: (forceShow) =>
     ipcRenderer.invoke("app:checkUpdate", forceShow),
-  CheckJavaHome: (javapath) => ipcRenderer.invoke("system:checkJavaHome", javapath),
+  CheckJavaHome: (javapath) =>
+    ipcRenderer.invoke("system:checkJavaHome", javapath),
   CreateKey: (
     keyPath,
     keyPasswd,
@@ -33,7 +34,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
     country,
     keyalg,
     keysize,
-    sigalg
+    sigalg,
   ) =>
     ipcRenderer.invoke(
       "app:createKey",
@@ -50,12 +51,12 @@ contextBridge.exposeInMainWorld("electronAPI", {
       country,
       keyalg,
       keysize,
-      sigalg
+      sigalg,
     ),
   config: {
-    get: (key) => ipcRenderer.invoke("config:get", key),
-    set: (key, value) => ipcRenderer.invoke("config:set", key, value),
-    del: (key) => ipcRenderer.invoke("config:del", key),
+    get: (key) => ipcRenderer.sendSync("config:get", key),
+    set: (key, value) => ipcRenderer.sendSync("config:set", key, value),
+    del: (key) => ipcRenderer.sendSync("config:del", key),
   },
   backupConfig: () => ipcRenderer.invoke("config:backup"),
   restoreConfig: () => ipcRenderer.invoke("config:restore"),

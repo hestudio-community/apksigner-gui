@@ -27,7 +27,8 @@
             <el-input v-model="apksigner" placeholder="apksigner">
               <template #append>
                 <el-button @click="open_apksigner">
-                  <el-icon><FolderOpened /></el-icon
+                  <el-icon>
+                    <FolderOpened /> </el-icon
                 ></el-button>
               </template>
             </el-input>
@@ -38,7 +39,8 @@
             <el-input v-model="zipalign" placeholder="zipalign">
               <template #append>
                 <el-button @click="open_zipalign">
-                  <el-icon><FolderOpened /></el-icon
+                  <el-icon>
+                    <FolderOpened /> </el-icon
                 ></el-button>
               </template>
             </el-input>
@@ -117,7 +119,8 @@
               <el-input v-model="JavaPath.javapath" placeholder="Java路径">
                 <template #append>
                   <el-button @click="open_java">
-                    <el-icon><FolderOpened /></el-icon
+                    <el-icon>
+                      <FolderOpened /> </el-icon
                   ></el-button>
                 </template>
               </el-input>
@@ -227,6 +230,7 @@
 .el-input {
   margin-top: 5px;
 }
+
 .el-page-header__title {
   font-size: 18px;
   color: gray;
@@ -406,7 +410,7 @@ export default {
             cancelButtonText: this.i18n.cancel,
             confirmButtonClass: "el-button--danger",
             type: "danger",
-          }
+          },
         ).then(() => {
           this.advancedSetting = true;
           window.electronAPI.config.set("advancedSetting", true);
@@ -436,42 +440,39 @@ export default {
       });
     },
     changelanguage() {
-      window.electronAPI.config.get("lang").then((result) => {
-        if (this.lang.chooseLang != result) {
-          let display = null;
-          for (
-            let index = 0;
-            index < Object.values(supportLangList).length;
-            index++
-          ) {
-            const element = Object.values(supportLangList)[index];
-            if (element.lang == this.lang.chooseLang) {
-              display = element.display;
-            }
+      const lang = window.electronAPI.config.get("lang");
+      if (this.lang.chooseLang != lang) {
+        let display = null;
+        for (
+          let index = 0;
+          index < Object.values(supportLangList).length;
+          index++
+        ) {
+          const element = Object.values(supportLangList)[index];
+          if (element.lang == this.lang.chooseLang) {
+            display = element.display;
           }
-          ElMessageBox.confirm(
-            this.i18n.isChangeLanguageTo(display),
-            this.i18n.chooseLanguage,
-            {
-              confirmButtonText: this.i18n.confirm,
-              cancelButtonText: this.i18n.cancel,
-              type: "warning",
-            }
-          )
-            .then(() => {
-              window.electronAPI.config
-                .set("lang", this.lang.chooseLang)
-                .then(() => {
-                  window.location.reload();
-                });
-            })
-            .catch(() => {
-              window.electronAPI.config.get("lang").then((result) => {
-                this.lang.chooseLang = result;
-              });
-            });
         }
-      });
+        ElMessageBox.confirm(
+          this.i18n.isChangeLanguageTo(display),
+          this.i18n.chooseLanguage,
+          {
+            confirmButtonText: this.i18n.confirm,
+            cancelButtonText: this.i18n.cancel,
+            type: "warning",
+          },
+        )
+          .then(() => {
+            window.electronAPI.config
+              .set("lang", this.lang.chooseLang)
+              .then(() => {
+                window.location.reload();
+              });
+          })
+          .catch(() => {
+            this.lang.chooseLang = window.electronAPI.config.get("lang");
+          });
+      }
     },
     ChangeAutoCheckUpdate() {
       if (this.AutoCheckUpdate) {
@@ -532,9 +533,7 @@ export default {
       if (this.JavaPath.AutoCheckJavaPath) {
         this.JavaPath.javapath = "";
       } else {
-        window.electronAPI.config.get("JavaPath").then((result) => {
-          this.JavaPath.javapath = result;
-        });
+        this.JavaPath.javapath = window.electronAPI.config.get("JavaPath");
       }
     },
     async checkJavaEnv() {
@@ -555,7 +554,7 @@ export default {
                 javapath = this.JavaPath.javapath;
                 keytoolpath = this.JavaPath.javapath.replace(
                   /\/java.exe$/,
-                  "keytool.exe"
+                  "keytool.exe",
                 );
               }
               ElMessageBox({
@@ -574,7 +573,7 @@ export default {
                 javapath = this.JavaPath.javapath;
                 keytoolpath = this.JavaPath.javapath.replace(
                   /\/java$/,
-                  "/keytool"
+                  "/keytool",
                 );
               }
               ElMessageBox({
@@ -608,34 +607,20 @@ export default {
     }
   },
   mounted() {
-    window.electronAPI.config.get("apksigner").then((result) => {
-      this.apksigner = result;
-    });
-    window.electronAPI.config.get("zipalign").then((result) => {
-      this.zipalign = result;
-    });
-    window.electronAPI.config.get("advancedSetting").then((result) => {
-      this.advancedSetting = result;
-    });
-    window.electronAPI.config.get("lang").then((result) => {
-      this.lang.chooseLang = result;
-    });
+    this.apksigner = window.electronAPI.config.get("apksigner");
+    this.zipalign = window.electronAPI.config.get("zipalign");
+    this.advancedSetting = window.electronAPI.config.get("advancedSetting");
+    this.lang.chooseLang = window.electronAPI.config.get("lang");
     this.lang.langlist = Object.values(supportLangList);
-    window.electronAPI.config.get("checkUpdate").then((result) => {
-      this.AutoCheckUpdate = result;
-    });
-    window.electronAPI.isDevMode().then((result) => {
-      this.isDevMode = result;
-    });
-    window.electronAPI.config.get("JavaPath").then((result) => {
-      if (result) {
-        this.JavaPath.AutoCheckJavaPath = false;
-        this.JavaPath.javapath = result;
-      } else {
-        this.JavaPath.AutoCheckJavaPath = true;
-        this.JavaPath.javapath = "";
-      }
-    });
+    this.AutoCheckUpdate = window.electronAPI.config.get("checkUpdate");
+    this.isDevMode = window.electronAPI.isDevMode();
+    if (window.electronAPI.config.get("JavaPath")) {
+      this.JavaPath.AutoCheckJavaPath = false;
+      this.JavaPath.javapath = result;
+    } else {
+      this.JavaPath.AutoCheckJavaPath = true;
+      this.JavaPath.javapath = "";
+    }
   },
 };
 </script>

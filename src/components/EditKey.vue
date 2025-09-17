@@ -13,7 +13,8 @@
           <el-input v-model="keystore" :placeholder="i18n.jksLocation">
             <template #append>
               <el-button @click="open_keystore">
-                <el-icon><FolderOpened /></el-icon
+                <el-icon>
+                  <FolderOpened /> </el-icon
               ></el-button>
             </template>
           </el-input>
@@ -130,24 +131,21 @@ export default {
             });
             return;
           }
-          let keyList;
-          window.electronAPI.config.get("keys").then((res) => {
-            keyList = res;
-            if (this.name != this.keyname) {
-              delete keyList[this.keyname];
-            }
-            keyList[this.name] = {
-              type: 1,
-              keystore: this.keystore,
-              keyalias: this.keyalias,
-              keypasswd: this.keypasswd,
-            };
-            window.electronAPI.config.set("keys", keyList);
-            ElMessage({
-              message: this.i18n.saveSuccess,
-              type: "success",
-              plain: true,
-            });
+          const keyList = window.electronAPI.config.get("keys");
+          if (this.name != this.keyname) {
+            delete keyList[this.keyname];
+          }
+          keyList[this.name] = {
+            type: 1,
+            keystore: this.keystore,
+            keyalias: this.keyalias,
+            keypasswd: this.keypasswd,
+          };
+          window.electronAPI.config.set("keys", keyList);
+          ElMessage({
+            message: this.i18n.saveSuccess,
+            type: "success",
+            plain: true,
           });
         });
       }
@@ -162,13 +160,11 @@ export default {
     }
   },
   mounted() {
-    window.electronAPI.config.get("keys").then((res) => {
-      const keyInfo = res[this.keyname];
-      this.name = this.keyname;
-      this.keystore = keyInfo.keystore;
-      this.keyalias = keyInfo.keyalias;
-      this.keypasswd = keyInfo.keypasswd;
-    });
+    const keyInfo = window.electronAPI.config.get("keys")[this.keyname];
+    this.name = this.keyname;
+    this.keystore = keyInfo.keystore;
+    this.keyalias = keyInfo.keyalias;
+    this.keypasswd = keyInfo.keypasswd;
   },
 };
 </script>
