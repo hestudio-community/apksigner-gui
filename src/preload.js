@@ -18,8 +18,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
   AppAbout: () => ipcRenderer.invoke("app:about"),
   AppCheckUpdate: (forceShow) =>
     ipcRenderer.invoke("app:checkUpdate", forceShow),
-  CheckJavaHome: (javapath) =>
-    ipcRenderer.invoke("system:checkJavaHome", javapath),
+  CheckJavaPath: (javapath) =>
+    ipcRenderer.invoke("system:CheckJavaPath", javapath),
   CreateKey: (
     keyPath,
     keyPasswd,

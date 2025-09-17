@@ -475,7 +475,7 @@ app.whenReady().then(async () => {
 
   importhandler();
 
-  ipcMain.handle("system:checkJavaHome", (event, javapath) => {
+  ipcMain.handle("system:CheckJavaPath", (event, javapath) => {
     return new Promise((resolve, reject) => {
       try {
         const isJavaHomeValid = CheckJavaHome(javapath);
