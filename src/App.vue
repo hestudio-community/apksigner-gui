@@ -632,13 +632,12 @@ export default {
     window.electronAPI.SystemPlatform().then(async (result) => {
       if (result == "darwin") {
         this.darwin.isDarwin = true;
-        document.querySelector(".toolbar").style.marginLeft = "64px";
         setInterval(async () => {
           const isFullScreen = await window.electronAPI.WindowsIsFullScreen();
           if (isFullScreen) {
             document.querySelector(".toolbar").style.marginLeft = "0px";
           } else {
-            document.querySelector(".toolbar").style.marginLeft = "64px";
+            document.querySelector(".toolbar").style.marginLeft = "72px";
           }
         }, 100);
       } else {
