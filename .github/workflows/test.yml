@@ -83,5 +83,5 @@ jobs:
         with:
           name: apksignergui_${{ needs.get-version.outputs.version }}_${{ matrix.arch == 'x64' && 'amd64' || matrix.arch }}_${{ matrix.platform }}
           path: |
-            ./out/make/**/*
+            ./out/**/*
           retention-days: 30
