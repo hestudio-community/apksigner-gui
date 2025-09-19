@@ -91,59 +91,55 @@ export class Config extends Storage {
     }
   }
 
-  /**
-   * Validate the values in the configuration file.
-   * @description Check whether certain values in the configuration file (sidebarWidth, windowSize) are valid. If any invalid values are found, they will be reset to their default values.
-   * @returns {boolean}
-   */
-  validateAndRestoreDefaults() {
-    let needsSave = false;
+  // /**
+  //  * Validate the values in the configuration file.
+  //  * @description Check whether certain values in the configuration file (sidebarWidth, windowSize) are valid. If any invalid values are found, they will be reset to their default values.
+  //  * @returns {boolean}
+  //  */
+  // validateAndRestoreDefaults() {
+  //   let needsSave = false;
 
-    // Validate sidebar width
-    if (this.config.sidebarWidth !== undefined) {
-      if (
-        this.config.sidebarWidth < 0 ||
-        this.config.sidebarWidth > 100 ||
-        isNaN(this.config.sidebarWidth)
-      ) {
-        console.warn(
-          `Invalid sidebar width ${this.config.sidebarWidth}, restoring default`,
-        );
-        this.config.sidebarWidth = this.defaults.sidebarWidth;
-        needsSave = true;
-      }
-    }
+  //   // Validate sidebar width
+  //   if (this.config.sidebarWidth !== undefined) {
+  //     if (
+  //       this.config.sidebarWidth < 0 ||
+  //       this.config.sidebarWidth > 100 ||
+  //       isNaN(this.config.sidebarWidth)
+  //     ) {
+  //       console.warn(
+  //         `Invalid sidebar width ${this.config.sidebarWidth}, restoring default`,
+  //       );
+  //       this.config.sidebarWidth = this.defaults.sidebarWidth;
+  //       needsSave = true;
+  //     }
+  //   }
 
-    // Validate window size
-    if (this.config.windowSize) {
-      const { width, height } = this.config.windowSize;
-      const minWidth = 640;
-      const minHeight = 480;
-      const maxWidth = 2560;
-      const maxHeight = 1440;
+  //   // Validate window size
+  //   if (this.config.windowSize) {
+  //     const { width, height } = this.config.windowSize;
+  //     const minWidth = 640;
+  //     const minHeight = 480;
 
-      if (
-        width < minWidth ||
-        width > maxWidth ||
-        height < minHeight ||
-        height > maxHeight ||
-        isNaN(width) ||
-        isNaN(height)
-      ) {
-        console.warn(
-          `Invalid window size ${width}x${height}, restoring default`,
-        );
-        this.config.windowSize = this.defaults.windowSize;
-        needsSave = true;
-      }
-    }
+  //     if (
+  //       width < minWidth ||
+  //       height < minHeight ||
+  //       isNaN(width) ||
+  //       isNaN(height)
+  //     ) {
+  //       console.warn(
+  //         `Invalid window size ${width}x${height}, restoring default`,
+  //       );
+  //       this.config.windowSize = this.defaults.windowSize;
+  //       needsSave = true;
+  //     }
+  //   }
 
-    if (needsSave) {
-      fs.writeFileSync(this.configPath, JSON.stringify(this.config));
-    }
+  //   if (needsSave) {
+  //     fs.writeFileSync(this.configPath, JSON.stringify(this.config));
+  //   }
 
-    return needsSave;
-  }
+  //   return needsSave;
+  // }
 
   /**
    * Determine the compatibility of configuration files with the running version.
