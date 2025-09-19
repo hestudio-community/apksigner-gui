@@ -1,26 +1,64 @@
-name: Test Build
+name: Build for AppTest
 
 on:
   push:
-    branches: [main, master, develop]
-  pull_request:
-    branches: [main, master]
+    branches: [develop]
 
 jobs:
-  test-build:
+  get-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Get version from package.json
+        id: get_version
+        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+  build:
+    needs: get-version
     strategy:
       matrix:
-        os:
-          [
-            ubuntu-latest,
-            ubuntu-24.04-arm,
-            windows-latest,
-            windows-11-arm,
-            macos-13,
-            macos-latest,
-          ]
+        include:
+          # Windows builds
+          - os: windows-latest
+            platform: win32
+            arch: x64
+            name: Windows x64
+            platform_name: windows
+          - os: windows-11-arm
+            platform: win32
+            arch: arm64
+            name: Windows ARM64
+            platform_name: windows
+
+          # macOS builds
+          - os: macos-13
+            platform: darwin
+            arch: x64
+            name: macOS Intel
+            platform_name: macos
+          - os: macos-latest
+            platform: darwin
+            arch: arm64
+            name: macOS Apple Silicon
+            platform_name: macos
+
+          # Linux builds
+          - os: ubuntu-latest
+            platform: linux
+            arch: x64
+            name: Linux x64
+            platform_name: linux
+          - os: ubuntu-24.04-arm
+            platform: linux
+            arch: arm64
+            name: Linux ARM64
+            platform_name: linux
+
     runs-on: ${{ matrix.os }}
-    name: Test on ${{ matrix.os }}
+    name: Build ${{ matrix.name }}
 
     steps:
       - name: Checkout code
@@ -35,16 +73,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install WiX Toolset (Windows only)
-        if: matrix.os == 'windows-latest' || matrix.os == 'windows-11-arm'
-        run: |
-          Invoke-WebRequest -Uri "https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314-binaries.zip" -OutFile "wix314-binaries.zip"
-          Expand-Archive -Path "wix314-binaries.zip" -DestinationPath "C:\wix"
-          echo "C:\wix" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-
-      - name: Test package build
+      - name: Build application
         run: npm run package
+        env:
+          ELECTRON_BUILDER_ARCH: ${{ matrix.arch }}
 
-      - name: Test make build (sample)
-        run: npm run make
-        continue-on-error: true
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: apksignergui_${{ needs.get-version.outputs.version }}_${{ matrix.arch == 'x64' && 'amd64' || matrix.arch }}_${{ matrix.platform }}
+          path: |
+            ./out/make/**/*
+          retention-days: 30

@@ -1,12 +1,8 @@
-name: Build Multi-Platform
+name: Build for Publish
 
 on:
-  push:
-    branches: [main, master]
-    tags: ["v*"]
   pull_request:
-    branches: [main, master]
-  workflow_dispatch:
+    branches: [main]
 
 jobs:
   get-version:
@@ -90,16 +86,10 @@ jobs:
         env:
           ELECTRON_BUILDER_ARCH: ${{ matrix.arch }}
 
-      - name: List output files (Debug)
-        run: |
-          echo "Contents of ./out/make:"
-          ls -la ./out/make/ || dir ./out/make/ || echo "No make directory found"
-        shell: bash
-
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: apksignergui_${{ needs.get-version.outputs.version || '1.3.1' }}_${{ matrix.arch == 'x64' && 'amd64' || matrix.arch }}_${{ matrix.platform }}
+          name: apksignergui_${{ needs.get-version.outputs.version }}_${{ matrix.arch == 'x64' && 'amd64' || matrix.arch }}_${{ matrix.platform }}
           path: |
             ./out/make/**/*
           retention-days: 30
