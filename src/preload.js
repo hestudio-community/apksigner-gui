@@ -3,6 +3,7 @@
 import { contextBridge, ipcRenderer } from "electron";
 
 contextBridge.exposeInMainWorld("electronAPI", {
+  reloadLang: () => ipcRenderer.invoke("system:reloadLang"),
   openFile: (filters) => ipcRenderer.invoke("dialog:openFile", filters),
   saveFile: (filters) => ipcRenderer.invoke("dialog:saveFile", filters),
   openDevtools: () => ipcRenderer.invoke("devtools:open"),

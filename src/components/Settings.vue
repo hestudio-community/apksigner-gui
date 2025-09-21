@@ -460,11 +460,9 @@ export default {
           },
         )
           .then(() => {
-            window.electronAPI.config
-              .set("lang", this.lang.chooseLang)
-              .then(() => {
-                window.location.reload();
-              });
+            window.electronAPI.config.set("lang", this.lang.chooseLang);
+            window.electronAPI.reloadLang();
+            window.location.reload();
           })
           .catch(() => {
             this.lang.chooseLang = window.electronAPI.config.get("lang");

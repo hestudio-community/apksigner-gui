@@ -13,7 +13,8 @@ import { spawn } from "node:child_process";
 import { CheckJavaHome, CreateKey } from "./utils/CreateKey";
 import { Config, Storage, importhandler } from "./utils/storage";
 import fs from "node:fs";
-import { error } from "./utils/alert";
+import { warn, error } from "./utils/alert";
+import { internationalization } from "./utils/i18nServices/server";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -24,7 +25,8 @@ if (started) {
 const gotTheLock = app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
-  error("Another instance is already running, exiting current instance");
+  const i18n = new internationalization();
+  error(i18n.geti18n("anotherAlreadyRunning"));
 } else {
   app.on("second-instance", (event, commandLine, workingDirectory) => {
     // When a second instance is launched, focus on the main window
@@ -149,6 +151,8 @@ app.whenReady().then(async () => {
     return; // App will quit if version check fails
   }
 
+  const i18n = await new internationalization();
+
   const CheckUpdate = (forceShow) => {
     fetch(
       "https://api.github.com/repos/hestudio-community/apksigner-gui/releases/latest",
@@ -161,9 +165,12 @@ app.whenReady().then(async () => {
               .showMessageBox({
                 title: "APKSignerGUI",
                 message: "APKSignerGUI",
-                detail: "You are using the latest version.",
+                detail: i18n.geti18n("latestVersion"),
                 type: "info",
-                buttons: ["OK", "View in Github"],
+                buttons: [
+                  i18n.geti18n("confirm"),
+                  i18n.geti18n("viewInGithub"),
+                ],
               })
               .then((response) => {
                 if (response.response == 1) {
@@ -178,9 +185,15 @@ app.whenReady().then(async () => {
             .showMessageBox({
               title: "APKSignerGUI",
               message: "APKSignerGUI",
-              detail: `New version ${data.name} is available.`,
+              detail: i18n.geti18n("newVersionAvailable")(data.name),
               type: "info",
-              buttons: ["Close", "Download Now", "View in Github"],
+              buttons: [
+                i18n.geti18n("cancel"),
+                ...(process.platform == "darwin" || process.platform == "win32"
+                  ? [i18n.geti18n("downloadNOW")]
+                  : []),
+                i18n.geti18n("viewInGithub"),
+              ],
             })
             .then((response) => {
               if (response.response == 1) {
@@ -192,6 +205,18 @@ app.whenReady().then(async () => {
                       "v",
                       "",
                     )}_arm64.dmg`,
+                  );
+                } else if (
+                  process.platform == "darwin" &&
+                  process.arch == "amd64"
+                ) {
+                  shell.openExternal(
+                    `https://github.com/hestudio-community/apksigner-gui/releases/download/${
+                      data.name
+                    }/apksignergui_${String(data.name).replace(
+                      "v",
+                      "",
+                    )}_amd64.dmg`,
                   );
                 } else if (
                   process.platform == "win32" &&
@@ -230,9 +255,10 @@ app.whenReady().then(async () => {
             });
         }
       })
-      .catch((error) => {
+      .catch((e) => {
+        console.log(e);
         if (forceShow) {
-          dialog.showErrorBox("APKSignerGUI", "Failed to check for updates.");
+          warn(undefined, i18n.geti18n("checkUpdateFailed"));
         }
       });
 
@@ -241,10 +267,9 @@ app.whenReady().then(async () => {
         .showMessageBox({
           title: "APKSignerGUI",
           message: "APKSignerGUI",
-          detail:
-            "You are running the x86_64 version of APKSignerGUI on an arm64 platform via translation, we provide native arm64 platforms, you can check it out on our Github.",
+          detail: i18n.geti18n("warnInARM64WithX86Program"),
           type: "warning",
-          buttons: ["OK", "View in Github"],
+          buttons: [i18n.geti18n("confirm"), i18n.geti18n("viewInGithub")],
         })
         .then((response) => {
           if (response.response == 1) {
@@ -262,15 +287,19 @@ app.whenReady().then(async () => {
         title: "APKSignerGUI",
         message: "APKSignerGUI",
         detail: `
-Version: ${app.getVersion()}
-Platform: ${process.platform}
-Architecture: ${process.arch}
-WorkStatus: ${app.isPackaged ? "Product" : "Develop"} ${app.isPackaged & allowDevtools ? "with DevTools" : ""}
-Copyright: Copyright © 2025 heStudio Community
+${i18n.geti18n("version")}: ${app.getVersion()}
+${i18n.geti18n("platform")}: ${process.platform}
+${i18n.geti18n("architecture")}: ${process.arch}
+${i18n.geti18n("workStatus")}: ${app.isPackaged ? "Product" : "Develop"} ${app.isPackaged & allowDevtools ? "with DevTools" : ""}
+${i18n.geti18n("copyright")}: Copyright © 2025 heStudio Community
     `,
         type: "none",
         icon: path.join(__dirname, "../icon.png"),
-        buttons: ["Close", "Check Update", "View in Github"],
+        buttons: [
+          i18n.geti18n("back"),
+          i18n.geti18n("checkUpdate"),
+          i18n.geti18n("viewInGithub"),
+        ],
       })
       .then((response) => {
         if (response.response == 1) {
@@ -290,13 +319,13 @@ Copyright: Copyright © 2025 heStudio Community
           label: app.name,
           submenu: [
             {
-              label: "About APKSignerGUI",
+              label: i18n.geti18n("aboutApp"),
               click: () => {
                 AboutPanel();
               },
             },
             {
-              label: "Check Update",
+              label: i18n.geti18n("checkUpdate"),
               click: () => {
                 CheckUpdate(true);
               },
@@ -335,7 +364,7 @@ Copyright: Copyright © 2025 heStudio Community
           role: "help",
           submenu: [
             {
-              label: "Report Issue",
+              label: i18n.geti18n("reportIssue"),
               click: () => {
                 shell.openExternal(
                   "https://github.com/hestudio-community/apksigner-gui/issues",
@@ -343,7 +372,7 @@ Copyright: Copyright © 2025 heStudio Community
               },
             },
             {
-              label: "View in Github",
+              label: i18n.geti18n("viewInGithub"),
               click: () => {
                 shell.openExternal(
                   "https://github.com/hestudio-community/apksigner-gui",
@@ -357,6 +386,84 @@ Copyright: Copyright © 2025 heStudio Community
   } else {
     Menu.setApplicationMenu(null);
   }
+
+  ipcMain.handle("system:reloadLang", async (event) => {
+    i18n.reloadLang();
+    if (process.platform == "darwin") {
+      Menu.setApplicationMenu(
+        Menu.buildFromTemplate([
+          {
+            label: app.name,
+            submenu: [
+              {
+                label: i18n.geti18n("aboutApp"),
+                click: () => {
+                  AboutPanel();
+                },
+              },
+              {
+                label: i18n.geti18n("checkUpdate"),
+                click: () => {
+                  CheckUpdate(true);
+                },
+              },
+              { type: "separator" },
+              { role: "services" },
+              { type: "separator" },
+              { role: "hide" },
+              { role: "hideOthers" },
+              { role: "unhide" },
+              { type: "separator" },
+              { role: "quit" },
+            ],
+          },
+          {
+            label: "File",
+            submenu: [{ role: "close" }],
+          },
+          { role: "editMenu" },
+          {
+            label: "View",
+            submenu: [
+              { role: "reload" },
+              { role: "forceReload" },
+              ...(allowDevtools ? [] : [{ role: "toggleDevTools" }]),
+              { type: "separator" },
+              { role: "resetZoom" },
+              { role: "zoomIn" },
+              { role: "zoomOut" },
+              { type: "separator" },
+              { role: "togglefullscreen" },
+            ],
+          },
+          { role: "windowMenu" },
+          {
+            role: "help",
+            submenu: [
+              {
+                label: i18n.geti18n("reportIssue"),
+                click: () => {
+                  shell.openExternal(
+                    "https://github.com/hestudio-community/apksigner-gui/issues",
+                  );
+                },
+              },
+              {
+                label: i18n.geti18n("viewInGithub"),
+                click: () => {
+                  shell.openExternal(
+                    "https://github.com/hestudio-community/apksigner-gui",
+                  );
+                },
+              },
+            ],
+          },
+        ]),
+      );
+    } else {
+      Menu.setApplicationMenu(null);
+    }
+  });
 
   ipcMain.handle("dialog:openFile", async (event, filters) => {
     const { canceled, filePaths } = await dialog.showOpenDialog({

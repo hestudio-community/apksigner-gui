@@ -3,15 +3,9 @@ import { Config } from "../storage";
 
 export class internationalization {
   constructor() {
-    const config = new Config();
     this.lang = null;
     this.userLang = {};
-    let lang = config.get("lang");
-    if (lang != null && supportLangList[lang]) {
-      this.lang = lang;
-      this.userLang = supportLangList[lang].library;
-      return;
-    }
+    this.reloadLang();
   }
 
   /**
@@ -21,5 +15,17 @@ export class internationalization {
    */
   geti18n(source) {
     return this.userLang[source];
+  }
+
+  reloadLang() {
+    const config = new Config();
+    let lang = config.get("lang");
+    if (lang != null && supportLangList[lang]) {
+      this.lang = lang;
+      this.userLang = supportLangList[lang].library;
+      return;
+    }
+    this.lang = "en-US";
+    this.userLang = supportLangList["en-US"].library;
   }
 }

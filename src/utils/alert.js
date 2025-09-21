@@ -5,6 +5,11 @@
 
 import { app, dialog } from "electron";
 
+/**
+ *
+ * @param {string | undefined} title
+ * @param {string} msg
+ */
 function warn(title = "APKSignerGUI", msg) {
   dialog.showMessageBox({
     type: "warning",
@@ -17,6 +22,11 @@ function warn(title = "APKSignerGUI", msg) {
   });
 }
 
+/**
+ *
+ * @param {string | undefined} title
+ * @param {string} msg
+ */
 function error(title = "APKSignerGUI", msg) {
   const result = dialog.showMessageBoxSync({
     type: "warning",
@@ -30,7 +40,6 @@ function error(title = "APKSignerGUI", msg) {
 
   if (result === 0) {
     app.quit();
-    return false;
   }
 }
 
