@@ -28,6 +28,7 @@ export class internationalization {
         this.lang = navLang;
         this.userLang = supportLangList[navLang].library;
         window.electronAPI.config.set("lang", navLang);
+        window.electronAPI.reloadLang();
         return;
       }
     }
@@ -35,6 +36,7 @@ export class internationalization {
     this.lang = "en-US";
     this.userLang = supportLangList[this.lang].library;
     window.electronAPI.config.set("lang", this.lang);
+    window.electronAPI.reloadLang();
   }
   /**
    * Translation to user language
