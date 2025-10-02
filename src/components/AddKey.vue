@@ -443,7 +443,7 @@ export default {
           });
           return;
         } else {
-          window.electronAPI.CheckJavaHome().then((result) => {
+          window.electronAPI.CheckJavaPath().then((result) => {
             if (result) {
               window.electronAPI
                 .CreateKey(

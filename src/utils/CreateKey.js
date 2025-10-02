@@ -2,7 +2,7 @@ import path from "node:path";
 import fs from "node:fs";
 import { spawnSync } from "node:child_process";
 
-function CheckJavaHome(javapath) {
+function CheckJavaPath(javapath) {
   if (javapath) {
     try {
       if (!fs.existsSync(javapath)) {
@@ -49,7 +49,7 @@ function CheckJavaHome(javapath) {
     return fs.existsSync(javaPath) && fs.existsSync(keytoolPath);
   }
 }
-export { CheckJavaHome };
+export { CheckJavaPath };
 
 export function CreateKey(
   keyPath,

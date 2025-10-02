@@ -10,7 +10,7 @@ import {
 import path from "node:path";
 import started from "electron-squirrel-startup";
 import { spawn } from "node:child_process";
-import { CheckJavaHome, CreateKey } from "./utils/CreateKey";
+import { CheckJavaPath, CreateKey } from "./utils/CreateKey";
 import { Config, Storage, importhandler } from "./utils/storage";
 import fs from "node:fs";
 import { warn, error } from "./utils/alert";
@@ -591,7 +591,7 @@ ${i18n.geti18n("copyright")}: Copyright © 2025 heStudio Community
   ipcMain.handle("system:CheckJavaPath", (event, javapath) => {
     return new Promise((resolve, reject) => {
       try {
-        const isJavaHomeValid = CheckJavaHome(javapath);
+        const isJavaHomeValid = CheckJavaPath(javapath);
         if (isJavaHomeValid) {
           resolve(true);
         } else {
