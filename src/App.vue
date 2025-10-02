@@ -2,14 +2,6 @@
   <div style="max-height: calc(100vh)">
     <el-container>
       <el-aside class="aside" :style="{ width: actualSidebarWidth + 'px' }">
-        <div
-          class="resize-handle-left"
-          @mousedown="startResize('left', $event)"
-        ></div>
-        <div
-          class="resize-handle-right"
-          @mousedown="startResize('right', $event)"
-        ></div>
         <div class="toolbar">
           <el-button
             text
@@ -26,6 +18,10 @@
             :icon="Refresh"
           />
           <div>
+            <div
+              class="resize-handle-right"
+              @mousedown="startResize('right', $event)"
+            ></div>
             <el-drawer
               v-model="openaddkey"
               class="addkey"
@@ -208,28 +204,19 @@
   position: relative;
 }
 
-.resize-handle-left,
 .resize-handle-right {
   position: absolute;
-  top: 0;
-  bottom: 0;
+  top: 36px;
+  bottom: 10px;
   width: 4px;
   cursor: col-resize;
   -webkit-app-region: no-drag;
   z-index: 10;
-}
-
-.resize-handle-left {
-  left: 0;
-}
-
-.resize-handle-right {
   right: 0;
 }
 
-.resize-handle-left:hover,
 .resize-handle-right:hover {
-  background-color: rgba(64, 158, 255, 0.3);
+  background-color: #fba4144d;
 }
 
 .toolbar {
@@ -430,7 +417,6 @@ export default {
       openSign: "",
       sidebarWidth: 30, // 相对百分比，0%=128px，100%=50%页面宽度
       isResizing: false,
-      resizeDirection: null,
       i18n: {
         noKeyTip: undefined,
         confirm: undefined,
@@ -476,7 +462,6 @@ export default {
   methods: {
     startResize(direction, event) {
       this.isResizing = true;
-      this.resizeDirection = direction;
       this.startX = event.clientX;
 
       // 记录当前的窗口宽度和范围，防止窗口大小改变后的瞬移
@@ -509,11 +494,7 @@ export default {
       const deltaPercent = (deltaX / this.resizeRange) * 100;
       let newWidthPercent;
 
-      if (this.resizeDirection === "right") {
-        newWidthPercent = this.startWidthPercent + deltaPercent;
-      } else {
-        newWidthPercent = this.startWidthPercent - deltaPercent;
-      }
+      newWidthPercent = this.startWidthPercent + deltaPercent;
 
       // 限制相对百分比范围：0% 到 100%
       newWidthPercent = Math.max(0, Math.min(100, newWidthPercent));
@@ -526,14 +507,14 @@ export default {
       const currentMinWidth = 128;
       const currentMaxWidth = Math.min(
         window.innerWidth * 0.5,
-        window.innerWidth,
+        window.innerWidth
       );
       const currentRange = currentMaxWidth - currentMinWidth;
 
       // 确保实际宽度在当前窗口的合理范围内
       const clampedActualWidth = Math.max(
         currentMinWidth,
-        Math.min(currentMaxWidth, newActualWidth),
+        Math.min(currentMaxWidth, newActualWidth)
       );
 
       // 更新sidebarWidth为在当前窗口尺寸下的百分比
@@ -558,7 +539,6 @@ export default {
 
     stopResize() {
       this.isResizing = false;
-      this.resizeDirection = null;
 
       document.removeEventListener("mousemove", this.doResize);
       document.removeEventListener("mouseup", this.stopResize);
@@ -598,7 +578,7 @@ export default {
           confirmButtonText: this.i18n.confirm,
           cancelButtonText: this.i18n.cancel,
           type: "warning",
-        },
+        }
       ).then(() => {
         const keys = window.electronAPI.config.get("keys");
         if (keys && keys[keyname]) {
@@ -656,7 +636,7 @@ export default {
     if (savedWidth !== null && savedWidth !== undefined) {
       if (savedWidth < 0 || savedWidth > 100 || isNaN(savedWidth)) {
         console.warn(
-          `Sidebar width ${savedWidth} is out of range (0-100), restoring default value ${defaultSidebarWidth}`,
+          `Sidebar width ${savedWidth} is out of range (0-100), restoring default value ${defaultSidebarWidth}`
         );
         this.sidebarWidth = defaultSidebarWidth;
         window.electronAPI.config.set("sidebarWidth", defaultSidebarWidth);
