@@ -16,9 +16,10 @@ function warn(title = "APKSignerGUI", msg) {
     title: title,
     message: title,
     detail: msg,
-    buttons: ["Close Alert"],
+    buttons: ["Cancel"],
     cancelId: 0,
     defaultId: 0,
+    noLink: true,
   });
 }
 
@@ -36,6 +37,7 @@ function error(title = "APKSignerGUI", msg) {
     buttons: ["Quit Application"],
     cancelId: 0,
     defaultId: 0,
+    noLink: true,
   });
 
   if (result === 0) {

@@ -168,9 +168,10 @@ app.whenReady().then(async () => {
                 detail: i18n.geti18n("latestVersion"),
                 type: "info",
                 buttons: [
-                  i18n.geti18n("confirm"),
+                  process.platform == "win32" ? "Yes" : i18n.geti18n("confirm"),
                   i18n.geti18n("viewInGithub"),
                 ],
+                cancelId: 0,
               })
               .then((response) => {
                 if (response.response == 1) {
@@ -188,12 +189,13 @@ app.whenReady().then(async () => {
               detail: i18n.geti18n("newVersionAvailable")(data.name),
               type: "info",
               buttons: [
-                i18n.geti18n("cancel"),
+                process.platform == "win32" ? "Cancel" : i18n.geti18n("cancel"),
                 ...(process.platform == "darwin" || process.platform == "win32"
                   ? [i18n.geti18n("downloadNOW")]
                   : []),
                 i18n.geti18n("viewInGithub"),
               ],
+              cancelId: 0,
             })
             .then((response) => {
               if (response.response == 1) {
@@ -269,7 +271,11 @@ app.whenReady().then(async () => {
           message: "APKSignerGUI",
           detail: i18n.geti18n("warnInARM64WithX86Program"),
           type: "warning",
-          buttons: [i18n.geti18n("confirm"), i18n.geti18n("viewInGithub")],
+          buttons: [
+            process.platform == "win32" ? "Cancel" : i18n.geti18n("cancel"),
+            i18n.geti18n("viewInGithub"),
+          ],
+          cancelId: 0,
         })
         .then((response) => {
           if (response.response == 1) {
@@ -296,10 +302,11 @@ ${i18n.geti18n("copyright")}: Copyright © 2025 heStudio Community
         type: "none",
         icon: path.join(__dirname, "../icon.png"),
         buttons: [
-          i18n.geti18n("back"),
+          process.platform == "win32" ? "Cancel" : i18n.geti18n("cancel"),
           i18n.geti18n("checkUpdate"),
           i18n.geti18n("viewInGithub"),
         ],
+        cancelId: 0,
       })
       .then((response) => {
         if (response.response == 1) {

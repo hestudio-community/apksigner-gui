@@ -507,14 +507,14 @@ export default {
       const currentMinWidth = 128;
       const currentMaxWidth = Math.min(
         window.innerWidth * 0.5,
-        window.innerWidth
+        window.innerWidth,
       );
       const currentRange = currentMaxWidth - currentMinWidth;
 
       // 确保实际宽度在当前窗口的合理范围内
       const clampedActualWidth = Math.max(
         currentMinWidth,
-        Math.min(currentMaxWidth, newActualWidth)
+        Math.min(currentMaxWidth, newActualWidth),
       );
 
       // 更新sidebarWidth为在当前窗口尺寸下的百分比
@@ -578,7 +578,7 @@ export default {
           confirmButtonText: this.i18n.confirm,
           cancelButtonText: this.i18n.cancel,
           type: "warning",
-        }
+        },
       ).then(() => {
         const keys = window.electronAPI.config.get("keys");
         if (keys && keys[keyname]) {
@@ -636,7 +636,7 @@ export default {
     if (savedWidth !== null && savedWidth !== undefined) {
       if (savedWidth < 0 || savedWidth > 100 || isNaN(savedWidth)) {
         console.warn(
-          `Sidebar width ${savedWidth} is out of range (0-100), restoring default value ${defaultSidebarWidth}`
+          `Sidebar width ${savedWidth} is out of range (0-100), restoring default value ${defaultSidebarWidth}`,
         );
         this.sidebarWidth = defaultSidebarWidth;
         window.electronAPI.config.set("sidebarWidth", defaultSidebarWidth);
