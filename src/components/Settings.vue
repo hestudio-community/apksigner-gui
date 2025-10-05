@@ -98,12 +98,12 @@
             "
           >
             <div>
-              <text>Java环境配置</text>
+              <text>{{ i18n.JavaEnvConfiguration }}</text>
             </div>
             <div>
-              <el-button text bg type="primary" @click="checkJavaEnv"
-                >检查并保存</el-button
-              >
+              <el-button text bg type="primary" @click="checkJavaEnv">{{
+                i18n.CheckAndSave
+              }}</el-button>
             </div>
           </div>
           <br />
@@ -111,10 +111,15 @@
             <el-checkbox
               v-model="JavaPath.AutoCheckJavaPath"
               @change="loadJavaPath"
-              >自动从系统中读取Java环境</el-checkbox
+              style="text-wrap-mode: wrap"
             >
+              {{ i18n.AutoLoadJavaInSystem }}
+            </el-checkbox>
             <div v-show="!JavaPath.AutoCheckJavaPath">
-              <el-input v-model="JavaPath.javapath" placeholder="Java路径">
+              <el-input
+                v-model="JavaPath.javapath"
+                :placeholder="i18n.JavaPath"
+              >
                 <template #append>
                   <el-button @click="open_java">
                     <el-icon> <FolderOpened /> </el-icon
@@ -297,6 +302,13 @@ export default {
         restoreSuccess: undefined,
         restoreError: undefined,
         backupError: undefined,
+        JavaEnvConfiguration: undefined,
+        CheckAndSave: undefined,
+        AutoLoadJavaInSystem: undefined,
+        JavaPath: undefined,
+        JavaEnvConfigurationNormalMsg: undefined,
+        JavaEnvConfigurationNormal: undefined,
+        JavaEnvConfigurationFailed: undefined,
       },
       AutoCheckUpdate: true,
       isDevMode: false,
@@ -553,7 +565,10 @@ export default {
                 );
               }
               ElMessageBox({
-                message: `<p>环境配置正常</p><p>Java路径: ${javapath}</p><p>keytool路径: ${keytoolpath}</p>`,
+                message: this.i18n.JavaEnvConfigurationNormalMsg(
+                  javapath,
+                  keytoolpath,
+                ),
                 type: "success",
                 dangerouslyUseHTMLString: true,
               });
@@ -572,20 +587,23 @@ export default {
                 );
               }
               ElMessageBox({
-                message: `<p>环境配置正常</p><p>Java路径: ${javapath}</p><p>keytool路径: ${keytoolpath}</p>`,
+                message: this.i18n.JavaEnvConfigurationNormalMsg(
+                  javapath,
+                  keytoolpath,
+                ),
                 type: "success",
                 dangerouslyUseHTMLString: true,
               });
             } else {
               ElMessage({
-                message: "环境配置正常",
+                message: this.i18n.JavaEnvConfigurationNormal,
                 type: "success",
                 plain: true,
               });
             }
           } else {
             ElMessage({
-              message: "Java环境异常,请检查Java是否存在或者是否附带keytool",
+              message: this.i18n.JavaEnvConfigurationFailed,
               type: "error",
               plain: true,
             });

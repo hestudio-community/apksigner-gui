@@ -116,4 +116,14 @@ export default {
   checkUpdate: "Check for Updates",
   aboutApp: "About APKSignerGUI",
   reportIssue: "Report Issue",
+  JavaEnvConfiguration: "Java Environment Configuration",
+  CheckAndSave: "Check and Save",
+  AutoLoadJavaInSystem: "Automatically read Java environment from system",
+  JavaPath: "Java Path",
+  JavaEnvConfigurationNormalMsg: (javapath, keytoolpath) => {
+    return `<p>Environment configuration is normal</p><p>Java path: ${javapath}</p><p>keytool path: ${keytoolpath}</p>`;
+  },
+  JavaEnvConfigurationNormal: "Java environment configuration is normal",
+  JavaEnvConfigurationFailed:
+    "Java environment exception, please check if Java exists or includes keytool",
 };

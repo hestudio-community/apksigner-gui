@@ -114,4 +114,14 @@ export default {
   checkUpdate: "檢查更新",
   aboutApp: "關於 APKSignerGUI",
   reportIssue: "報告問題",
+  JavaEnvConfiguration: "Java環境配置",
+  CheckAndSave: "檢查並儲存",
+  AutoLoadJavaInSystem: "自動從系統中讀取Java環境",
+  JavaPath: "Java路徑",
+  JavaEnvConfigurationNormalMsg: (javapath, keytoolpath) => {
+    return `<p>環境配置正常</p><p>Java路徑: ${javapath}</p><p>keytool路徑: ${keytoolpath}</p>`;
+  },
+  JavaEnvConfigurationNormal: "Java環境配置正常",
+  JavaEnvConfigurationFailed:
+    "Java環境異常，請檢查Java是否存在或者是否附帶keytool",
 };
