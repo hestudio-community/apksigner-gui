@@ -11,10 +11,11 @@ import path from "node:path";
 import started from "electron-squirrel-startup";
 import { spawn } from "node:child_process";
 import { CheckJavaPath, CreateKey } from "./utils/CreateKey";
-import { Config, Storage, importhandler } from "./utils/storage";
+import { Config, Storage, importConfigHandler } from "./utils/storage";
 import fs from "node:fs";
 import { warn, error } from "./utils/alert";
 import { internationalization } from "./utils/i18nServices/server";
+import fixPath from "fix-path";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -41,6 +42,8 @@ let allowDevtools = false;
 if (process.argv.includes("--allow-devtools") || !app.isPackaged) {
   allowDevtools = true;
 }
+
+fixPath();
 
 const storage = new Storage();
 const config = new Config();
@@ -100,7 +103,7 @@ const createWindow = () => {
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       backgroundThrottling: false,
-      devTools: allowDevtools,
+      devTools: true,
     },
     // Add icon configuration
     icon: path.join(__dirname, "../icon.png"),
@@ -593,7 +596,7 @@ ${i18n.geti18n("copyright")}: Copyright © 2025 heStudio Community
     });
   });
 
-  importhandler();
+  importConfigHandler();
 
   ipcMain.handle("system:CheckJavaPath", (event, javapath) => {
     return new Promise((resolve, reject) => {
