@@ -103,7 +103,7 @@ const createWindow = () => {
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       backgroundThrottling: false,
-      devTools: true,
+      devTools: allowDevtools,
     },
     // Add icon configuration
     icon: path.join(__dirname, "../icon.png"),
@@ -360,7 +360,7 @@ ${i18n.geti18n("copyright")}: Copyright © 2025 heStudio Community
           submenu: [
             { role: "reload" },
             { role: "forceReload" },
-            ...(allowDevtools ? [] : [{ role: "toggleDevTools" }]),
+            ...(allowDevtools ? [{ role: "toggleDevTools" }] : []),
             { type: "separator" },
             { role: "resetZoom" },
             { role: "zoomIn" },
@@ -437,7 +437,7 @@ ${i18n.geti18n("copyright")}: Copyright © 2025 heStudio Community
             submenu: [
               { role: "reload" },
               { role: "forceReload" },
-              ...(allowDevtools ? [] : [{ role: "toggleDevTools" }]),
+              ...(allowDevtools ? [{ role: "toggleDevTools" }] : []),
               { type: "separator" },
               { role: "resetZoom" },
               { role: "zoomIn" },

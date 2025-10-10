@@ -625,7 +625,7 @@ export default {
     this.lang.chooseLang = window.electronAPI.config.get("lang");
     this.lang.langlist = Object.values(supportLangList);
     this.AutoCheckUpdate = window.electronAPI.config.get("checkUpdate");
-    this.isDevMode = window.electronAPI.isDevMode();
+    window.electronAPI.isDevMode().then((data) => (this.isDevMode = data));
     if (window.electronAPI.config.get("JavaPath")) {
       this.JavaPath.AutoCheckJavaPath = false;
       this.JavaPath.javapath = result;
