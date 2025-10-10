@@ -89,47 +89,6 @@
           </div>
         </el-card>
         <el-card>
-          <div
-            style="
-              display: flex;
-              flex-direction: row;
-              justify-content: space-between;
-              align-items: center;
-            "
-          >
-            <div>
-              <text>{{ i18n.JavaEnvConfiguration }}</text>
-            </div>
-            <div>
-              <el-button text bg type="primary" @click="checkJavaEnv">{{
-                i18n.CheckAndSave
-              }}</el-button>
-            </div>
-          </div>
-          <br />
-          <div style="display: flex; flex-direction: column">
-            <el-checkbox
-              v-model="JavaPath.AutoCheckJavaPath"
-              @change="loadJavaPath"
-              style="text-wrap-mode: wrap"
-            >
-              {{ i18n.AutoLoadJavaInSystem }}
-            </el-checkbox>
-            <div v-show="!JavaPath.AutoCheckJavaPath">
-              <el-input
-                v-model="JavaPath.javapath"
-                :placeholder="i18n.JavaPath"
-              >
-                <template #append>
-                  <el-button @click="open_java">
-                    <el-icon> <FolderOpened /> </el-icon
-                  ></el-button>
-                </template>
-              </el-input>
-            </div>
-          </div>
-        </el-card>
-        <el-card>
           <div>
             <text>{{ i18n.chooseLanguage }}</text>
           </div>
@@ -302,20 +261,9 @@ export default {
         restoreSuccess: undefined,
         restoreError: undefined,
         backupError: undefined,
-        JavaEnvConfiguration: undefined,
-        CheckAndSave: undefined,
-        AutoLoadJavaInSystem: undefined,
-        JavaPath: undefined,
-        JavaEnvConfigurationNormalMsg: undefined,
-        JavaEnvConfigurationNormal: undefined,
-        JavaEnvConfigurationFailed: undefined,
       },
       AutoCheckUpdate: true,
       isDevMode: false,
-      JavaPath: {
-        AutoCheckJavaPath: true,
-        javapath: "",
-      },
     };
   },
   methods: {
@@ -347,21 +295,6 @@ export default {
         ])
         .then((result) => {
           this.zipalign = result;
-        });
-    },
-    async open_java() {
-      window.electronAPI
-        .openFile([
-          {
-            name: "java",
-            extensions:
-              (await window.electronAPI.SystemPlatform()) === "win32"
-                ? ["exe"]
-                : ["*"],
-          },
-        ])
-        .then((result) => {
-          this.JavaPath.javapath = result;
         });
     },
     save_filepath() {
@@ -536,80 +469,6 @@ export default {
         });
       }
     },
-    loadJavaPath() {
-      if (this.JavaPath.AutoCheckJavaPath) {
-        this.JavaPath.javapath = "";
-      } else {
-        this.JavaPath.javapath = window.electronAPI.config.get("JavaPath");
-      }
-    },
-    async checkJavaEnv() {
-      window.electronAPI
-        .CheckJavaPath(this.JavaPath.javapath)
-        .then(async (data) => {
-          if (data) {
-            window.electronAPI.config.set("JavaPath", this.JavaPath.javapath);
-            const platform = await window.electronAPI.SystemPlatform();
-            if (platform === "win32") {
-              let javapath;
-              let keytoolpath;
-              if (!this.JavaPath.javapath) {
-                javapath = await window.electronAPI.SystemShell("where java");
-                keytoolpath =
-                  await window.electronAPI.SystemShell("where keytool");
-              } else {
-                javapath = this.JavaPath.javapath;
-                keytoolpath = this.JavaPath.javapath.replace(
-                  /\/java.exe$/,
-                  "keytool.exe",
-                );
-              }
-              ElMessageBox({
-                message: this.i18n.JavaEnvConfigurationNormalMsg(
-                  javapath,
-                  keytoolpath,
-                ),
-                type: "success",
-                dangerouslyUseHTMLString: true,
-              });
-            } else if (platform === "darwin") {
-              let javapath;
-              let keytoolpath;
-              if (!this.JavaPath.javapath) {
-                javapath = await window.electronAPI.SystemShell("which java");
-                keytoolpath =
-                  await window.electronAPI.SystemShell("which keytool");
-              } else {
-                javapath = this.JavaPath.javapath;
-                keytoolpath = this.JavaPath.javapath.replace(
-                  /\/java$/,
-                  "/keytool",
-                );
-              }
-              ElMessageBox({
-                message: this.i18n.JavaEnvConfigurationNormalMsg(
-                  javapath,
-                  keytoolpath,
-                ),
-                type: "success",
-                dangerouslyUseHTMLString: true,
-              });
-            } else {
-              ElMessage({
-                message: this.i18n.JavaEnvConfigurationNormal,
-                type: "success",
-                plain: true,
-              });
-            }
-          } else {
-            ElMessage({
-              message: this.i18n.JavaEnvConfigurationFailed,
-              type: "error",
-              plain: true,
-            });
-          }
-        });
-    },
   },
   async created() {
     const i18n = new internationalization();
@@ -626,13 +485,6 @@ export default {
     this.lang.langlist = Object.values(supportLangList);
     this.AutoCheckUpdate = window.electronAPI.config.get("checkUpdate");
     window.electronAPI.isDevMode().then((data) => (this.isDevMode = data));
-    if (window.electronAPI.config.get("JavaPath")) {
-      this.JavaPath.AutoCheckJavaPath = false;
-      this.JavaPath.javapath = result;
-    } else {
-      this.JavaPath.AutoCheckJavaPath = true;
-      this.JavaPath.javapath = "";
-    }
   },
 };
 </script>
