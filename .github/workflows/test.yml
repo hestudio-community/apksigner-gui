@@ -73,8 +73,16 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install WiX Toolset (Windows only)
+        if: matrix.platform == 'win32'
+        run: |
+          # Download and install WiX Toolset v3
+          Invoke-WebRequest -Uri "https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314-binaries.zip" -OutFile "wix314-binaries.zip"
+          Expand-Archive -Path "wix314-binaries.zip" -DestinationPath "C:\wix"
+          echo "C:\wix" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
       - name: Build application
-        run: npm run package
+        run: npm run make
         env:
           ELECTRON_BUILDER_ARCH: ${{ matrix.arch }}
 
@@ -83,5 +91,5 @@ jobs:
         with:
           name: apksignergui_${{ needs.get-version.outputs.version }}_${{ matrix.arch == 'x64' && 'amd64' || matrix.arch }}_${{ matrix.platform }}
           path: |
-            ./out/**/*
+            ./out/*
           retention-days: 30
