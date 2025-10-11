@@ -1,8 +1,9 @@
 // See the Electron documentation for details on how to use preload scripts:
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
-const { contextBridge, ipcRenderer } = require("electron");
+import { contextBridge, ipcRenderer } from "electron";
 
 contextBridge.exposeInMainWorld("electronAPI", {
+  reloadLang: () => ipcRenderer.invoke("system:reloadLang"),
   openFile: (filters) => ipcRenderer.invoke("dialog:openFile", filters),
   saveFile: (filters) => ipcRenderer.invoke("dialog:saveFile", filters),
   openDevtools: () => ipcRenderer.invoke("devtools:open"),
@@ -11,14 +12,15 @@ contextBridge.exposeInMainWorld("electronAPI", {
   WindowsMinimize: () => ipcRenderer.invoke("windows:minimize"),
   WindowsIsMaximized: () => ipcRenderer.invoke("windows:isMaximized"),
   WindowsIsFullScreen: () => ipcRenderer.invoke("windows:isFullScreen"),
-  SystemPlatfrom: () => ipcRenderer.invoke("system:platfrom"),
+  SystemPlatform: () => ipcRenderer.invoke("system:platform"),
   CopyToTmp: (file) => ipcRenderer.invoke("app:copyToTmp", file),
   ClearTmpDir: () => ipcRenderer.invoke("app:clearTmpDir"),
   SystemShell: (shell) => ipcRenderer.invoke("system:shell", shell),
   AppAbout: () => ipcRenderer.invoke("app:about"),
   AppCheckUpdate: (forceShow) =>
     ipcRenderer.invoke("app:checkUpdate", forceShow),
-  CheckJavaHome: () => ipcRenderer.invoke("system:checkJavaHome"),
+  CheckJavaPath: (javapath) =>
+    ipcRenderer.invoke("system:CheckJavaPath", javapath),
   CreateKey: (
     keyPath,
     keyPasswd,
@@ -33,7 +35,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
     country,
     keyalg,
     keysize,
-    sigalg
+    sigalg,
   ) =>
     ipcRenderer.invoke(
       "app:createKey",
@@ -50,12 +52,12 @@ contextBridge.exposeInMainWorld("electronAPI", {
       country,
       keyalg,
       keysize,
-      sigalg
+      sigalg,
     ),
   config: {
-    get: (key) => ipcRenderer.invoke("config:get", key),
-    set: (key, value) => ipcRenderer.invoke("config:set", key, value),
-    del: (key) => ipcRenderer.invoke("config:del", key),
+    get: (key) => ipcRenderer.sendSync("config:get", key),
+    set: (key, value) => ipcRenderer.sendSync("config:set", key, value),
+    del: (key) => ipcRenderer.sendSync("config:del", key),
   },
   backupConfig: () => ipcRenderer.invoke("config:backup"),
   restoreConfig: () => ipcRenderer.invoke("config:restore"),

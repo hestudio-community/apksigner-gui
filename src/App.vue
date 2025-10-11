@@ -2,8 +2,6 @@
   <div style="max-height: calc(100vh)">
     <el-container>
       <el-aside class="aside" :style="{ width: actualSidebarWidth + 'px' }">
-        <div class="resize-handle-left" @mousedown="startResize('left', $event)"></div>
-        <div class="resize-handle-right" @mousedown="startResize('right', $event)"></div>
         <div class="toolbar">
           <el-button
             text
@@ -20,6 +18,10 @@
             :icon="Refresh"
           />
           <div>
+            <div
+              class="resize-handle-right"
+              @mousedown="startResize('right', $event)"
+            ></div>
             <el-drawer
               v-model="openaddkey"
               class="addkey"
@@ -63,9 +65,7 @@
                   bg
                   class="keybutton"
                 >
-                  <span
-                    :style="keyTextStyle"
-                  >{{ item }}</span>
+                  <span :style="keyTextStyle">{{ item }}</span>
                 </el-button>
                 <template #dropdown>
                   <el-dropdown-item
@@ -100,10 +100,12 @@
                 style="height: 18px; width: 18px"
                 @click="opensetting = true"
               >
-                <el-icon><Setting /></el-icon>
+                <el-icon>
+                  <Setting />
+                </el-icon>
               </el-button>
             </div>
-            <div v-if="!darwin.isDarwin" style="margin-left: 8px;">
+            <div v-if="!darwin.isDarwin" style="margin-left: 8px">
               <el-button
                 text
                 type="text"
@@ -202,28 +204,19 @@
   position: relative;
 }
 
-.resize-handle-left,
 .resize-handle-right {
   position: absolute;
-  top: 0;
-  bottom: 0;
+  top: 36px;
+  bottom: 10px;
   width: 4px;
   cursor: col-resize;
   -webkit-app-region: no-drag;
   z-index: 10;
-}
-
-.resize-handle-left {
-  left: 0;
-}
-
-.resize-handle-right {
   right: 0;
 }
 
-.resize-handle-left:hover,
 .resize-handle-right:hover {
-  background-color: rgba(64, 158, 255, 0.3);
+  background-color: #fba4144d;
 }
 
 .toolbar {
@@ -303,13 +296,16 @@
   border-bottom-right-radius: 15px;
   -webkit-app-region: no-drag;
 }
+
 .el-card {
   border-radius: 15px;
   margin: 10px;
 }
+
 .el-input__wrapper {
   border-radius: 10px;
 }
+
 .el-input-group__append {
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
@@ -334,6 +330,7 @@
 .el-message {
   border-radius: 10px;
 }
+
 .el-overlay {
   -webkit-backdrop-filter: blur(6.18px);
   backdrop-filter: blur(6.18px);
@@ -351,12 +348,15 @@
   transition: transform 0.618s ease;
   transform: rotate(360deg);
 }
+
 .el-select__wrapper {
   border-radius: 10px;
 }
+
 .el-scrollbar__view {
   border-radius: 15px;
 }
+
 .el-popper.is-pure {
   border-radius: 15px;
 }
@@ -373,6 +373,7 @@
   .header {
     color: #e5eaf3;
   }
+
   .main {
     background-color: #1d1e1f;
   }
@@ -392,7 +393,7 @@ import AddKey from "./components/AddKey.vue";
 import EditKey from "./components/EditKey.vue";
 import Sign from "./components/Sign.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { internationalization } from "./utils/i18n.js";
+import { internationalization } from "./utils/i18nServices/client.js";
 </script>
 
 <script>
@@ -416,7 +417,6 @@ export default {
       openSign: "",
       sidebarWidth: 30, // 相对百分比，0%=128px，100%=50%页面宽度
       isResizing: false,
-      resizeDirection: null,
       i18n: {
         noKeyTip: undefined,
         confirm: undefined,
@@ -434,118 +434,121 @@ export default {
       const minWidth = 128; // 最小宽度128px (对应0%)
       const maxWidth = Math.min(window.innerWidth * 0.5, window.innerWidth); // 最大宽度50%页面宽度 (对应100%)
       const range = maxWidth - minWidth;
-      
+
       // 确保范围有效
       if (range <= 0) {
         return minWidth;
       }
-      
+
       // 验证sidebarWidth在0-100范围内
       const validatedPercent = Math.max(0, Math.min(100, this.sidebarWidth));
       const calculatedWidth = minWidth + (validatedPercent / 100) * range;
-      
+
       // 再次验证结果在合理范围内
       return Math.max(minWidth, Math.min(maxWidth, calculatedWidth));
     },
-    
+
     keyTextStyle() {
       return {
-        textAlign: 'left',
-        overflow: 'hidden',
-        whiteSpace: 'nowrap',
-        textOverflow: 'ellipsis',
-        flex: '1',
-        minWidth: '0'
+        textAlign: "left",
+        overflow: "hidden",
+        whiteSpace: "nowrap",
+        textOverflow: "ellipsis",
+        flex: "1",
+        minWidth: "0",
       };
-    }
+    },
   },
   methods: {
     startResize(direction, event) {
       this.isResizing = true;
-      this.resizeDirection = direction;
       this.startX = event.clientX;
-      
+
       // 记录当前的窗口宽度和范围，防止窗口大小改变后的瞬移
       const minWidth = 128;
       const maxWidth = Math.min(window.innerWidth * 0.5, window.innerWidth);
       this.resizeRange = Math.max(0, maxWidth - minWidth);
       this.resizeMinWidth = minWidth;
-      
+
       // 计算当前实际像素宽度对应的百分比
       const currentActualWidth = this.actualSidebarWidth;
       if (this.resizeRange > 0) {
-        this.startWidthPercent = ((currentActualWidth - minWidth) / this.resizeRange) * 100;
+        this.startWidthPercent =
+          ((currentActualWidth - minWidth) / this.resizeRange) * 100;
       } else {
         this.startWidthPercent = 0;
       }
-      
-      document.addEventListener('mousemove', this.doResize);
-      document.addEventListener('mouseup', this.stopResize);
-      document.body.style.cursor = 'col-resize';
-      document.body.style.userSelect = 'none';
+
+      document.addEventListener("mousemove", this.doResize);
+      document.addEventListener("mouseup", this.stopResize);
+      document.body.style.cursor = "col-resize";
+      document.body.style.userSelect = "none";
     },
-    
+
     doResize(event) {
       if (!this.isResizing) return;
-      
+
       const deltaX = event.clientX - this.startX;
-      
+
       // 使用在startResize时记录的固定范围
       const deltaPercent = (deltaX / this.resizeRange) * 100;
       let newWidthPercent;
-      
-      if (this.resizeDirection === 'right') {
-        newWidthPercent = this.startWidthPercent + deltaPercent;
-      } else {
-        newWidthPercent = this.startWidthPercent - deltaPercent;
-      }
-      
+
+      newWidthPercent = this.startWidthPercent + deltaPercent;
+
       // 限制相对百分比范围：0% 到 100%
       newWidthPercent = Math.max(0, Math.min(100, newWidthPercent));
-      
+
       // 计算对应的实际像素宽度
-      const newActualWidth = this.resizeMinWidth + (newWidthPercent / 100) * this.resizeRange;
-      
+      const newActualWidth =
+        this.resizeMinWidth + (newWidthPercent / 100) * this.resizeRange;
+
       // 重新计算在当前窗口尺寸下的百分比
       const currentMinWidth = 128;
-      const currentMaxWidth = Math.min(window.innerWidth * 0.5, window.innerWidth);
+      const currentMaxWidth = Math.min(
+        window.innerWidth * 0.5,
+        window.innerWidth,
+      );
       const currentRange = currentMaxWidth - currentMinWidth;
-      
+
       // 确保实际宽度在当前窗口的合理范围内
-      const clampedActualWidth = Math.max(currentMinWidth, Math.min(currentMaxWidth, newActualWidth));
-      
+      const clampedActualWidth = Math.max(
+        currentMinWidth,
+        Math.min(currentMaxWidth, newActualWidth),
+      );
+
       // 更新sidebarWidth为在当前窗口尺寸下的百分比
       if (currentRange > 0) {
-        this.sidebarWidth = ((clampedActualWidth - currentMinWidth) / currentRange) * 100;
+        this.sidebarWidth =
+          ((clampedActualWidth - currentMinWidth) / currentRange) * 100;
       } else {
         this.sidebarWidth = 0;
       }
-      
+
       // 延迟更新文字宽度，确保DOM已更新
       this.$nextTick(() => {
         this.updateKeyTextWidth();
       });
     },
-    
+
     updateKeyTextWidth() {
       // 由于使用了百分比布局，文字宽度会自动跟随侧边栏调整
       // 这个方法现在主要用于强制重新渲染，确保样式同步
       this.$forceUpdate();
     },
-    
+
     stopResize() {
       this.isResizing = false;
-      this.resizeDirection = null;
-      
-      document.removeEventListener('mousemove', this.doResize);
-      document.removeEventListener('mouseup', this.stopResize);
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-      
+
+      document.removeEventListener("mousemove", this.doResize);
+      document.removeEventListener("mouseup", this.stopResize);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+
       // 保存侧边栏宽度到配置
       window.electronAPI.config.set("sidebarWidth", this.sidebarWidth);
     },
-    
+
     async RefreshKey() {
       this.keyLoading = true;
       document.querySelector(".refresh").classList.add("element-rotate");
@@ -553,19 +556,17 @@ export default {
         document.querySelector(".refresh").classList.remove("element-rotate");
       }, 618);
       this.keyList = [];
-      window.electronAPI.config.get("keys").then((data) => {
-        if (data) {
-          this.keyList = Object.keys(data);
-          if (!this.keyList.includes(this.openSign)) {
-            this.openSign = "";
-          }
-        } else {
+      const keys = window.electronAPI.config.get("keys");
+      if (keys) {
+        this.keyList = Object.keys(keys);
+        if (!this.keyList.includes(this.openSign)) {
           this.openSign = "";
         }
-        // 更新密钥文字容器宽度
-        this.$nextTick(() => {
-          this.updateKeyTextWidth();
-        });
+      } else {
+        this.openSign = "";
+      }
+      this.$nextTick(() => {
+        this.updateKeyTextWidth();
       });
       this.keyLoading = false;
     },
@@ -577,20 +578,19 @@ export default {
           confirmButtonText: this.i18n.confirm,
           cancelButtonText: this.i18n.cancel,
           type: "warning",
-        }
+        },
       ).then(() => {
-        window.electronAPI.config.get("keys").then((data) => {
-          if (data && data[keyname]) {
-            delete data[keyname];
-            window.electronAPI.config.set("keys", data);
-          }
-          ElMessage({
-            message: this.i18n.DeleteSuccess,
-            type: "success",
-            plain: true,
-          });
-          this.RefreshKey();
+        const keys = window.electronAPI.config.get("keys");
+        if (keys && keys[keyname]) {
+          delete keys[keyname];
+          window.electronAPI.config.set("keys", keys);
+        }
+        ElMessage({
+          message: this.i18n.DeleteSuccess,
+          type: "success",
+          plain: true,
         });
+        this.RefreshKey();
       });
     },
     WindowsClose() {
@@ -605,21 +605,19 @@ export default {
   },
   async created() {
     const i18n = new internationalization();
-    await i18n.init();
     for (let i = 0; i < Object.keys(this.i18n).length; i++) {
       const key = Object.keys(this.i18n)[i];
       this.i18n[key] = i18n.geti18n(key);
     }
-    window.electronAPI.SystemPlatfrom().then(async (result) => {
+    window.electronAPI.SystemPlatform().then(async (result) => {
       if (result == "darwin") {
         this.darwin.isDarwin = true;
-        document.querySelector(".toolbar").style.marginLeft = "64px";
         setInterval(async () => {
           const isFullScreen = await window.electronAPI.WindowsIsFullScreen();
           if (isFullScreen) {
             document.querySelector(".toolbar").style.marginLeft = "0px";
           } else {
-            document.querySelector(".toolbar").style.marginLeft = "64px";
+            document.querySelector(".toolbar").style.marginLeft = "72px";
           }
         }, 100);
       } else {
@@ -632,34 +630,31 @@ export default {
     });
   },
   mounted() {
-    // 读取保存的侧边栏宽度
-    window.electronAPI.config.get("sidebarWidth").then((savedWidth) => {
-      const defaultSidebarWidth = 30;
-      
-      if (savedWidth !== null && savedWidth !== undefined) {
-        // 验证侧边栏宽度范围 (0-100%)，超出范围则恢复默认值
-        if (savedWidth < 0 || savedWidth > 100 || isNaN(savedWidth)) {
-          console.warn(`Sidebar width ${savedWidth} is out of range (0-100), restoring default value ${defaultSidebarWidth}`);
-          this.sidebarWidth = defaultSidebarWidth;
-          window.electronAPI.config.set("sidebarWidth", defaultSidebarWidth);
-        } else {
-          this.sidebarWidth = savedWidth;
-        }
-      } else {
-        // 使用默认值并保存
+    const savedWidth = window.electronAPI.config.get("sidebarWidth");
+    const defaultSidebarWidth = 30;
+
+    if (savedWidth !== null && savedWidth !== undefined) {
+      if (savedWidth < 0 || savedWidth > 100 || isNaN(savedWidth)) {
+        console.warn(
+          `Sidebar width ${savedWidth} is out of range (0-100), restoring default value ${defaultSidebarWidth}`,
+        );
         this.sidebarWidth = defaultSidebarWidth;
         window.electronAPI.config.set("sidebarWidth", defaultSidebarWidth);
+      } else {
+        this.sidebarWidth = savedWidth;
       }
-    });
+    } else {
+      this.sidebarWidth = defaultSidebarWidth;
+      window.electronAPI.config.set("sidebarWidth", defaultSidebarWidth);
+    }
 
-    window.electronAPI.config.get("checkUpdate").then((data) => {
-      if (data == null) {
-        window.electronAPI.config.set("checkUpdate", true);
-        window.electronAPI.AppCheckUpdate(false);
-      } else if (data) {
-        window.electronAPI.AppCheckUpdate(false);
-      }
-    });
+    const checkUpdate = window.electronAPI.config.get("checkUpdate");
+    if (checkUpdate == null) {
+      window.electronAPI.config.set("checkUpdate", true);
+      window.electronAPI.AppCheckUpdate(false);
+    } else if (checkUpdate) {
+      window.electronAPI.AppCheckUpdate(false);
+    }
 
     setInterval(async () => {
       if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
@@ -713,16 +708,14 @@ export default {
       }
     }, 100);
     this.RefreshKey().then(() => {
-      window.electronAPI.config.get("lastUseKey").then((data) => {
-        if (data && this.keyList.includes(data)) {
-          this.openSign = data;
-        } else {
-          this.openSign = "";
-        }
-        // 初始化时也需要更新文字宽度
-        this.$nextTick(() => {
-          this.updateKeyTextWidth();
-        });
+      const lastUseKey = window.electronAPI.config.get("lastUseKey");
+      if (lastUseKey && this.keyList.includes(lastUseKey)) {
+        this.openSign = lastUseKey;
+      } else {
+        this.openSign = "";
+      }
+      this.$nextTick(() => {
+        this.updateKeyTextWidth();
       });
     });
 

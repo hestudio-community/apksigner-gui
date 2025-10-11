@@ -16,7 +16,7 @@
           <el-input v-model="keystore" :placeholder="i18n.jksLocation">
             <template #append>
               <el-button @click="open_keystore">
-                <el-icon><FolderOpened /></el-icon
+                <el-icon> <FolderOpened /> </el-icon
               ></el-button>
             </template>
           </el-input>
@@ -61,7 +61,7 @@
             >
               <template #append>
                 <el-button @click="save_keystone">
-                  <el-icon><FolderOpened /></el-icon
+                  <el-icon> <FolderOpened /> </el-icon
                 ></el-button>
               </template>
             </el-input>
@@ -243,7 +243,7 @@
 <script setup>
 import { FolderOpened } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
-import { internationalization } from "../utils/i18n.js";
+import { internationalization } from "../utils/i18nServices/client.js";
 </script>
 
 <script>
@@ -371,35 +371,34 @@ export default {
             return;
           }
           let keyList;
-          window.electronAPI.config.get("keys").then((res) => {
-            if (res) {
-              keyList = res;
-            } else {
-              keyList = {};
-            }
+          const keys = window.electronAPI.config.get("keys");
+          if (keys) {
+            keyList = keys;
+          } else {
+            keyList = {};
+          }
 
-            if (Object.keys(keyList).includes(this.name)) {
-              ElMessage({
-                message: this.i18n.HadSameKeyName,
-                type: "error",
-                plain: true,
-              });
-              return;
-            } else {
-              keyList[this.name] = {
-                type: 1,
-                keystore: this.keystore,
-                keyalias: this.keyalias,
-                keypasswd: this.keypasswd,
-              };
-              window.electronAPI.config.set("keys", keyList);
-              ElMessage({
-                message: this.i18n.saveSuccess,
-                type: "success",
-                plain: true,
-              });
-            }
-          });
+          if (Object.keys(keyList).includes(this.name)) {
+            ElMessage({
+              message: this.i18n.HadSameKeyName,
+              type: "error",
+              plain: true,
+            });
+            return;
+          } else {
+            keyList[this.name] = {
+              type: 1,
+              keystore: this.keystore,
+              keyalias: this.keyalias,
+              keypasswd: this.keypasswd,
+            };
+            window.electronAPI.config.set("keys", keyList);
+            ElMessage({
+              message: this.i18n.saveSuccess,
+              type: "success",
+              plain: true,
+            });
+          }
         });
       }
     },
@@ -444,7 +443,7 @@ export default {
           });
           return;
         } else {
-          window.electronAPI.CheckJavaHome().then((result) => {
+          window.electronAPI.CheckJavaPath().then((result) => {
             if (result) {
               window.electronAPI
                 .CreateKey(
@@ -461,7 +460,7 @@ export default {
                   this.create.advanceOptions.country,
                   this.create.advanceOptions.keyalg,
                   this.create.advanceOptions.keysize,
-                  this.create.advanceOptions.sigalg
+                  this.create.advanceOptions.sigalg,
                 )
                 .then((res) => {
                   if (res === true) {
@@ -500,18 +499,16 @@ export default {
   },
   async created() {
     const i18n = new internationalization();
-    await i18n.init();
     for (let i = 0; i < Object.keys(this.i18n).length; i++) {
       const key = Object.keys(this.i18n)[i];
       this.i18n[key] = i18n.geti18n(key);
     }
   },
   mounted() {
-    window.electronAPI.config.get("advancedSetting").then((res) => {
-      if (res) {
-        this.create.advancedSetting = res;
-      }
-    });
+    const advancedSetting = window.electronAPI.config.get("advancedSetting");
+    if (advancedSetting) {
+      this.create.advancedSetting = advancedSetting;
+    }
   },
 };
 </script>

@@ -13,7 +13,7 @@
           <el-input v-model="keystore" :placeholder="i18n.jksLocation">
             <template #append>
               <el-button @click="open_keystore">
-                <el-icon><FolderOpened /></el-icon
+                <el-icon> <FolderOpened /> </el-icon
               ></el-button>
             </template>
           </el-input>
@@ -53,7 +53,7 @@
 <script setup>
 import { FolderOpened } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
-import { internationalization } from "../utils/i18n.js";
+import { internationalization } from "../utils/i18nServices/client.js";
 </script>
 
 <script>
@@ -130,24 +130,21 @@ export default {
             });
             return;
           }
-          let keyList;
-          window.electronAPI.config.get("keys").then((res) => {
-            keyList = res;
-            if (this.name != this.keyname) {
-              delete keyList[this.keyname];
-            }
-            keyList[this.name] = {
-              type: 1,
-              keystore: this.keystore,
-              keyalias: this.keyalias,
-              keypasswd: this.keypasswd,
-            };
-            window.electronAPI.config.set("keys", keyList);
-            ElMessage({
-              message: this.i18n.saveSuccess,
-              type: "success",
-              plain: true,
-            });
+          const keyList = window.electronAPI.config.get("keys");
+          if (this.name != this.keyname) {
+            delete keyList[this.keyname];
+          }
+          keyList[this.name] = {
+            type: 1,
+            keystore: this.keystore,
+            keyalias: this.keyalias,
+            keypasswd: this.keypasswd,
+          };
+          window.electronAPI.config.set("keys", keyList);
+          ElMessage({
+            message: this.i18n.saveSuccess,
+            type: "success",
+            plain: true,
           });
         });
       }
@@ -155,20 +152,17 @@ export default {
   },
   async created() {
     const i18n = new internationalization();
-    await i18n.init();
     for (let i = 0; i < Object.keys(this.i18n).length; i++) {
       const key = Object.keys(this.i18n)[i];
       this.i18n[key] = i18n.geti18n(key);
     }
   },
   mounted() {
-    window.electronAPI.config.get("keys").then((res) => {
-      const keyInfo = res[this.keyname];
-      this.name = this.keyname;
-      this.keystore = keyInfo.keystore;
-      this.keyalias = keyInfo.keyalias;
-      this.keypasswd = keyInfo.keypasswd;
-    });
+    const keyInfo = window.electronAPI.config.get("keys")[this.keyname];
+    this.name = this.keyname;
+    this.keystore = keyInfo.keystore;
+    this.keyalias = keyInfo.keyalias;
+    this.keypasswd = keyInfo.keypasswd;
   },
 };
 </script>

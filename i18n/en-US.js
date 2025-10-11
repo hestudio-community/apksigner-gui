@@ -97,4 +97,23 @@ export default {
   restoreSuccess: "Configuration restore successful",
   restoreError: "Configuration restore failed",
   backupError: "Configuration backup failed",
+  anotherAlreadyRunning:
+    "Another process is already running. This process will exit.",
+  latestVersion: "You are currently using the latest version.",
+  newVersionAvailable: (version) => {
+    return `A new version ${version} is available.`;
+  },
+  viewInGithub: "View on Github",
+  downloadNOW: "Download NOW",
+  checkUpdateFailed: "Failed to check for updates",
+  warnInARM64WithX86Program:
+    "You are currently running an x86-based application through translation on an arm64 platform. We have provided a native arm64 application, please check it out on Github.",
+  version: "Version",
+  platform: "Platform",
+  architecture: "Architecture",
+  workStatus: "Work Status",
+  copyright: "Copyright",
+  checkUpdate: "Check for Updates",
+  aboutApp: "About APKSignerGUI",
+  reportIssue: "Report Issue",
 };

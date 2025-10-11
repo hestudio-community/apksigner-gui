@@ -9,8 +9,7 @@ export default {
   },
   AddKey: "添加密鑰",
   editKey: "修改密鑰",
-  AddKeyTips:
-    "目前僅支持 密鑰庫 文件。對於公私鑰分離的證書將在後續版本支持。",
+  AddKeyTips: "目前僅支持 密鑰庫 文件。對於公私鑰分離的證書將在後續版本支持。",
   name: "名稱",
   jksLocation: "密鑰庫位置",
   keyAlias: "證書別名",
@@ -97,4 +96,22 @@ export default {
   restoreSuccess: "設定檔恢復成功",
   restoreError: "設定檔恢復失敗",
   backupError: "設定檔備份失敗",
+  anotherAlreadyRunning: "另一個進程正在運行，本進程將退出。",
+  latestVersion: "你現在使用的是最新版本。",
+  newVersionAvailable: (version) => {
+    return `新版本 ${version} 可用。`;
+  },
+  viewInGithub: "在 Github 中查看",
+  downloadNOW: "現在下載",
+  checkUpdateFailed: "檢查更新失敗",
+  warnInARM64WithX86Program:
+    "你現在正在 arm64 平台中通過轉譯的方式運行基於 x86 的應用程式，我們已經提供了原生 arm64 應用程式，請前往 Github 中查看。",
+  version: "版本",
+  platform: "平台",
+  architecture: "架構",
+  workStatus: "工作狀態",
+  copyright: "版權",
+  checkUpdate: "檢查更新",
+  aboutApp: "關於 APKSignerGUI",
+  reportIssue: "報告問題",
 };

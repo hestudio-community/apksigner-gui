@@ -2,7 +2,28 @@ import path from "node:path";
 import fs from "node:fs";
 import { spawnSync } from "node:child_process";
 
-export function CheckJavaHome() {
+function CheckJavaPath(javapath) {
+  if (javapath) {
+    try {
+      if (!fs.existsSync(javapath)) {
+        return false;
+      }
+      const javaBinDir = path.dirname(javapath);
+      let keytoolPath;
+      if (process.platform === "win32") {
+        keytoolPath = path.join(javaBinDir, "keytool.exe");
+      } else {
+        keytoolPath = path.join(javaBinDir, "keytool");
+      }
+      if (!fs.existsSync(keytoolPath)) {
+        return false;
+      }
+      const result = spawnSync(keytoolPath, ["-version"], { stdio: "pipe" });
+      return result.status === 0;
+    } catch (error) {
+      return false;
+    }
+  }
   const javaHome = process.env.JAVA_HOME;
   if (!javaHome || !fs.existsSync(javaHome)) {
     try {
@@ -20,14 +41,15 @@ export function CheckJavaHome() {
     let keytoolPath;
     if (process.platform == "win32") {
       javaPath = path.join(javaHome, "bin", "java.exe");
-      keytoolPath = path.join(process.env.JAVA_HOME, "bin", "keytool.exe");
+      keytoolPath = path.join(javaHome, "bin", "keytool.exe");
     } else {
       javaPath = path.join(javaHome, "bin", "java");
-      keytoolPath = path.join(process.env.JAVA_HOME, "bin", "keytool");
+      keytoolPath = path.join(javaHome, "bin", "keytool");
     }
     return fs.existsSync(javaPath) && fs.existsSync(keytoolPath);
   }
 }
+export { CheckJavaPath };
 
 export function CreateKey(
   keyPath,
@@ -43,7 +65,7 @@ export function CreateKey(
   country,
   keyalg,
   keysize,
-  sigalg
+  sigalg,
 ) {
   let keytoolPath;
   if (fs.existsSync(process.env.JAVA_HOME)) {

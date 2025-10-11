@@ -206,7 +206,7 @@
 <script setup>
 import { FolderOpened, QuestionFilled } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
-import { internationalization } from "../utils/i18n.js";
+import { internationalization } from "../utils/i18nServices/client.js";
 </script>
 
 <script>
@@ -362,91 +362,85 @@ export default {
             return;
           }
           window.electronAPI.CopyToTmp(this.input_apk).then(async (result) => {
-            window.electronAPI.config.get("keys").then((res) => {
-              const k = res[this.keyname];
-              window.electronAPI.config.get("apksigner").then((apksigner) => {
-                if (!apksigner) {
+            const key = window.electronAPI.config.get("keys")[this.keyname];
+            const apksigner = window.electronAPI.config.get("apksigner");
+            if (!apksigner) {
+              ElMessage({
+                message: this.i18n.noApksignerLocation,
+                type: "error",
+                plain: true,
+              });
+              this.sign = false;
+              return;
+            }
+            let script = `${apksigner} sign -v --ks ${key.keystore} --ks-key-alias ${key.keyalias} --ks-pass pass:${key.keypasswd}`;
+            if (!this.output.rewrite) {
+              if (!this.output.path) {
+                ElMessage({
+                  message: this.i18n.CheckDeficiencies,
+                  type: "error",
+                  plain: true,
+                });
+                this.sign = false;
+                return;
+              } else {
+                script += ` --out ${this.output.path}`;
+              }
+            } else {
+              script += ` --out ${this.input_apk}`;
+            }
+            if (this.advancedSetting) {
+              if (!this.api.auto.min) {
+                script += ` --min-sdk-version ${this.api.min}`;
+              }
+              if (!this.api.auto.max) {
+                script += ` --max-sdk-version ${this.api.max}`;
+              }
+              if (!this.signplan.auto) {
+                script += ` --v1-signing-enabled ${this.signplan.plans.includes(
+                  "V1",
+                )}`;
+                script += ` --v2-signing-enabled ${this.signplan.plans.includes(
+                  "V2",
+                )}`;
+                script += ` --v3-signing-enabled ${this.signplan.plans.includes(
+                  "V3",
+                )}`;
+                script += ` --v4-signing-enabled ${this.signplan.plans.includes(
+                  "V4",
+                )}`;
+              }
+              if (this.zipalign.status) {
+                const zipalign = window.electronAPI.config.get("zipalign");
+                if (!zipalign) {
                   ElMessage({
-                    message: this.i18n.noApksignerLocation,
+                    message: this.i18n.noZipalignLocation,
                     type: "error",
                     plain: true,
                   });
                   this.sign = false;
                   return;
                 }
-                let script = `${apksigner} sign -v --ks ${k.keystore} --ks-key-alias ${k.keyalias} --ks-pass pass:${k.keypasswd}`;
-                if (!this.output.rewrite) {
-                  if (!this.output.path) {
-                    ElMessage({
-                      message: this.i18n.CheckDeficiencies,
-                      type: "error",
-                      plain: true,
-                    });
-                    this.sign = false;
-                    return;
-                  } else {
-                    script += ` --out ${this.output.path}`;
-                  }
-                } else {
-                  script += ` --out ${this.input_apk}`;
-                }
-                if (this.advancedSetting) {
-                  if (!this.api.auto.min) {
-                    script += ` --min-sdk-version ${this.api.min}`;
-                  }
-                  if (!this.api.auto.max) {
-                    script += ` --max-sdk-version ${this.api.max}`;
-                  }
-                  if (!this.signplan.auto) {
-                    script += ` --v1-signing-enabled ${this.signplan.plans.includes(
-                      "V1"
-                    )}`;
-                    script += ` --v2-signing-enabled ${this.signplan.plans.includes(
-                      "V2"
-                    )}`;
-                    script += ` --v3-signing-enabled ${this.signplan.plans.includes(
-                      "V3"
-                    )}`;
-                    script += ` --v4-signing-enabled ${this.signplan.plans.includes(
-                      "V4"
-                    )}`;
-                  }
-                  if (this.zipalign.status) {
-                    window.electronAPI.config
-                      .get("zipalign")
-                      .then((zipalign) => {
-                        if (!zipalign) {
-                          ElMessage({
-                            message: this.i18n.noZipalignLocation,
-                            type: "error",
-                            plain: true,
-                          });
-                          this.sign = false;
-                          return;
-                        }
-                        script += ` ${result}_zipalign.apk`;
-                        console.log(
-                          `${zipalign} -v -P ${this.zipalign.config.P} -f ${
-                            this.zipalign.config.Zopfli ? "-z" : ""
-                          } 4 ${result} ${result}_zipalign.apk && ${script}`
-                        );
-                        this.shell(
-                          `${zipalign} -v -P ${this.zipalign.config.P} -f ${
-                            this.zipalign.config.Zopfli ? "-z" : ""
-                          } 4 ${result} ${result}_zipalign.apk && ${script}`
-                        );
-                        return;
-                      });
-                  } else {
-                    script += ` ${result}`;
-                    this.shell(`${script}`);
-                  }
-                } else {
-                  script += ` ${result}`;
-                  this.shell(`${script}`);
-                }
-              });
-            });
+                script += ` ${result}_zipalign.apk`;
+                console.log(
+                  `${zipalign} -v -P ${this.zipalign.config.P} -f ${
+                    this.zipalign.config.Zopfli ? "-z" : ""
+                  } 4 ${result} ${result}_zipalign.apk && ${script}`,
+                );
+                this.shell(
+                  `${zipalign} -v -P ${this.zipalign.config.P} -f ${
+                    this.zipalign.config.Zopfli ? "-z" : ""
+                  } 4 ${result} ${result}_zipalign.apk && ${script}`,
+                );
+                return;
+              } else {
+                script += ` ${result}`;
+                this.shell(`${script}`);
+              }
+            } else {
+              script += ` ${result}`;
+              this.shell(`${script}`);
+            }
           });
         });
       }
@@ -454,7 +448,6 @@ export default {
   },
   async created() {
     const i18n = new internationalization();
-    await i18n.init();
     for (let i = 0; i < Object.keys(this.i18n).length; i++) {
       const key = Object.keys(this.i18n)[i];
       this.i18n[key] = i18n.geti18n(key);
@@ -462,13 +455,12 @@ export default {
   },
   mounted() {
     setInterval(async () => {
-      window.electronAPI.config.get("advancedSetting").then((res) => {
-        if (res) {
-          this.advancedSetting = res;
-        } else {
-          this.advancedSetting = false;
-        }
-      });
+      const advancedSetting = window.electronAPI.config.get("advancedSetting");
+      if (advancedSetting) {
+        this.advancedSetting = advancedSetting;
+      } else {
+        this.advancedSetting = false;
+      }
     }, 100);
   },
 };

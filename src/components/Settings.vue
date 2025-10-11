@@ -27,7 +27,7 @@
             <el-input v-model="apksigner" placeholder="apksigner">
               <template #append>
                 <el-button @click="open_apksigner">
-                  <el-icon><FolderOpened /></el-icon
+                  <el-icon> <FolderOpened /> </el-icon
                 ></el-button>
               </template>
             </el-input>
@@ -38,7 +38,7 @@
             <el-input v-model="zipalign" placeholder="zipalign">
               <template #append>
                 <el-button @click="open_zipalign">
-                  <el-icon><FolderOpened /></el-icon
+                  <el-icon> <FolderOpened /> </el-icon
                 ></el-button>
               </template>
             </el-input>
@@ -78,13 +78,12 @@
             "
           >
             <div>
-              <text style="margin: 3px">{{ i18n.signAdvancedOptions }}</text>
+              <text>{{ i18n.signAdvancedOptions }}</text>
             </div>
             <div>
               <el-switch
                 v-model="advancedSetting"
                 @change="openSignAdvancedSetting"
-                style="margin: 3px"
               />
             </div>
           </div>
@@ -113,7 +112,7 @@
             "
           >
             <div>
-              <text style="margin: 3px">{{ i18n.cacheCleanup }}</text>
+              <text>{{ i18n.cacheCleanup }}</text>
             </div>
             <div>
               <el-button
@@ -136,13 +135,12 @@
             "
           >
             <div>
-              <text style="margin: 3px">{{ i18n.openAutoCheckUpdate }}</text>
+              <text>{{ i18n.openAutoCheckUpdate }}</text>
             </div>
             <div>
               <el-switch
                 v-model="AutoCheckUpdate"
                 @change="ChangeAutoCheckUpdate"
-                style="margin: 3px"
               />
             </div>
           </div>
@@ -157,7 +155,7 @@
             "
           >
             <div>
-              <text style="margin: 3px">{{ i18n.backupConfig }}</text>
+              <text>{{ i18n.backupConfig }}</text>
             </div>
             <div>
               <el-button text bg type="primary" @click="backupConfig">{{
@@ -175,7 +173,7 @@
             "
           >
             <div>
-              <text style="margin: 3px">{{ i18n.restoreConfig }}</text>
+              <text>{{ i18n.restoreConfig }}</text>
             </div>
             <div>
               <el-button text bg type="primary" @click="restoreConfig">{{
@@ -193,6 +191,7 @@
 .el-input {
   margin-top: 5px;
 }
+
 .el-page-header__title {
   font-size: 18px;
   color: gray;
@@ -214,7 +213,8 @@
 <script setup>
 import { FolderOpened } from "@element-plus/icons-vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { internationalization, supportLangList } from "../utils/i18n.js";
+import { internationalization } from "../utils/i18nServices/client.js";
+import { supportLangList } from "../utils/i18nServices/config.js";
 </script>
 
 <script>
@@ -352,7 +352,7 @@ export default {
             cancelButtonText: this.i18n.cancel,
             confirmButtonClass: "el-button--danger",
             type: "danger",
-          }
+          },
         ).then(() => {
           this.advancedSetting = true;
           window.electronAPI.config.set("advancedSetting", true);
@@ -382,42 +382,37 @@ export default {
       });
     },
     changelanguage() {
-      window.electronAPI.config.get("lang").then((result) => {
-        if (this.lang.chooseLang != result) {
-          let display = null;
-          for (
-            let index = 0;
-            index < Object.values(supportLangList).length;
-            index++
-          ) {
-            const element = Object.values(supportLangList)[index];
-            if (element.lang == this.lang.chooseLang) {
-              display = element.display;
-            }
+      const lang = window.electronAPI.config.get("lang");
+      if (this.lang.chooseLang != lang) {
+        let display = null;
+        for (
+          let index = 0;
+          index < Object.values(supportLangList).length;
+          index++
+        ) {
+          const element = Object.values(supportLangList)[index];
+          if (element.lang == this.lang.chooseLang) {
+            display = element.display;
           }
-          ElMessageBox.confirm(
-            this.i18n.isChangeLanguageTo(display),
-            this.i18n.chooseLanguage,
-            {
-              confirmButtonText: this.i18n.confirm,
-              cancelButtonText: this.i18n.cancel,
-              type: "warning",
-            }
-          )
-            .then(() => {
-              window.electronAPI.config
-                .set("lang", this.lang.chooseLang)
-                .then(() => {
-                  window.location.reload();
-                });
-            })
-            .catch(() => {
-              window.electronAPI.config.get("lang").then((result) => {
-                this.lang.chooseLang = result;
-              });
-            });
         }
-      });
+        ElMessageBox.confirm(
+          this.i18n.isChangeLanguageTo(display),
+          this.i18n.chooseLanguage,
+          {
+            confirmButtonText: this.i18n.confirm,
+            cancelButtonText: this.i18n.cancel,
+            type: "warning",
+          },
+        )
+          .then(() => {
+            window.electronAPI.config.set("lang", this.lang.chooseLang);
+            window.electronAPI.reloadLang();
+            window.location.reload();
+          })
+          .catch(() => {
+            this.lang.chooseLang = window.electronAPI.config.get("lang");
+          });
+      }
     },
     ChangeAutoCheckUpdate() {
       if (this.AutoCheckUpdate) {
@@ -477,32 +472,19 @@ export default {
   },
   async created() {
     const i18n = new internationalization();
-    await i18n.init();
     for (let i = 0; i < Object.keys(this.i18n).length; i++) {
       const key = Object.keys(this.i18n)[i];
       this.i18n[key] = i18n.geti18n(key);
     }
   },
   mounted() {
-    window.electronAPI.config.get("apksigner").then((result) => {
-      this.apksigner = result;
-    });
-    window.electronAPI.config.get("zipalign").then((result) => {
-      this.zipalign = result;
-    });
-    window.electronAPI.config.get("advancedSetting").then((result) => {
-      this.advancedSetting = result;
-    });
-    window.electronAPI.config.get("lang").then((result) => {
-      this.lang.chooseLang = result;
-    });
+    this.apksigner = window.electronAPI.config.get("apksigner");
+    this.zipalign = window.electronAPI.config.get("zipalign");
+    this.advancedSetting = window.electronAPI.config.get("advancedSetting");
+    this.lang.chooseLang = window.electronAPI.config.get("lang");
     this.lang.langlist = Object.values(supportLangList);
-    window.electronAPI.config.get("checkUpdate").then((result) => {
-      this.AutoCheckUpdate = result;
-    });
-    window.electronAPI.isDevMode().then((result) => {
-      this.isDevMode = result;
-    });
+    this.AutoCheckUpdate = window.electronAPI.config.get("checkUpdate");
+    window.electronAPI.isDevMode().then((data) => (this.isDevMode = data));
   },
 };
 </script>

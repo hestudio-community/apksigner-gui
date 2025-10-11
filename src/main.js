@@ -1,10 +1,21 @@
-import { app, BrowserWindow, dialog, ipcMain, Menu, shell } from "electron";
+import {
+  app,
+  BrowserWindow,
+  dialog,
+  ipcMain,
+  Menu,
+  shell,
+  nativeImage,
+} from "electron";
 import path from "node:path";
 import started from "electron-squirrel-startup";
 import { spawn } from "node:child_process";
-import { CheckJavaHome, CreateKey } from "./utils/CreateKey";
-import { Config, Storage } from "./utils/storage";
+import { CheckJavaPath, CreateKey } from "./utils/CreateKey";
+import { Config, Storage, importConfigHandler } from "./utils/storage";
 import fs from "node:fs";
+import { warn, error } from "./utils/alert";
+import { internationalization } from "./utils/i18nServices/server";
+import fixPath from "fix-path";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -15,8 +26,8 @@ if (started) {
 const gotTheLock = app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
-  console.log("Another instance is already running, exiting current instance");
-  app.quit();
+  const i18n = new internationalization();
+  error(i18n.geti18n("anotherAlreadyRunning"));
 } else {
   app.on("second-instance", (event, commandLine, workingDirectory) => {
     // When a second instance is launched, focus on the main window
@@ -27,157 +38,290 @@ if (!gotTheLock) {
   });
 }
 
+let allowDevtools = false;
+if (process.argv.includes("--allow-devtools") || !app.isPackaged) {
+  allowDevtools = true;
+}
+
+fixPath();
+
 const storage = new Storage();
-let config = null;
+const config = new Config();
 
 const initializeConfig = async () => {
-  config = new Config();
   const versionCheckResult = await config.checkVersionCompatibility();
   if (!versionCheckResult) {
     return false;
   }
-  
-  // Validate and restore defaults for out-of-range values
-  config.validateAndRestoreDefaults();
-  
+
   return true;
 };
 
 // Save reference to mainWindow for use in IPC handlers
 let mainWindow = null;
 
-const CheckUpdate = (forceShow) => {
-  fetch(
-    "https://api.github.com/repos/hestudio-community/apksigner-gui/releases/latest"
-  )
-    .then(async (response) => {
-      const data = await response.json();
-      if (data.name == `v${app.getVersion()}`) {
-        if (forceShow) {
+const createWindow = () => {
+  // Get saved window size or use defaults
+  const windowConfig = config.get("windowSize") || {};
+  const defaultWidth = 800;
+  const defaultHeight = 600;
+  const minWidth = 640;
+  const minHeight = 480;
+
+  // Validate and apply constraints with default restoration
+  let width = windowConfig.width || defaultWidth;
+  let height = windowConfig.height || defaultHeight;
+  let needsReset = false;
+
+  // Check if values exceed expected ranges and restore defaults
+  if (width < minWidth) {
+    width = defaultWidth;
+    needsReset = true;
+  }
+  if (height < minHeight) {
+    height = defaultHeight;
+    needsReset = true;
+  }
+
+  // Apply minimum constraints
+  width = Math.max(minWidth, width);
+  height = Math.max(minHeight, height);
+
+  // Reset to defaults if values were out of range
+  if (needsReset) {
+    config.set("windowSize", { width: defaultWidth, height: defaultHeight });
+  }
+
+  // Create the browser window.
+  mainWindow = new BrowserWindow({
+    width: width,
+    height: height,
+    center: true,
+    minWidth: minWidth,
+    minHeight: minHeight,
+    title: "APKSignerGUI",
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+      backgroundThrottling: false,
+      devTools: allowDevtools,
+    },
+    // Add icon configuration
+    icon: path.join(__dirname, "../icon.png"),
+    titleBarStyle: "hiddenInset",
+    show: true,
+    frame: false,
+    transparent: process.platform === "darwin",
+    vibrancy: process.platform === "darwin" ? "under-window" : undefined,
+  });
+
+  // Save window size when it changes
+  mainWindow.on("resize", () => {
+    if (!mainWindow.isMaximized() && !mainWindow.isMinimized()) {
+      const [currentWidth, currentHeight] = mainWindow.getSize();
+      config.set("windowSize", {
+        width: currentWidth,
+        height: currentHeight,
+      });
+    }
+  });
+
+  // Set Dock icon for Mac
+  if (process.platform === "darwin") {
+    const image = nativeImage.createFromPath(
+      path.join(__dirname, "../build/icon.icns"),
+    );
+    app.dock.setIcon(image);
+    console.log(path.join(__dirname, "../build/icon.icns"));
+  }
+
+  // and load the index.html of the app.
+  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
+  } else {
+    mainWindow.loadFile(
+      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
+    );
+  }
+  mainWindow.setHasShadow(true);
+};
+
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+app.whenReady().then(async () => {
+  // Initialize config and check version compatibility
+  const canProceed = await initializeConfig();
+  if (!canProceed) {
+    return; // App will quit if version check fails
+  }
+
+  const i18n = await new internationalization();
+
+  const CheckUpdate = (forceShow) => {
+    fetch(
+      "https://api.github.com/repos/hestudio-community/apksigner-gui/releases/latest",
+    )
+      .then(async (response) => {
+        const data = await response.json();
+        if (data.name == `v${app.getVersion()}`) {
+          if (forceShow) {
+            dialog
+              .showMessageBox({
+                title: "APKSignerGUI",
+                message: "APKSignerGUI",
+                detail: i18n.geti18n("latestVersion"),
+                type: "info",
+                buttons: [
+                  process.platform == "win32" ? "Yes" : i18n.geti18n("confirm"),
+                  i18n.geti18n("viewInGithub"),
+                ],
+                cancelId: 0,
+              })
+              .then((response) => {
+                if (response.response == 1) {
+                  shell.openExternal(
+                    "https://github.com/hestudio-community/apksigner-gui/releases/latest",
+                  );
+                }
+              });
+          }
+        } else {
           dialog
             .showMessageBox({
               title: "APKSignerGUI",
               message: "APKSignerGUI",
-              detail: "You are using the latest version.",
+              detail: i18n.geti18n("newVersionAvailable")(data.name),
               type: "info",
-              buttons: ["OK", "View in Github"],
+              buttons: [
+                process.platform == "win32" ? "Cancel" : i18n.geti18n("cancel"),
+                ...(process.platform == "darwin" || process.platform == "win32"
+                  ? [i18n.geti18n("downloadNOW")]
+                  : []),
+                i18n.geti18n("viewInGithub"),
+              ],
+              cancelId: 0,
             })
             .then((response) => {
               if (response.response == 1) {
+                if (process.platform == "darwin" && process.arch == "arm64") {
+                  shell.openExternal(
+                    `https://github.com/hestudio-community/apksigner-gui/releases/download/${
+                      data.name
+                    }/apksignergui_${String(data.name).replace(
+                      "v",
+                      "",
+                    )}_arm64.dmg`,
+                  );
+                } else if (
+                  process.platform == "darwin" &&
+                  process.arch == "amd64"
+                ) {
+                  shell.openExternal(
+                    `https://github.com/hestudio-community/apksigner-gui/releases/download/${
+                      data.name
+                    }/apksignergui_${String(data.name).replace(
+                      "v",
+                      "",
+                    )}_amd64.dmg`,
+                  );
+                } else if (
+                  process.platform == "win32" &&
+                  process.arch == "x64"
+                ) {
+                  shell.openExternal(
+                    `https://github.com/hestudio-community/apksigner-gui/releases/download/${
+                      data.name
+                    }/apksignergui_${String(data.name).replace(
+                      "v",
+                      "",
+                    )}_amd64.msi`,
+                  );
+                } else if (
+                  process.platform == "win32" &&
+                  process.arch == "arm64"
+                ) {
+                  shell.openExternal(
+                    `https://github.com/hestudio-community/apksigner-gui/releases/download/${
+                      data.name
+                    }/apksignergui_${String(data.name).replace(
+                      "v",
+                      "",
+                    )}_arm64.msi`,
+                  );
+                } else {
+                  shell.openExternal(
+                    "https://github.com/hestudio-community/apksigner-gui/releases/latest",
+                  );
+                }
+              } else if (response.response == 2) {
                 shell.openExternal(
-                  "https://github.com/hestudio-community/apksigner-gui/releases/latest"
+                  "https://github.com/hestudio-community/apksigner-gui/releases/latest",
                 );
               }
             });
         }
-      } else {
-        dialog
-          .showMessageBox({
-            title: "APKSignerGUI",
-            message: "APKSignerGUI",
-            detail: `New version ${data.name} is available.`,
-            type: "info",
-            buttons: ["Close", "Download Now", "View in Github"],
-          })
-          .then((response) => {
-            if (response.response == 1) {
-              if (process.platform == "darwin" && process.arch == "arm64") {
-                shell.openExternal(
-                  `https://github.com/hestudio-community/apksigner-gui/releases/download/${
-                    data.name
-                  }/apksignergui_${String(data.name).replace(
-                    "v",
-                    ""
-                  )}_arm64.dmg`
-                );
-              } else if (process.platform == "win32" && process.arch == "x64") {
-                shell.openExternal(
-                  `https://github.com/hestudio-community/apksigner-gui/releases/download/${
-                    data.name
-                  }/apksignergui_${String(data.name).replace(
-                    "v",
-                    ""
-                  )}_amd64.msi`
-                );
-              } else if (
-                process.platform == "win32" &&
-                process.arch == "arm64"
-              ) {
-                shell.openExternal(
-                  `https://github.com/hestudio-community/apksigner-gui/releases/download/${
-                    data.name
-                  }/apksignergui_${String(data.name).replace(
-                    "v",
-                    ""
-                  )}_arm64.msi`
-                );
-              } else {
-                shell.openExternal(
-                  "https://github.com/hestudio-community/apksigner-gui/releases/latest"
-                );
-              }
-            } else if (response.response == 2) {
-              shell.openExternal(
-                "https://github.com/hestudio-community/apksigner-gui/releases/latest"
-              );
-            }
-          });
-      }
-    })
-    .catch((error) => {
-      if (forceShow) {
-        dialog.showErrorBox("APKSignerGUI", "Failed to check for updates.");
-      }
-    });
+      })
+      .catch((e) => {
+        console.log(e);
+        if (forceShow) {
+          warn(undefined, i18n.geti18n("checkUpdateFailed"));
+        }
+      });
 
-  if (app.runningUnderARM64Translation) {
+    if (app.runningUnderARM64Translation) {
+      dialog
+        .showMessageBox({
+          title: "APKSignerGUI",
+          message: "APKSignerGUI",
+          detail: i18n.geti18n("warnInARM64WithX86Program"),
+          type: "warning",
+          buttons: [
+            process.platform == "win32" ? "Cancel" : i18n.geti18n("cancel"),
+            i18n.geti18n("viewInGithub"),
+          ],
+          cancelId: 0,
+        })
+        .then((response) => {
+          if (response.response == 1) {
+            shell.openExternal(
+              "https://github.com/hestudio-community/apksigner-gui/releases/latest",
+            );
+          }
+        });
+    }
+  };
+
+  const AboutPanel = () => {
     dialog
       .showMessageBox({
         title: "APKSignerGUI",
         message: "APKSignerGUI",
-        detail:
-          "You are running the x86_64 version of APKSignerGUI on an arm64 platform via translation, we provide native arm64 platforms, you can check it out on our Github.",
-        type: "warning",
-        buttons: ["OK", "View in Github"],
+        detail: `
+${i18n.geti18n("version")}: ${app.getVersion()}
+${i18n.geti18n("platform")}: ${process.platform}
+${i18n.geti18n("architecture")}: ${process.arch}
+${i18n.geti18n("workStatus")}: ${app.isPackaged ? "Product" : "Develop"} ${app.isPackaged & allowDevtools ? "with DevTools" : ""}
+${i18n.geti18n("copyright")}: Copyright © 2025 heStudio Community
+    `,
+        type: "none",
+        icon: path.join(__dirname, "../icon.png"),
+        buttons: [
+          process.platform == "win32" ? "Cancel" : i18n.geti18n("cancel"),
+          i18n.geti18n("checkUpdate"),
+          i18n.geti18n("viewInGithub"),
+        ],
+        cancelId: 0,
       })
       .then((response) => {
         if (response.response == 1) {
+          CheckUpdate(true);
+        } else if (response.response == 2) {
           shell.openExternal(
-            "https://github.com/hestudio-community/apksigner-gui/releases/latest"
+            "https://github.com/hestudio-community/apksigner-gui",
           );
         }
       });
-  }
-};
+  };
 
-const AboutPanel = () => {
-  dialog
-    .showMessageBox({
-      title: "APKSignerGUI",
-      message: "APKSignerGUI",
-      detail: `
-Version: ${app.getVersion()}
-Platform: ${process.platform}
-Architecture: ${process.arch}
-WorkStatus: ${app.isPackaged ? "Product" : "Develop"}
-Copyright: Copyright © 2025 heStudio Community
-    `,
-      type: "none",
-      icon: path.join(__dirname, "../icon.png"),
-      buttons: ["Close", "Check Update", "View in Github"],
-    })
-    .then((response) => {
-      if (response.response == 1) {
-        CheckUpdate(true);
-      } else if (response.response == 2) {
-        shell.openExternal(
-          "https://github.com/hestudio-community/apksigner-gui"
-        );
-      }
-    });
-};
-
-const createWindow = () => {
   if (process.platform == "darwin") {
     Menu.setApplicationMenu(
       Menu.buildFromTemplate([
@@ -185,13 +329,13 @@ const createWindow = () => {
           label: app.name,
           submenu: [
             {
-              label: "About APKSignerGUI",
+              label: i18n.geti18n("aboutApp"),
               click: () => {
                 AboutPanel();
               },
             },
             {
-              label: "Check Update",
+              label: i18n.geti18n("checkUpdate"),
               click: () => {
                 CheckUpdate(true);
               },
@@ -216,13 +360,13 @@ const createWindow = () => {
           submenu: [
             { role: "reload" },
             { role: "forceReload" },
-            ...(app.isPackaged ? [] : [{ role: "toggleDevTools" }]),
+            ...(allowDevtools ? [{ role: "toggleDevTools" }] : []),
             { type: "separator" },
             { role: "resetZoom" },
             { role: "zoomIn" },
             { role: "zoomOut" },
             { type: "separator" },
-            { role: "togglefullscreen" }
+            { role: "togglefullscreen" },
           ],
         },
         { role: "windowMenu" },
@@ -230,124 +374,106 @@ const createWindow = () => {
           role: "help",
           submenu: [
             {
-              label: "Report Issue",
+              label: i18n.geti18n("reportIssue"),
               click: () => {
                 shell.openExternal(
-                  "https://github.com/hestudio-community/apksigner-gui/issues"
+                  "https://github.com/hestudio-community/apksigner-gui/issues",
                 );
               },
             },
             {
-              label: "View in Github",
+              label: i18n.geti18n("viewInGithub"),
               click: () => {
                 shell.openExternal(
-                  "https://github.com/hestudio-community/apksigner-gui"
+                  "https://github.com/hestudio-community/apksigner-gui",
                 );
               },
             },
           ],
         },
-      ])
+      ]),
     );
   } else {
     Menu.setApplicationMenu(null);
   }
-  
-  // Get saved window size or use defaults
-  const windowConfig = config.get("windowSize") || {};
-  const defaultWidth = 800;
-  const defaultHeight = 600;
-  const minWidth = 640;
-  const minHeight = 480;
-  const maxWidth = 2560;
-  const maxHeight = 1440;
-  
-  // Validate and apply constraints with default restoration
-  let width = windowConfig.width || defaultWidth;
-  let height = windowConfig.height || defaultHeight;
-  let needsReset = false;
-  
-  // Check if values exceed expected ranges and restore defaults
-  if (width < minWidth || width > maxWidth) {
-    width = defaultWidth;
-    needsReset = true;
-  }
-  if (height < minHeight || height > maxHeight) {
-    height = defaultHeight;
-    needsReset = true;
-  }
-  
-  // Apply minimum constraints
-  width = Math.max(minWidth, width);
-  height = Math.max(minHeight, height);
-  
-  // Reset to defaults if values were out of range
-  if (needsReset) {
-    config.set("windowSize", { width: defaultWidth, height: defaultHeight });
-  }
-  
-  // Create the browser window.
-  mainWindow = new BrowserWindow({
-    width: width,
-    height: height,
-    center: true,
-    minWidth: minWidth,
-    minHeight: minHeight,
-    title: "APKSignerGUI",
-    webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
-      backgroundThrottling: false,
-      devTools: !app.isPackaged, // Disable devtools in production
-    },
-    // Add icon configuration
-    icon: path.join(__dirname, "../icon.png"),
-    titleBarStyle: "hiddenInset",
-    show: true,
-    frame: false,
-    transparent: process.platform === "darwin",
-    vibrancy: process.platform === "darwin" ? "under-window" : undefined,
-  });
-  
-  // Save window size when it changes
-  mainWindow.on('resize', () => {
-    if (!mainWindow.isMaximized() && !mainWindow.isMinimized()) {
-      const [currentWidth, currentHeight] = mainWindow.getSize();
-      config.set("windowSize", {
-        width: currentWidth,
-        height: currentHeight
-      });
+
+  ipcMain.handle("system:reloadLang", async (event) => {
+    i18n.reloadLang();
+    if (process.platform == "darwin") {
+      Menu.setApplicationMenu(
+        Menu.buildFromTemplate([
+          {
+            label: app.name,
+            submenu: [
+              {
+                label: i18n.geti18n("aboutApp"),
+                click: () => {
+                  AboutPanel();
+                },
+              },
+              {
+                label: i18n.geti18n("checkUpdate"),
+                click: () => {
+                  CheckUpdate(true);
+                },
+              },
+              { type: "separator" },
+              { role: "services" },
+              { type: "separator" },
+              { role: "hide" },
+              { role: "hideOthers" },
+              { role: "unhide" },
+              { type: "separator" },
+              { role: "quit" },
+            ],
+          },
+          {
+            label: "File",
+            submenu: [{ role: "close" }],
+          },
+          { role: "editMenu" },
+          {
+            label: "View",
+            submenu: [
+              { role: "reload" },
+              { role: "forceReload" },
+              ...(allowDevtools ? [{ role: "toggleDevTools" }] : []),
+              { type: "separator" },
+              { role: "resetZoom" },
+              { role: "zoomIn" },
+              { role: "zoomOut" },
+              { type: "separator" },
+              { role: "togglefullscreen" },
+            ],
+          },
+          { role: "windowMenu" },
+          {
+            role: "help",
+            submenu: [
+              {
+                label: i18n.geti18n("reportIssue"),
+                click: () => {
+                  shell.openExternal(
+                    "https://github.com/hestudio-community/apksigner-gui/issues",
+                  );
+                },
+              },
+              {
+                label: i18n.geti18n("viewInGithub"),
+                click: () => {
+                  shell.openExternal(
+                    "https://github.com/hestudio-community/apksigner-gui",
+                  );
+                },
+              },
+            ],
+          },
+        ]),
+      );
+    } else {
+      Menu.setApplicationMenu(null);
     }
   });
-
-  // Set Dock icon for Mac
-  if (process.platform === "darwin") {
-    const { nativeImage } = require("electron");
-    const image = nativeImage.createFromPath(
-      path.join(__dirname, "../build/icon.icns")
-    );
-    app.dock.setIcon(image);
-    console.log(path.join(__dirname, "../build/icon.icns"));
-  }
-
-  // and load the index.html of the app.
-  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
-  } else {
-    mainWindow.loadFile(
-      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
-    );
-  }
-  mainWindow.setHasShadow(true);
-};
-
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-app.whenReady().then(async () => {
-  // Initialize config and check version compatibility
-  const canProceed = await initializeConfig();
-  if (!canProceed) {
-    return; // App will quit if version check fails
-  }
 
   ipcMain.handle("dialog:openFile", async (event, filters) => {
     const { canceled, filePaths } = await dialog.showOpenDialog({
@@ -368,19 +494,19 @@ app.whenReady().then(async () => {
       return filePath;
     }
   });
-  ipcMain.handle("system:platfrom", async () => {
+  ipcMain.handle("system:platform", async () => {
     return process.platform;
   });
 
   // DevTools handler - only allowed in development mode
   ipcMain.handle("devtools:open", async () => {
-    if (mainWindow && !app.isPackaged) {
+    if (mainWindow && allowDevtools) {
       mainWindow.webContents.openDevTools();
     }
   });
 
   ipcMain.handle("system:isDevMode", async () => {
-    return !app.isPackaged;
+    return allowDevtools;
   });
 
   // Windows control handlers
@@ -470,87 +596,12 @@ app.whenReady().then(async () => {
     });
   });
 
-  ipcMain.handle("config:get", (event, key) => {
-    return new Promise((resolve, reject) => {
-      try {
-        const value = config.get(key);
-        resolve(value);
-      } catch (error) {
-        reject(error.message);
-      }
-    });
-  });
-  ipcMain.handle("config:set", (event, key, value) => {
-    return new Promise((resolve, reject) => {
-      try {
-        config.set(key, value);
-        resolve(true);
-      } catch (error) {
-        reject(error.message);
-      }
-    });
-  });
-  ipcMain.handle("config:del", (event, key) => {
-    return new Promise((resolve, reject) => {
-      try {
-        config.del(key);
-        resolve(true);
-      } catch (error) {
-        reject(error.message);
-      }
-    });
-  });
+  importConfigHandler();
 
-  ipcMain.handle("config:backup", async (event) => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const { canceled, filePath } = await dialog.showSaveDialog({
-          title: "Backup Configuration",
-          defaultPath: `config-backup-${new Date().toISOString().split('T')[0]}.json`,
-          filters: [
-            { name: "JSON Files", extensions: ["json"] },
-            { name: "All Files", extensions: ["*"] }
-          ]
-        });
-        if (!canceled && filePath) {
-          config.backup(filePath);
-          resolve(true);
-        } else {
-          resolve(false);
-        }
-      } catch (error) {
-        reject(error.message);
-      }
-    });
-  });
-
-  ipcMain.handle("config:restore", async (event) => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const { canceled, filePaths } = await dialog.showOpenDialog({
-          title: "Restore Configuration",
-          properties: ["openFile"],
-          filters: [
-            { name: "JSON Files", extensions: ["json"] },
-            { name: "All Files", extensions: ["*"] }
-          ]
-        });
-        if (!canceled && filePaths.length > 0) {
-          const success = await config.restore(filePaths[0]);
-          resolve(success);
-        } else {
-          resolve(false);
-        }
-      } catch (error) {
-        reject(error.message);
-      }
-    });
-  });
-
-  ipcMain.handle("system:checkJavaHome", (event) => {
+  ipcMain.handle("system:CheckJavaPath", (event, javapath) => {
     return new Promise((resolve, reject) => {
       try {
-        const isJavaHomeValid = CheckJavaHome();
+        const isJavaHomeValid = CheckJavaPath(javapath);
         if (isJavaHomeValid) {
           resolve(true);
         } else {
@@ -589,7 +640,7 @@ app.whenReady().then(async () => {
       country,
       keyalg,
       keysize,
-      sigalg
+      sigalg,
     ) => {
       return new Promise((resolve, reject) => {
         try {
@@ -607,14 +658,14 @@ app.whenReady().then(async () => {
             country,
             keyalg,
             keysize,
-            sigalg
+            sigalg,
           );
           resolve(result);
         } catch (error) {
           reject(error.message);
         }
       });
-    }
+    },
   );
 
   createWindow();

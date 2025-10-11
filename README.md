@@ -127,7 +127,7 @@ Thanks to [Crowdin](https://crowdin.com/) for providing an open-source license.
       config: {
         // ...
       },
-      platfrom: ["win32"],
+      platform: ["win32"],
    },
    ```
 
@@ -136,7 +136,7 @@ Thanks to [Crowdin](https://crowdin.com/) for providing an open-source license.
    ```javascript
    {
      name: "@electron-forge/maker-zip",
-     platfrom: ["win32"],
+     platform: ["win32"],
    }
    ```
 
