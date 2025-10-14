@@ -20,10 +20,54 @@
 }
 
 body {
-  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    "PingFang SC",
+    "Microsoft YaHei",
+    "Microsoft JhengHei",
+    "Noto Sans CJK SC",
+    "Noto Sans CJK TC",
+    Tahoma,
+    Geneva,
+    Verdana,
+    sans-serif;
   background-color: #f2f3f5;
   color: #303133;
   margin: 10px;
+}
+
+span {
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    "PingFang SC",
+    "Microsoft YaHei",
+    "Microsoft JhengHei",
+    "Noto Sans CJK SC",
+    "Noto Sans CJK TC",
+    Tahoma,
+    Geneva,
+    Verdana,
+    sans-serif;
+}
+
+input {
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    "PingFang SC",
+    "Microsoft YaHei",
+    "Microsoft JhengHei",
+    "Noto Sans CJK SC",
+    "Noto Sans CJK TC",
+    Tahoma,
+    Geneva,
+    Verdana,
+    sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
