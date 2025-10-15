@@ -103,6 +103,30 @@
           </el-select>
         </el-card>
         <el-card>
+          <div>
+            <text>{{ i18n.chooseFont }}</text>
+          </div>
+          <br />
+          <el-select
+            v-model="font.selected"
+            filterable
+            :loading="font.loading"
+            @visible-change="handleFontDropdown"
+            @change="changeFont"
+          >
+            <el-option
+              :label="i18n.systemFontDefault"
+              :value="font.systemDefaultValue"
+            />
+            <el-option
+              v-for="item in font.list"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-card>
+        <el-card>
           <div
             style="
               display: flex;
@@ -202,6 +226,14 @@
   border-radius: 8px;
 }
 
+.font-preview-wrapper {
+  margin-top: 12px;
+}
+
+.font-preview-text {
+  font-family: var(--app-font-preview, var(--app-font-stack));
+}
+
 /* 主页面和高级设置页面样式 */
 .mainPage,
 .advancedSetting {
@@ -230,6 +262,15 @@ export default {
         chooseLang: "",
         langlist: [],
       },
+      font: {
+        list: [],
+        selected: "__SYSTEM_DEFAULT__",
+        loading: false,
+        loaded: false,
+        systemDefaultValue: "__SYSTEM_DEFAULT__",
+      },
+      defaultFontStack:
+        'system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Microsoft JhengHei", "Noto Sans CJK SC", "Noto Sans CJK TC", Tahoma, Geneva, Verdana, sans-serif',
       i18n: {
         Setting: undefined,
         apksignerLocation: undefined,
@@ -249,6 +290,8 @@ export default {
         cacheCleanFailed: undefined,
         advancedSettingWarning: undefined,
         chooseLanguage: undefined,
+        chooseFont: undefined,
+        systemFontDefault: undefined,
         isChangeLanguageTo: undefined,
         back: undefined,
         openAutoCheckUpdate: undefined,
@@ -267,6 +310,205 @@ export default {
     };
   },
   methods: {
+    cleanupFontName(name) {
+      if (!name || typeof name !== "string") {
+        return "";
+      }
+      const withoutExtension = name
+        .replace(/\.(ttf|otf|ttc|otc|dfont|woff2?|pcf)$/i, "")
+        .replace(/\s*\(.*?\)\s*/g, " ")
+        .trim();
+      if (!withoutExtension) {
+        return "";
+      }
+      return withoutExtension.replace(/\s+/g, " ").trim();
+    },
+    formatFontLabel(name) {
+      const cleaned = this.cleanupFontName(name);
+      if (!cleaned) {
+        return typeof name === "string" ? name.trim() : "";
+      }
+      const replaced = cleaned
+        .replace(/[_-]+/g, " ")
+        .replace(/([a-z])([A-Z])/g, "$1 $2")
+        .replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2")
+        .replace(/\s+/g, " ")
+        .trim();
+      if (!replaced) {
+        return cleaned;
+      }
+      return replaced
+        .split(" ")
+        .map((word) => {
+          if (/^[A-Za-z]+$/.test(word)) {
+            if (/^[A-Z]+$/.test(word)) {
+              return word;
+            }
+            return word[0].toUpperCase() + word.slice(1).toLowerCase();
+          }
+          return word;
+        })
+        .join(" ");
+    },
+    normalizeFontKey(name) {
+      const cleaned = this.cleanupFontName(name);
+      if (!cleaned) {
+        return "";
+      }
+      return cleaned.toLowerCase().replace(/[\s_-]+/g, "");
+    },
+    handleFontDropdown(visible) {
+      if (visible && !this.font.loaded) {
+        this.loadFonts();
+      }
+    },
+    async loadFonts() {
+      if (this.font.loading || this.font.loaded) {
+        return;
+      }
+      this.font.loading = true;
+      try {
+        const fonts = await window.electronAPI.getSystemFonts();
+        if (Array.isArray(fonts)) {
+          const dedupe = new Map();
+          for (const entry of fonts) {
+            if (entry && typeof entry === "object" && entry.value) {
+              const value =
+                typeof entry.value === "string" ? entry.value.trim() : "";
+              if (!value) {
+                continue;
+              }
+              const labelCandidate =
+                entry.label && typeof entry.label === "string"
+                  ? entry.label.trim()
+                  : "";
+              const label =
+                labelCandidate || this.formatFontLabel(value) || value;
+              const key = this.normalizeFontKey(value);
+              if (!key) {
+                continue;
+              }
+              const existing = dedupe.get(key);
+              if (existing) {
+                if (
+                  existing.label === existing.value &&
+                  label &&
+                  label !== existing.label
+                ) {
+                  dedupe.set(key, { value, label });
+                }
+                continue;
+              }
+              dedupe.set(key, { value, label });
+            } else if (typeof entry === "string") {
+              const value = entry.trim();
+              if (!value) {
+                continue;
+              }
+              const key = this.normalizeFontKey(value);
+              if (!key) {
+                continue;
+              }
+              const label = this.formatFontLabel(value) || value;
+              const existing = dedupe.get(key);
+              if (existing) {
+                if (
+                  existing.label === existing.value &&
+                  label !== existing.label
+                ) {
+                  dedupe.set(key, { value, label });
+                }
+                continue;
+              }
+              dedupe.set(key, { value, label });
+            }
+          }
+          const items = Array.from(dedupe.values());
+          items.sort((a, b) =>
+            a.label.localeCompare(b.label, undefined, { sensitivity: "base" }),
+          );
+          let selectionChanged = false;
+          if (
+            this.font.selected &&
+            this.font.selected !== this.font.systemDefaultValue
+          ) {
+            const selectedValue = this.font.selected.trim();
+            if (selectedValue) {
+              const valueMap = new Map(
+                items.map((item) => [
+                  this.normalizeFontKey(item.value),
+                  item.value,
+                ]),
+              );
+              const matched = valueMap.get(
+                this.normalizeFontKey(selectedValue),
+              );
+              if (matched) {
+                if (matched !== this.font.selected) {
+                  this.font.selected = matched;
+                  selectionChanged = true;
+                }
+              } else {
+                items.unshift({
+                  value: selectedValue,
+                  label: this.formatFontLabel(selectedValue) || selectedValue,
+                });
+              }
+            }
+          }
+          this.font.list = items;
+          this.font.loaded = true;
+          if (selectionChanged) {
+            this.updateFontStack();
+            window.electronAPI.config.set("fontFamily", this.font.selected);
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        this.font.loading = false;
+      }
+    },
+    changeFont() {
+      this.updateFontStack();
+      if (this.font.selected === this.font.systemDefaultValue) {
+        window.electronAPI.config.del("fontFamily");
+      } else {
+        window.electronAPI.config.set("fontFamily", this.font.selected);
+      }
+    },
+    updateFontStack() {
+      const stack = this.createFontStack(this.font.selected);
+      document.documentElement.style.setProperty("--app-font-stack", stack);
+      document.documentElement.style.setProperty("--el-font-family", stack);
+      document.documentElement.style.setProperty("--app-font-preview", stack);
+    },
+    createFontStack(fontName) {
+      if (!fontName || fontName === this.font.systemDefaultValue) {
+        return this.defaultFontStack;
+      }
+      return `${this.wrapFontName(fontName)}, ${this.defaultFontStack}`;
+    },
+    wrapFontName(name) {
+      if (!name) {
+        return "";
+      }
+      const trimmed = name.trim();
+      if (!trimmed) {
+        return "";
+      }
+      if (
+        (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+        (trimmed.startsWith("'") && trimmed.endsWith("'"))
+      ) {
+        return trimmed;
+      }
+      const escaped = trimmed.replace(/"/g, '\\"');
+      if (/\s/.test(escaped) || escaped.includes("'")) {
+        return `"${escaped}"`;
+      }
+      return escaped;
+    },
     open_devtools() {
       window.electronAPI.openDevtools();
     },
@@ -484,6 +726,14 @@ export default {
     this.lang.chooseLang = window.electronAPI.config.get("lang");
     this.lang.langlist = Object.values(supportLangList);
     this.AutoCheckUpdate = window.electronAPI.config.get("checkUpdate");
+    const savedFont = window.electronAPI.config.get("fontFamily");
+    if (savedFont && typeof savedFont === "string" && savedFont.trim()) {
+      this.font.selected = savedFont;
+    } else {
+      this.font.selected = this.font.systemDefaultValue;
+    }
+    this.updateFontStack();
+    this.loadFonts();
     window.electronAPI.isDevMode().then((data) => (this.isDevMode = data));
   },
 };
