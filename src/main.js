@@ -53,7 +53,6 @@ program.parse();
 const options = program.opts();
 let allowDevtools = false;
 if (options.allowDevtools || !app.isPackaged) {
-  console.log(options);
   allowDevtools = true;
 }
 

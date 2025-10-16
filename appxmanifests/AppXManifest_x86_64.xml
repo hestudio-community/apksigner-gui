@@ -2,7 +2,7 @@
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities">
-  <Identity Name="heStudioCommunity.APKSignerGUI" ProcessorArchitecture="x64" Publisher="CN=73AC1CCD-0F7C-48FE-A64D-F404735487C1" Version="1.4.0.0" />
+  <Identity Name="heStudioCommunity.APKSignerGUI" ProcessorArchitecture="x64" Publisher="CN=73AC1CCD-0F7C-48FE-A64D-F404735487C1" Version="1.4.1.0" />
   <Properties>
     <DisplayName>APKSignerGUI</DisplayName>
     <PublisherDisplayName>heStudio Community</PublisherDisplayName>
@@ -15,7 +15,7 @@
     <Resource Language="en-us" />
   </Resources>
   <Dependencies>
-    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26100.0" />
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26200.0" />
   </Dependencies>
   <Capabilities>
     <rescap:Capability Name="runFullTrust"/>
