@@ -8,3 +8,79 @@
 
 @use "element-plus/theme-chalk/src/index.scss" as *;
 @use "element-plus/theme-chalk/src/dark/css-vars.scss" as *;
+
+.el-card {
+  border-radius: 15px !important;
+  margin: 10px;
+}
+
+.el-input__wrapper {
+  border-radius: 10px;
+}
+
+.el-input-group__append {
+  border-top-right-radius: 10px !important;
+  border-bottom-right-radius: 10px !important;
+}
+
+.el-input-number__decrease {
+  border-top-left-radius: 10px !important;
+  border-bottom-left-radius: 10px !important;
+  margin-top: 5.5px;
+}
+
+.el-input-number__increase {
+  border-top-right-radius: 10px !important;
+  border-bottom-right-radius: 10px !important;
+  margin-top: 5.5px;
+}
+
+.el-button {
+  border-radius: 10px !important;
+}
+
+.el-message {
+  border-radius: 15px !important;
+}
+
+.el-overlay {
+  -webkit-backdrop-filter: blur(6.18px);
+  backdrop-filter: blur(6.18px);
+}
+
+.el-message-box {
+  border-radius: 15px !important;
+}
+
+.el-dialog {
+  border-radius: 15px !important;
+}
+
+.element-rotate {
+  transition: transform 0.618s ease;
+  transform: rotate(360deg);
+}
+
+.el-select__wrapper {
+  border-radius: 10px !important;
+}
+
+.el-scrollbar__view {
+  border-radius: 15px !important;
+}
+
+.el-popper.is-pure {
+  border-radius: 15px !important;
+}
+
+.el-dropdown-menu__item {
+  border-radius: 15px !important;
+}
+
+.el-popper__arrow {
+  left: 80% !important;
+}
+
+.el-select-dropdown__item {
+  border-radius: 10px !important;
+}

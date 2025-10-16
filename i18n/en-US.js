@@ -58,6 +58,8 @@ export default {
   showLog: "Show log",
   sign: "Sign",
   chooseLanguage: "Choose language",
+  chooseFont: "Choose font",
+  systemFontDefault: "System default",
   isChangeLanguageTo: (lang) => {
     return `Do you want to switch the language to ${lang}?`;
   },

@@ -57,6 +57,8 @@ export default {
   showLog: "顯示日誌",
   sign: "簽名",
   chooseLanguage: "選擇語言",
+  chooseFont: "選擇字體",
+  systemFontDefault: "系統預設",
   isChangeLanguageTo: (lang) => {
     return `是否將語言切換為 ${lang} ？`;
   },

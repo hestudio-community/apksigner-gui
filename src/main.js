@@ -16,6 +16,8 @@ import fs from "node:fs";
 import { warn, error } from "./utils/alert";
 import { internationalization } from "./utils/i18nServices/server";
 import fixPath from "fix-path";
+import { getSystemFonts } from "./utils/systemFonts";
+import { Command } from "commander";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -38,8 +40,19 @@ if (!gotTheLock) {
   });
 }
 
+// argv
+const program = new Command();
+program
+  .name("APKSignerGUI")
+  .description("Simple but complete APK signing tool.")
+  .version(app.getVersion());
+program.option("--allow-devtools", "Allow use devtools in Production mode.");
+program.showHelpAfterError("(add --help for additional information)");
+program.parse();
+
+const options = program.opts();
 let allowDevtools = false;
-if (process.argv.includes("--allow-devtools") || !app.isPackaged) {
+if (options.allowDevtools || !app.isPackaged) {
   allowDevtools = true;
 }
 
@@ -496,6 +509,14 @@ ${i18n.geti18n("copyright")}: Copyright © 2025 heStudio Community
   });
   ipcMain.handle("system:platform", async () => {
     return process.platform;
+  });
+  ipcMain.handle("system:getFonts", async () => {
+    try {
+      return await getSystemFonts();
+    } catch (error) {
+      warn(`Failed to list fonts: ${error.message}`);
+      return [];
+    }
   });
 
   // DevTools handler - only allowed in development mode

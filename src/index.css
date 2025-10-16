@@ -19,10 +19,40 @@
   font-variation-settings: "wght" 300;
 }
 
+:root {
+  --app-font-stack:
+    system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei",
+    "Microsoft JhengHei", "Noto Sans CJK SC", "Noto Sans CJK TC", Tahoma,
+    Geneva, Verdana, sans-serif;
+  --el-font-family: var(--app-font-stack);
+  --app-font-preview: var(--app-font-stack);
+}
+
+html {
+  font-family: var(--app-font-stack);
+}
+
 body {
+  font-family: var(--app-font-stack);
   background-color: #f2f3f5;
   color: #303133;
   margin: 10px;
+}
+
+#app {
+  font-family: var(--app-font-stack);
+}
+
+span {
+  font-family: var(--app-font-stack);
+}
+
+input {
+  font-family: var(--app-font-stack);
+}
+
+text {
+  font-family: var(--app-font-stack);
 }
 
 @media (prefers-color-scheme: dark) {
