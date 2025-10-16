@@ -503,7 +503,7 @@ export default {
       ) {
         return trimmed;
       }
-      const escaped = trimmed.replace(/"/g, '\\"');
+      const escaped = trimmed.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
       if (/\s/.test(escaped) || escaped.includes("'")) {
         return `"${escaped}"`;
       }
