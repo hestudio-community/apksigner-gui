@@ -1,11 +1,16 @@
 import path from "node:path";
 import fs from "node:fs";
 import { spawnSync } from "node:child_process";
+import { _log } from "./log";
+
+const logger = new _log("CreateKey");
 
 function CheckJavaPath(javapath) {
+  logger.startload("CheckJavaPath");
   if (javapath) {
     try {
       if (!fs.existsSync(javapath)) {
+        logger.endload("CheckJavaPath");
         return false;
       }
       const javaBinDir = path.dirname(javapath);
@@ -16,11 +21,14 @@ function CheckJavaPath(javapath) {
         keytoolPath = path.join(javaBinDir, "keytool");
       }
       if (!fs.existsSync(keytoolPath)) {
+        logger.endload("CheckJavaPath");
         return false;
       }
       const result = spawnSync(keytoolPath, ["-version"], { stdio: "pipe" });
+      logger.endload("CheckJavaPath");
       return result.status === 0;
     } catch (error) {
+      logger.endload("CheckJavaPath");
       return false;
     }
   }
@@ -29,11 +37,14 @@ function CheckJavaPath(javapath) {
     try {
       const result = spawnSync("keytool", ["-version"], { stdio: "pipe" });
       if (result.status === 0) {
+        logger.endload("CheckJavaPath");
         return true;
       } else {
+        logger.endload("CheckJavaPath");
         return false;
       }
     } catch (error) {
+      logger.endload("CheckJavaPath");
       return false;
     }
   } else {
@@ -46,6 +57,7 @@ function CheckJavaPath(javapath) {
       javaPath = path.join(javaHome, "bin", "java");
       keytoolPath = path.join(javaHome, "bin", "keytool");
     }
+    logger.endload("CheckJavaPath");
     return fs.existsSync(javaPath) && fs.existsSync(keytoolPath);
   }
 }
@@ -67,6 +79,7 @@ export function CreateKey(
   keysize,
   sigalg,
 ) {
+  logger.startload("CreateKey");
   let keytoolPath;
   if (fs.existsSync(process.env.JAVA_HOME)) {
     if (process.platform == "win32") {
@@ -81,9 +94,17 @@ export function CreateKey(
       if (result.status === 0) {
         keytoolPath = "keytool";
       } else {
+        logger.endload("CreateKey");
+        logger.warn(
+          "keytool is not found, make sure to add Java's bin directory to the PATH or set JAVA_HOME.",
+        );
         return "keytool is not found, make sure to add Java's bin directory to the PATH or set JAVA_HOME.";
       }
     } catch (error) {
+      logger.endload("CreateKey");
+      logger.warn(
+        "keytool is not found, make sure to add Java's bin directory to the PATH or set JAVA_HOME.",
+      );
       return "keytool is not found, make sure to add Java's bin directory to the PATH or set JAVA_HOME.";
     }
   }
@@ -114,6 +135,8 @@ export function CreateKey(
   try {
     const result = spawnSync(keytoolPath, args, { stdio: "pipe" });
     if (result.error) {
+      logger.endload("CreateKey");
+      logger.warn(result.error.message);
       return result.error.message;
     }
     if (result.status !== 0) {
@@ -123,8 +146,11 @@ export function CreateKey(
         errorOutput ? ": " + errorOutput : ""
       }`;
     }
+    logger.endload("CreateKey");
     return true;
   } catch (error) {
+    logger.endload("CreateKey");
+    logger.warn(error.message);
     return error.message;
   }
 }

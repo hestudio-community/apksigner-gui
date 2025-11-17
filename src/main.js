@@ -18,6 +18,12 @@ import { internationalization } from "./utils/i18nServices/server";
 import fixPath from "fix-path";
 import { getSystemFonts } from "./utils/systemFonts";
 import { Command } from "commander";
+import { _log } from "./utils/log";
+import { CheckUpdate } from "./utils/CheckUpdate";
+
+const logger = new _log("main");
+
+logger.info("Run Start.");
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -25,11 +31,13 @@ if (started) {
 }
 
 // Ensure only one instance of the application is running
+logger.startload("Process lock");
 const gotTheLock = app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
   const i18n = new internationalization();
   error(i18n.geti18n("anotherAlreadyRunning"));
+  logger.error(i18n.geti18n("anotherAlreadyRunning"));
 } else {
   app.on("second-instance", (event, commandLine, workingDirectory) => {
     // When a second instance is launched, focus on the main window
@@ -39,8 +47,10 @@ if (!gotTheLock) {
     }
   });
 }
+logger.endload("Process lock");
 
 // argv
+logger.startload("CLI");
 const program = new Command();
 program
   .name("APKSignerGUI")
@@ -49,6 +59,7 @@ program
 program.option("--allow-devtools", "Allow use devtools in Production mode.");
 program.showHelpAfterError("(add --help for additional information)");
 program.parse();
+logger.endload("CLI");
 
 const options = program.opts();
 let allowDevtools = false;
@@ -56,11 +67,14 @@ if (options.allowDevtools || !app.isPackaged) {
   allowDevtools = true;
 }
 
+logger.startload("fixPath");
 fixPath();
+logger.endload("fixPath");
 
 const storage = new Storage();
 const config = new Config();
 
+logger.startload("initializeConfig");
 const initializeConfig = async () => {
   const versionCheckResult = await config.checkVersionCompatibility();
   if (!versionCheckResult) {
@@ -69,12 +83,14 @@ const initializeConfig = async () => {
 
   return true;
 };
+logger.endload("initializeConfig");
 
 // Save reference to mainWindow for use in IPC handlers
 let mainWindow = null;
 
 const createWindow = () => {
   // Get saved window size or use defaults
+  logger.startload("createWindow");
   const windowConfig = config.get("windowSize") || {};
   const defaultWidth = 800;
   const defaultHeight = 600;
@@ -156,6 +172,7 @@ const createWindow = () => {
     );
   }
   mainWindow.setHasShadow(true);
+  logger.endload("createWindow");
 };
 
 // This method will be called when Electron has finished
@@ -168,140 +185,6 @@ app.whenReady().then(async () => {
   }
 
   const i18n = await new internationalization();
-
-  const CheckUpdate = (forceShow) => {
-    fetch(
-      "https://api.github.com/repos/hestudio-community/apksigner-gui/releases/latest",
-    )
-      .then(async (response) => {
-        const data = await response.json();
-        if (data.name == `v${app.getVersion()}`) {
-          if (forceShow) {
-            dialog
-              .showMessageBox({
-                title: "APKSignerGUI",
-                message: "APKSignerGUI",
-                detail: i18n.geti18n("latestVersion"),
-                type: "info",
-                buttons: [
-                  process.platform == "win32" ? "Yes" : i18n.geti18n("confirm"),
-                  i18n.geti18n("viewInGithub"),
-                ],
-                cancelId: 0,
-              })
-              .then((response) => {
-                if (response.response == 1) {
-                  shell.openExternal(
-                    "https://github.com/hestudio-community/apksigner-gui/releases/latest",
-                  );
-                }
-              });
-          }
-        } else {
-          dialog
-            .showMessageBox({
-              title: "APKSignerGUI",
-              message: "APKSignerGUI",
-              detail: i18n.geti18n("newVersionAvailable")(data.name),
-              type: "info",
-              buttons: [
-                process.platform == "win32" ? "Cancel" : i18n.geti18n("cancel"),
-                ...(process.platform == "darwin" || process.platform == "win32"
-                  ? [i18n.geti18n("downloadNOW")]
-                  : []),
-                i18n.geti18n("viewInGithub"),
-              ],
-              cancelId: 0,
-            })
-            .then((response) => {
-              if (response.response == 1) {
-                if (process.platform == "darwin" && process.arch == "arm64") {
-                  shell.openExternal(
-                    `https://github.com/hestudio-community/apksigner-gui/releases/download/${
-                      data.name
-                    }/apksignergui_${String(data.name).replace(
-                      "v",
-                      "",
-                    )}_arm64.dmg`,
-                  );
-                } else if (
-                  process.platform == "darwin" &&
-                  process.arch == "amd64"
-                ) {
-                  shell.openExternal(
-                    `https://github.com/hestudio-community/apksigner-gui/releases/download/${
-                      data.name
-                    }/apksignergui_${String(data.name).replace(
-                      "v",
-                      "",
-                    )}_amd64.dmg`,
-                  );
-                } else if (
-                  process.platform == "win32" &&
-                  process.arch == "x64"
-                ) {
-                  shell.openExternal(
-                    `https://github.com/hestudio-community/apksigner-gui/releases/download/${
-                      data.name
-                    }/apksignergui_${String(data.name).replace(
-                      "v",
-                      "",
-                    )}_amd64.msi`,
-                  );
-                } else if (
-                  process.platform == "win32" &&
-                  process.arch == "arm64"
-                ) {
-                  shell.openExternal(
-                    `https://github.com/hestudio-community/apksigner-gui/releases/download/${
-                      data.name
-                    }/apksignergui_${String(data.name).replace(
-                      "v",
-                      "",
-                    )}_arm64.msi`,
-                  );
-                } else {
-                  shell.openExternal(
-                    "https://github.com/hestudio-community/apksigner-gui/releases/latest",
-                  );
-                }
-              } else if (response.response == 2) {
-                shell.openExternal(
-                  "https://github.com/hestudio-community/apksigner-gui/releases/latest",
-                );
-              }
-            });
-        }
-      })
-      .catch((e) => {
-        console.log(e);
-        if (forceShow) {
-          warn(undefined, i18n.geti18n("checkUpdateFailed"));
-        }
-      });
-
-    if (app.runningUnderARM64Translation) {
-      dialog
-        .showMessageBox({
-          title: "APKSignerGUI",
-          message: "APKSignerGUI",
-          detail: i18n.geti18n("warnInARM64WithX86Program"),
-          type: "warning",
-          buttons: [
-            process.platform == "win32" ? "Cancel" : i18n.geti18n("cancel"),
-            i18n.geti18n("viewInGithub"),
-          ],
-          cancelId: 0,
-        })
-        .then((response) => {
-          if (response.response == 1) {
-            shell.openExternal(
-              "https://github.com/hestudio-community/apksigner-gui/releases/latest",
-            );
-          }
-        });
-    }
-  };
 
   const AboutPanel = () => {
     dialog

@@ -28,18 +28,19 @@
     "@electron-forge/plugin-fuses": "7.10.2",
     "@electron-forge/plugin-vite": "7.10.2",
     "@electron/fuses": "1.8.0",
-    "electron": "38.3.0",
-    "prettier": "3.6.2",
-    "vite": "7.1.10",
     "@vitejs/plugin-vue": "6.0.1",
-    "electron-squirrel-startup": "^1.0.1"
+    "electron": "38.3.0",
+    "electron-squirrel-startup": "^1.0.1",
+    "prettier": "3.6.2",
+    "vite": "7.1.10"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
     "commander": "^14.0.1",
-    "sass-embedded": "1.93.2",
+    "dayjs": "^1.11.19",
     "element-plus": "^2.11.4",
     "fix-path": "^5.0.0",
+    "sass-embedded": "1.93.2",
     "vue": "^3.5.22"
   }
 }
