@@ -3,6 +3,12 @@
  * @description This file is used to standardize and store logs for debugging purposes.
  */
 import dayjs from "dayjs";
+import { app } from "electron";
+import path from "node:path";
+import fs from "node:fs";
+
+if (!process.env.APKSIGNERGUI_STARTINFO)
+  process.env.APKSIGNERGUI_STARTINFO = `${dayjs().format()}-${app.getVersion()}-${process.platform}-${process.arch}`;
 
 export class _log {
   /**
@@ -12,30 +18,64 @@ export class _log {
   constructor(module) {
     this.module = module;
     this._loadTimers = Object.create(null);
+
+    if (process.platform == "win32") {
+      this.logdir = path.join(process.env.APPDATA, "APKSignerGUI", "logs");
+    } else if (process.platform == "linux") {
+      this.logdir = path.join(
+        process.env.HOME,
+        ".config",
+        "APKSignerGUI",
+        "logs"
+      );
+    } else if (process.platform == "darwin") {
+      this.logdir = path.join(
+        process.env.HOME,
+        "/Library/Application Support",
+        "APKSignerGUI",
+        "logs"
+      );
+    }
+    this.logfile = path.join(
+      this.logdir,
+      `${process.env.APKSIGNERGUI_STARTINFO}.log`
+    );
+    if (!fs.existsSync(this.logdir)) fs.mkdirSync(this.logdir);
+    if (!fs.existsSync(this.logfile)) fs.writeFileSync(this.logfile, "");
   }
 
   log(log) {
-    console.log(`[${dayjs().format()}][${this.module}][log] ${log}`);
+    const l = `[${dayjs().format()}][${this.module}][log] ${log}`;
+    fs.appendFileSync(this.logfile, `${l}\n`);
+    console.log(l);
   }
 
   debug(log) {
-    console.debug(`[${dayjs().format()}][${this.module}][debug] ${log}`);
+    const l = `[${dayjs().format()}][${this.module}][debug] ${log}`;
+    fs.appendFileSync(this.logfile, `${l}\n`);
+    console.debug(l);
   }
   info(log) {
-    console.info(`[${dayjs().format()}][${this.module}][info] ${log}`);
+    const l = `[${dayjs().format()}][${this.module}][info] ${log}`;
+    fs.appendFileSync(this.logfile, `${l}\n`);
+    console.info(l);
   }
 
   warn(log) {
-    console.warn(`[${dayjs().format()}][${this.module}][warn] ${log}`);
+    const l = `[${dayjs().format()}][${this.module}][warn] ${log}`;
+    fs.appendFileSync(this.logfile, `${l}\n`);
+    console.warn(l);
   }
 
   error(log) {
-    console.error(`[${dayjs().format()}][${this.module}][error] ${log}`);
+    const l = `[${dayjs().format()}][${this.module}][error] ${log}`;
+    fs.appendFileSync(this.logfile, `${l}\n`);
+    console.error(l);
   }
 
   startload(submodule) {
     this._loadTimers[submodule] = performance.now();
-    this.info(`Loading ${submodule}`);
+    this.log(`Loading ${submodule}`);
   }
 
   endload(submodule) {
