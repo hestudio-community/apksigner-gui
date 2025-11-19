@@ -20,6 +20,9 @@ import { getSystemFonts } from "./utils/systemFonts";
 import { Command } from "commander";
 import { _log } from "./utils/log";
 import { CheckUpdate } from "./utils/CheckUpdate";
+import init from "./utils/init";
+
+init();
 
 const logger = new _log("main");
 

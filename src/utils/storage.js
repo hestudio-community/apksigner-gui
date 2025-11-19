@@ -37,13 +37,6 @@ export class Storage {
         "APKSignerGUI",
       );
     }
-
-    if (!fs.existsSync(this.tmp)) {
-      fs.mkdirSync(this.tmp, { recursive: true });
-    }
-    if (!fs.existsSync(this.appdata)) {
-      fs.mkdirSync(this.appdata, { recursive: true });
-    }
     logger.endload("storage");
   }
 

@@ -6,9 +6,10 @@ import dayjs from "dayjs";
 import { app } from "electron";
 import path from "node:path";
 import fs from "node:fs";
+import init from "./init";
 
 if (!process.env.APKSIGNERGUI_STARTINFO)
-  process.env.APKSIGNERGUI_STARTINFO = `${dayjs().format()}-${app.getVersion()}-${process.platform}-${process.arch}`;
+  process.env.APKSIGNERGUI_STARTINFO = `${Date.now()}-${app.getVersion()}-${process.platform}-${process.arch}`;
 
 export class _log {
   /**
@@ -26,20 +27,21 @@ export class _log {
         process.env.HOME,
         ".config",
         "APKSignerGUI",
-        "logs"
+        "logs",
       );
     } else if (process.platform == "darwin") {
       this.logdir = path.join(
         process.env.HOME,
         "/Library/Application Support",
         "APKSignerGUI",
-        "logs"
+        "logs",
       );
     }
     this.logfile = path.join(
       this.logdir,
-      `${process.env.APKSIGNERGUI_STARTINFO}.log`
+      `${process.env.APKSIGNERGUI_STARTINFO}.log`,
     );
+    init();
     if (!fs.existsSync(this.logdir)) fs.mkdirSync(this.logdir);
     if (!fs.existsSync(this.logfile)) fs.writeFileSync(this.logfile, "");
   }
