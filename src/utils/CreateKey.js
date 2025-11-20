@@ -57,8 +57,10 @@ function CheckJavaPath(javapath) {
       javaPath = path.join(javaHome, "bin", "java");
       keytoolPath = path.join(javaHome, "bin", "keytool");
     }
+    const result = fs.existsSync(javaPath) && fs.existsSync(keytoolPath);
+    logger.info(`CheckJavaPath: ${result}`);
     logger.endload("CheckJavaPath");
-    return fs.existsSync(javaPath) && fs.existsSync(keytoolPath);
+    return result;
   }
 }
 export { CheckJavaPath };

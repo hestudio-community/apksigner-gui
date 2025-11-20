@@ -23,10 +23,7 @@ import { CheckUpdate } from "./utils/CheckUpdate";
 import init from "./utils/init";
 
 init();
-
 const logger = new _log("main");
-
-logger.info("Run Start.");
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -68,6 +65,7 @@ const options = program.opts();
 let allowDevtools = false;
 if (options.allowDevtools || !app.isPackaged) {
   allowDevtools = true;
+  logger.warn("Devtools enabled.");
 }
 
 logger.startload("fixPath");
@@ -109,10 +107,12 @@ const createWindow = () => {
   if (width < minWidth) {
     width = defaultWidth;
     needsReset = true;
+    logger.warn("width is less than minWidth and has been reset.");
   }
   if (height < minHeight) {
     height = defaultHeight;
     needsReset = true;
+    logger.warn("height is less than minHeight and has been reset.");
   }
 
   // Apply minimum constraints
@@ -163,7 +163,6 @@ const createWindow = () => {
       path.join(__dirname, "../build/icon.icns"),
     );
     app.dock.setIcon(image);
-    console.log(path.join(__dirname, "../build/icon.icns"));
   }
 
   // and load the index.html of the app.
@@ -181,6 +180,8 @@ const createWindow = () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.whenReady().then(async () => {
+  logger.info("Run Start.");
+
   // Initialize config and check version compatibility
   const canProceed = await initializeConfig();
   if (!canProceed) {
@@ -190,6 +191,7 @@ app.whenReady().then(async () => {
   const i18n = await new internationalization();
 
   const AboutPanel = () => {
+    logger.info("Show AboutPanel.");
     dialog
       .showMessageBox({
         title: "APKSignerGUI",
@@ -222,6 +224,7 @@ ${i18n.geti18n("copyright")}: Copyright © 2025 heStudio Community
   };
 
   if (process.platform == "darwin") {
+    logger.startload("setApplicationMenu");
     Menu.setApplicationMenu(
       Menu.buildFromTemplate([
         {
@@ -292,6 +295,7 @@ ${i18n.geti18n("copyright")}: Copyright © 2025 heStudio Community
         },
       ]),
     );
+    logger.endload("setApplicationMenu");
   } else {
     Menu.setApplicationMenu(null);
   }
@@ -299,6 +303,7 @@ ${i18n.geti18n("copyright")}: Copyright © 2025 heStudio Community
   ipcMain.handle("system:reloadLang", async (event) => {
     i18n.reloadLang();
     if (process.platform == "darwin") {
+      logger.startload("setApplicationMenu");
       Menu.setApplicationMenu(
         Menu.buildFromTemplate([
           {
@@ -369,31 +374,37 @@ ${i18n.geti18n("copyright")}: Copyright © 2025 heStudio Community
           },
         ]),
       );
+      logger.endload("setApplicationMenu");
     } else {
       Menu.setApplicationMenu(null);
     }
   });
 
   ipcMain.handle("dialog:openFile", async (event, filters) => {
+    logger.info(`showOpenDialog: ${JSON.stringify(filters)}`);
     const { canceled, filePaths } = await dialog.showOpenDialog({
       title: "APKSignerGUI",
       properties: ["openFile", "showHiddenFiles"],
       filters: filters,
     });
     if (!canceled) {
+      logger.info(`showOpenDialog: Select ${filePaths[0]}`);
       return filePaths[0];
     }
   });
   ipcMain.handle("dialog:saveFile", async (event, filters) => {
+    logger.info(`showSaveDialog: ${JSON.stringify(filters)}`);
     const { canceled, filePath } = await dialog.showSaveDialog({
       title: "APKSignerGUI",
       filters: filters,
     });
     if (!canceled) {
+      logger.info(`showSaveDialog: Select ${filePath}`);
       return filePath;
     }
   });
   ipcMain.handle("system:platform", async () => {
+    logger.info("Get platform.");
     return process.platform;
   });
   ipcMain.handle("system:getFonts", async () => {
@@ -408,27 +419,37 @@ ${i18n.geti18n("copyright")}: Copyright © 2025 heStudio Community
   // DevTools handler - only allowed in development mode
   ipcMain.handle("devtools:open", async () => {
     if (mainWindow && allowDevtools) {
+      logger.info("openDevTools");
       mainWindow.webContents.openDevTools();
+    } else {
+      warn((msg = "openDevTools does not have permission."));
     }
   });
 
   ipcMain.handle("system:isDevMode", async () => {
+    logger.info("Check allowDevtools.");
     return allowDevtools;
   });
 
   // Windows control handlers
   if (process.platform != "darwin") {
     ipcMain.handle("windows:close", async () => {
+      logger.info("Click close.");
       app.quit();
     });
     ipcMain.handle("windows:minimize", async () => {
-      if (mainWindow) mainWindow.minimize();
+      if (mainWindow) {
+        logger.info("Click minimize.");
+        mainWindow.minimize();
+      }
     });
     ipcMain.handle("windows:maximize", async () => {
       if (!mainWindow) return;
       if (mainWindow.isMaximized()) {
+        logger.info("Click unmaximize.");
         mainWindow.unmaximize();
       } else {
+        logger.info("Click maximize.");
         mainWindow.maximize();
       }
     });
@@ -443,10 +464,12 @@ ${i18n.geti18n("copyright")}: Copyright © 2025 heStudio Community
   });
 
   ipcMain.handle("windows:isMaximized", async () => {
+    logger.info("Check isMaximized.");
     return mainWindow ? mainWindow.isMaximized() : false;
   });
 
   ipcMain.handle("windows:isFullScreen", async () => {
+    logger.info("Check isFullScreen.");
     return mainWindow ? mainWindow.isFullScreen() : false;
   });
 
@@ -474,6 +497,8 @@ ${i18n.geti18n("copyright")}: Copyright © 2025 heStudio Community
 
   ipcMain.handle("system:shell", (event, shellCommand) => {
     return new Promise((resolve, reject) => {
+      logger.startload("shell");
+      logger.info(`Shell Command: ${shellCommand}`);
       const shell = spawn(shellCommand, {
         shell: true,
       });
@@ -491,13 +516,21 @@ ${i18n.geti18n("copyright")}: Copyright © 2025 heStudio Community
 
       shell.on("close", (code) => {
         if (code === 0) {
+          logger.info(`Shell STDOUT: ${stdout}`);
+          logger.endload("shell");
           resolve(stdout);
         } else {
+          logger.error(
+            `Shell STDERR: ${stderr || `Process exited with code ${code}`}`,
+          );
+          logger.endload("shell");
           reject(stderr || `Process exited with code ${code}`);
         }
       });
 
       shell.on("error", (err) => {
+        logger.error(`Shell Error: ${err.message}`);
+        logger.endload("shell");
         reject(`Failed to start command: ${err.message}`);
       });
     });
@@ -522,9 +555,15 @@ ${i18n.geti18n("copyright")}: Copyright © 2025 heStudio Community
 
   ipcMain.handle("system:checkFileExists", (event, filePath) => {
     return new Promise((resolve, reject) => {
+      logger.startload("checkFileExists");
       try {
-        resolve(fs.existsSync(filePath));
+        const result = fs.existsSync(filePath);
+        logger.info(`Check file ${filePath} exist: ${result}`);
+        logger.endload("checkFileExists");
+        resolve(result);
       } catch (error) {
+        warn((msg = error.message));
+        logger.endload("checkFileExists");
         reject(error.message);
       }
     });
@@ -575,10 +614,12 @@ ${i18n.geti18n("copyright")}: Copyright © 2025 heStudio Community
     },
   );
 
+  logger.log("createWindow");
   createWindow();
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
+      logger.log("createWindow");
       createWindow();
     }
   });
@@ -586,6 +627,7 @@ ${i18n.geti18n("copyright")}: Copyright © 2025 heStudio Community
 
 // Remaining code stays unchanged
 app.on("window-all-closed", () => {
+  logger.info("Window all closed.");
   if (process.platform !== "darwin") {
     app.quit();
   }
