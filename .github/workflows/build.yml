@@ -68,10 +68,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "24"
-          cache: "npm"
+          cache: "pnpm"
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install
 
       - name: Install WiX Toolset (Windows only)
         if: matrix.platform == 'win32'
@@ -82,7 +87,7 @@ jobs:
           echo "C:\wix" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Build application
-        run: npm run make
+        run: pnpm run make
         env:
           ELECTRON_BUILDER_ARCH: ${{ matrix.arch }}
 
