@@ -19,6 +19,7 @@ jobs:
   build:
     needs: get-version
     strategy:
+      fail-fast: false
       matrix:
         include:
           # Windows builds
