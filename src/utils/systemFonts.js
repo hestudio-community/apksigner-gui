@@ -137,7 +137,7 @@ async function listWindowsFonts() {
   const fonts = new Set();
   try {
     const { stdout } = await execAsync(
-      'powershell -NoProfile -Command "Add-Type -AssemblyName System.Drawing; [System.Drawing.Text.InstalledFontCollection]::new().Families | ForEach-Object { $_.Name }"',
+      'powershell -NoProfile -Command "[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; Add-Type -AssemblyName System.Drawing; [System.Drawing.Text.InstalledFontCollection]::new().Families | ForEach-Object { $_.Name }"',
     );
     stdout
       .split(/\r?\n/)
@@ -146,23 +146,24 @@ async function listWindowsFonts() {
       .forEach((name) => fonts.add(name));
   } catch (error) {
     const regSources = [
-      '"HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts"',
-      '"HKCU\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts"',
+      "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts",
+      "HKCU:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts",
     ];
     for (const source of regSources) {
       try {
-        const { stdout } = await execAsync(`reg query ${source}`);
+        const psCommand =
+          'powershell -NoProfile -Command "[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; $props = Get-ItemProperty -Path \'' +
+          source +
+          '\'; $props.PSObject.Properties | Where-Object { $_.MemberType -eq \'NoteProperty\' } | ForEach-Object { $_.Name }"';
+        const { stdout } = await execAsync(psCommand);
         stdout
           .split(/\r?\n/)
           .map((line) => line.trim())
           .filter(Boolean)
           .forEach((line) => {
-            const parts = line.split(/\s{2,}/);
-            if (parts.length >= 1) {
-              const family = cleanupFamilyValue(parts[0]);
-              if (family) {
-                fonts.add(family);
-              }
+            const family = cleanupFamilyValue(line);
+            if (family) {
+              fonts.add(family);
             }
           });
       } catch (regError) {
