@@ -152,9 +152,9 @@ async function listWindowsFonts() {
     for (const source of regSources) {
       try {
         const psCommand =
-          'powershell -NoProfile -Command "[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; $props = Get-ItemProperty -Path \'' +
+          "powershell -NoProfile -Command \"[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; $props = Get-ItemProperty -Path '" +
           source +
-          '\'; $props.PSObject.Properties | Where-Object { $_.MemberType -eq \'NoteProperty\' } | ForEach-Object { $_.Name }"';
+          "'; $props.PSObject.Properties | Where-Object { $_.MemberType -eq 'NoteProperty' } | ForEach-Object { $_.Name }\"";
         const { stdout } = await execAsync(psCommand);
         stdout
           .split(/\r?\n/)

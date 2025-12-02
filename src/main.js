@@ -427,7 +427,7 @@ ${i18n.geti18n("copyright")}: Copyright © 2025 heStudio Community
   });
 
   ipcMain.handle("system:isDevMode", async () => {
-    logger.info("Check allowDevtools.");
+    logger.debug("Check allowDevtools.");
     return allowDevtools;
   });
 
@@ -464,12 +464,12 @@ ${i18n.geti18n("copyright")}: Copyright © 2025 heStudio Community
   });
 
   ipcMain.handle("windows:isMaximized", async () => {
-    logger.info("Check isMaximized.");
+    logger.debug("Check isMaximized.");
     return mainWindow ? mainWindow.isMaximized() : false;
   });
 
   ipcMain.handle("windows:isFullScreen", async () => {
-    logger.info("Check isFullScreen.");
+    logger.debug("Check isFullScreen.");
     return mainWindow ? mainWindow.isFullScreen() : false;
   });
 

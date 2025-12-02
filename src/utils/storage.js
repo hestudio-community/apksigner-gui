@@ -7,8 +7,8 @@ import { _log } from "./log";
 const logger = new _log("storage");
 
 function compareVersions(v1, v2) {
-  const parts1 = v1.split(".").map(Number);
-  const parts2 = v2.split(".").map(Number);
+  const parts1 = v1.split("-")[0].split(".").map(Number);
+  const parts2 = v2.split("-")[0].split(".").map(Number);
 
   for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
     const part1 = parts1[i] || 0;

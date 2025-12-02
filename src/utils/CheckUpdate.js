@@ -40,6 +40,14 @@ export function CheckUpdate(forceShow) {
             });
         }
       } else {
+        if (!forceShow) {
+          if (!/^\d+(\.\d+)*$/.test(app.getVersion()) | !app.isPackaged) {
+            logger.debug(
+              `You are now running the test version ${app.getVersion()} ${!app.isPackaged ? "Develop Mode" : ""}. Skip the version check pop-up.`,
+            );
+            return;
+          }
+        }
         dialog
           .showMessageBox({
             title: "APKSignerGUI",

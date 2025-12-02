@@ -9,7 +9,7 @@ import fs from "node:fs";
 import init from "./init";
 
 if (!process.env.APKSIGNERGUI_STARTINFO)
-  process.env.APKSIGNERGUI_STARTINFO = `${Date.now()}-${app.getVersion()}-${process.platform}-${process.arch}`;
+  process.env.APKSIGNERGUI_STARTINFO = `${Date.now()}-${app.getVersion()}${!app.isPackaged ? "-develop" : ""}-${process.platform}-${process.arch}`;
 
 export class _log {
   /**
@@ -43,7 +43,11 @@ export class _log {
     );
     init();
     if (!fs.existsSync(this.logdir)) fs.mkdirSync(this.logdir);
-    if (!fs.existsSync(this.logfile)) fs.writeFileSync(this.logfile, "");
+    if (!fs.existsSync(this.logfile))
+      fs.writeFileSync(
+        this.logfile,
+        `[${dayjs().format()}][log][log] The log will be saved to ${this.logfile}`,
+      );
   }
 
   log(log) {
@@ -53,9 +57,11 @@ export class _log {
   }
 
   debug(log) {
-    const l = `[${dayjs().format()}][${this.module}][debug] ${log}`;
-    fs.appendFileSync(this.logfile, `${l}\n`);
-    console.debug(l);
+    if (!/^\d+(\.\d+)*$/.test(app.getVersion()) | !app.isPackaged) {
+      const l = `[${dayjs().format()}][${this.module}][debug] ${log}`;
+      fs.appendFileSync(this.logfile, `${l}\n`);
+      console.debug(l);
+    }
   }
   info(log) {
     const l = `[${dayjs().format()}][${this.module}][info] ${log}`;
