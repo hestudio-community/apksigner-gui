@@ -16,7 +16,7 @@ function getShortCommitId() {
   return run("git rev-parse --short HEAD");
 }
 function getGitStatus() {
-  const status = run("git status --porcelain");
+  const status = run("git status --porcelain").replaceAll("M package.json", "");
   return status === "" ? null : "dirty";
 }
 
