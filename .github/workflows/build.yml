@@ -85,6 +85,7 @@ jobs:
       - name: Install WiX Toolset (Windows only)
         if: matrix.platform == 'win32'
         run: |
+          cd ..
           # Download and install WiX Toolset v3
           Invoke-WebRequest -Uri "https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314-binaries.zip" -OutFile "wix314-binaries.zip"
           Expand-Archive -Path "wix314-binaries.zip" -DestinationPath "C:\wix"
