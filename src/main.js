@@ -464,12 +464,10 @@ ${i18n.geti18n("copyright")}: Copyright © 2025 heStudio Community
   });
 
   ipcMain.handle("windows:isMaximized", async () => {
-    logger.debug("Check isMaximized.");
     return mainWindow ? mainWindow.isMaximized() : false;
   });
 
   ipcMain.handle("windows:isFullScreen", async () => {
-    logger.debug("Check isFullScreen.");
     return mainWindow ? mainWindow.isFullScreen() : false;
   });
 

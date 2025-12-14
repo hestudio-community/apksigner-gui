@@ -251,6 +251,7 @@ import { supportLangList } from "../utils/i18nServices/config.js";
 
 <script>
 export default {
+  emits: ["advancedSetting"],
   data() {
     return {
       apksigner: "",
@@ -598,9 +599,11 @@ export default {
         ).then(() => {
           this.advancedSetting = true;
           window.electronAPI.config.set("advancedSetting", true);
+          this.$emit("advancedSetting");
         });
       } else {
         window.electronAPI.config.set("advancedSetting", false);
+        this.$emit("advancedSetting");
       }
     },
     clearTmpDir() {

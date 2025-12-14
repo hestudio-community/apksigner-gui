@@ -216,11 +216,14 @@ export default {
       type: String,
       required: true,
     },
+    advancedSetting: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
       input_apk: "",
-      advancedSetting: false,
       api: {
         auto: {
           min: true,
@@ -453,15 +456,6 @@ export default {
       this.i18n[key] = i18n.geti18n(key);
     }
   },
-  mounted() {
-    setInterval(async () => {
-      const advancedSetting = window.electronAPI.config.get("advancedSetting");
-      if (advancedSetting) {
-        this.advancedSetting = advancedSetting;
-      } else {
-        this.advancedSetting = false;
-      }
-    }, 100);
-  },
+  mounted() {},
 };
 </script>
