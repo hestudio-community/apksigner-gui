@@ -51,6 +51,10 @@ input {
   font-family: var(--app-font-stack);
 }
 
+button {
+  font-family: var(--app-font-stack);
+}
+
 text {
   font-family: var(--app-font-stack);
 }
