@@ -64,7 +64,7 @@
   backdrop-filter: blur(4px);
   background: color-mix(
     in srgb,
-    var(--el-bg-color-overlay) 75%,
+    var(--el-bg-color) 75%,
     transparent
   ) !important;
 }
@@ -74,7 +74,7 @@
   backdrop-filter: blur(4px);
   background: color-mix(
     in srgb,
-    var(--el-bg-color-overlay) 75%,
+    var(--el-drawer-bg-color) 75%,
     transparent
   ) !important;
 }
@@ -121,7 +121,7 @@
   outline: none;
 }
 
-.el-tooltip {
+.el-popover {
   border-radius: 15px !important;
   backdrop-filter: blur(4px);
   background: color-mix(
@@ -135,7 +135,7 @@
   backdrop-filter: blur(4px);
   background: color-mix(
     in srgb,
-    var(--el-bg-color-overlay) 75%,
+    var(--el-card-bg-color) 75%,
     transparent
   ) !important;
   border-radius: 15px;
@@ -149,4 +149,12 @@
     transparent
   ) !important;
   border-radius: 15px;
+}
+
+.el-drawer {
+  background: color-mix(
+    in srgb,
+    var(--el-drawer-bg-color) 75%,
+    transparent
+  ) !important;
 }

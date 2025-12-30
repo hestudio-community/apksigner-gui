@@ -26,14 +26,19 @@
           :label="i18n.autoDecideMinSDK"
           style="margin: 3px"
         />
-        <el-tooltip placement="right">
-          <template #content>
-            <div style="width: calc(30vw); max-width: fit-content">
-              <text>{{ i18n.minSDKTooltip }}</text>
-            </div>
+        <el-popover
+          placement="right"
+          width="30vw"
+          style="max-width: fit-content"
+          trigger="hover"
+          :content="i18n.minSDKTooltip"
+        >
+          <template #reference>
+            <el-icon>
+              <QuestionFilled />
+            </el-icon>
           </template>
-          <el-icon><QuestionFilled /></el-icon>
-        </el-tooltip>
+        </el-popover>
         <el-input
           v-model="api.min"
           v-if="!api.auto.min"
@@ -48,14 +53,19 @@
           :label="i18n.autoDecideMaxSDK"
           style="margin: 3px"
         />
-        <el-tooltip placement="right">
-          <template #content>
-            <div style="width: calc(30vw); max-width: fit-content">
-              <text>{{ i18n.maxSDKTooltip }}</text>
-            </div>
+        <el-popover
+          placement="right"
+          width="30vw"
+          style="max-width: fit-content"
+          trigger="hover"
+          :content="i18n.maxSDKTooltip"
+        >
+          <template #reference>
+            <el-icon>
+              <QuestionFilled />
+            </el-icon>
           </template>
-          <el-icon><QuestionFilled /></el-icon>
-        </el-tooltip>
+        </el-popover>
         <el-input
           v-model="api.max"
           v-if="!api.auto.max"
@@ -74,14 +84,19 @@
         "
       >
         <text>{{ i18n.signingScheme }}</text>
-        <el-tooltip placement="right">
-          <template #content>
-            <div style="width: calc(30vw); max-width: fit-content">
-              <text>{{ i18n.signingSchemeTooltip }}</text>
-            </div>
+        <el-popover
+          placement="left"
+          width="30vw"
+          style="max-width: fit-content"
+          trigger="hover"
+          :content="i18n.signingSchemeTooltip"
+        >
+          <template #reference>
+            <el-icon>
+              <QuestionFilled />
+            </el-icon>
           </template>
-          <el-icon><QuestionFilled /></el-icon>
-        </el-tooltip>
+        </el-popover>
       </div>
       <br />
       <div>
@@ -110,14 +125,19 @@
         "
       >
         <text>{{ i18n.zipalignTitle }}</text>
-        <el-tooltip placement="right">
-          <template #content>
-            <div style="width: calc(30vw); max-width: fit-content">
-              <text>{{ i18n.zipalignTooltip }}</text>
-            </div>
+        <el-popover
+          placement="right"
+          width="30vw"
+          style="max-width: fit-content"
+          trigger="hover"
+          :content="i18n.zipalignTooltip"
+        >
+          <template #reference>
+            <el-icon>
+              <QuestionFilled />
+            </el-icon>
           </template>
-          <el-icon><QuestionFilled /></el-icon>
-        </el-tooltip>
+        </el-popover>
       </div>
       <br />
       <div>
