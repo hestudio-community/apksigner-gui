@@ -9,12 +9,12 @@
             style="height: 32px; width: 32px"
             @click="open_devtools"
             v-if="isDevMode"
-            ><span class="material-symbols-outlined" style="font-size: 20px">
+            ><span class="material-symbols-rounded" style="font-size: 20px">
               code
             </span></el-button
           >
           <el-button text style="height: 32px; width: 32px" @click="open_about">
-            <span class="material-symbols-outlined" style="font-size: 20px">
+            <span class="material-symbols-rounded" style="font-size: 20px">
               info
             </span></el-button
           >

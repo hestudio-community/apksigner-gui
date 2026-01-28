@@ -114,7 +114,7 @@
               >
                 <el-icon
                   ><span
-                    class="material-symbols-outlined"
+                    class="material-symbols-rounded"
                     style="font-size: 18px"
                   >
                     remove
@@ -130,7 +130,7 @@
               >
                 <el-icon
                   ><span
-                    class="material-symbols-outlined"
+                    class="material-symbols-rounded"
                     style="font-size: 18px"
                   >
                     collapse_content
@@ -146,7 +146,7 @@
               >
                 <el-icon
                   ><span
-                    class="material-symbols-outlined"
+                    class="material-symbols-rounded"
                     style="font-size: 18px"
                   >
                     expand_content
@@ -161,7 +161,7 @@
               >
                 <el-icon
                   ><span
-                    class="material-symbols-outlined"
+                    class="material-symbols-rounded"
                     style="font-size: 18px"
                   >
                     close
