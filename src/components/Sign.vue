@@ -340,31 +340,11 @@ export default {
           this.output.path = result;
         });
     },
-    shell(shell) {
-      window.electronAPI
-        .SystemShell(shell)
-        .then(async (result) => {
-          this.stdout += result;
-          this.sign = false;
-          ElMessage({
-            message: this.i18n.signSuccess,
-            type: "success",
-            plain: true,
-          });
-        })
-        .catch((error) => {
-          this.stdout += error;
-          this.sign = false;
-          ElMessage({
-            message: this.i18n.signFailed,
-            type: "error",
-            plain: true,
-          });
-        });
-    },
     signButton() {
       this.sign = true;
       this.stdout = "";
+
+      // 1. Validate input
       if (!this.input_apk) {
         ElMessage({
           message: this.i18n.CheckDeficiencies,
@@ -373,100 +353,115 @@ export default {
         });
         this.sign = false;
         return;
-      } else {
-        window.electronAPI.checkFileExists(this.input_apk).then((exists) => {
-          if (!exists) {
+      }
+
+      // 2. Check if file exists
+      window.electronAPI.checkFileExists(this.input_apk).then((exists) => {
+        if (!exists) {
+          ElMessage({
+            message: this.i18n.fileNotExists(this.input_apk),
+            type: "error",
+            plain: true,
+          });
+          this.sign = false;
+          return;
+        }
+
+        // 3. Copy to temporary directory
+        window.electronAPI.CopyToTmp(this.input_apk).then((tmpPath) => {
+          const key = window.electronAPI.config.get("keys")[this.keyname];
+          const apksigner = window.electronAPI.config.get("apksigner");
+          const zipalign = window.electronAPI.config.get("zipalign");
+
+          // Validate apksigner path
+          if (!apksigner) {
             ElMessage({
-              message: this.i18n.fileNotExists(this.input_apk),
+              message: this.i18n.noApksignerLocation,
               type: "error",
               plain: true,
             });
             this.sign = false;
             return;
           }
-          window.electronAPI.CopyToTmp(this.input_apk).then(async (result) => {
-            const key = window.electronAPI.config.get("keys")[this.keyname];
-            const apksigner = window.electronAPI.config.get("apksigner");
-            if (!apksigner) {
-              ElMessage({
-                message: this.i18n.noApksignerLocation,
-                type: "error",
-                plain: true,
-              });
-              this.sign = false;
-              return;
+
+          // Validate output path if not overwriting
+          if (!this.output.rewrite && !this.output.path) {
+            ElMessage({
+              message: this.i18n.CheckDeficiencies,
+              type: "error",
+              plain: true,
+            });
+            this.sign = false;
+            return;
+          }
+
+          // 4. Build options object
+          const options = {
+            apkPath: tmpPath,
+            outputPath: this.output.rewrite ? this.input_apk : this.output.path,
+            overwrite: this.output.rewrite,
+            keystore: key.keystore,
+            keyAlias: key.keyalias,
+            keyPassword: key.keypasswd,
+            apksignerPath: apksigner,
+          };
+
+          // 5. Add advanced settings
+          if (this.advancedSetting) {
+            if (!this.api.auto.min) {
+              options.minSdkVersion = this.api.min;
             }
-            let script = `${apksigner} sign -v --ks ${key.keystore} --ks-key-alias ${key.keyalias} --ks-pass pass:${key.keypasswd}`;
-            if (!this.output.rewrite) {
-              if (!this.output.path) {
+            if (!this.api.auto.max) {
+              options.maxSdkVersion = this.api.max;
+            }
+
+            if (!this.signplan.auto) {
+              options.v1SigningEnabled = this.signplan.plans.includes("V1");
+              options.v2SigningEnabled = this.signplan.plans.includes("V2");
+              options.v3SigningEnabled = this.signplan.plans.includes("V3");
+              options.v4SigningEnabled = this.signplan.plans.includes("V4");
+            }
+
+            if (this.zipalign.status) {
+              if (!zipalign) {
                 ElMessage({
-                  message: this.i18n.CheckDeficiencies,
+                  message: this.i18n.noZipalignLocation,
                   type: "error",
                   plain: true,
                 });
                 this.sign = false;
                 return;
-              } else {
-                script += ` --out ${this.output.path}`;
               }
-            } else {
-              script += ` --out ${this.input_apk}`;
+              options.useZipalign = true;
+              options.zipalignPath = zipalign;
+              options.pageSize = this.zipalign.config.P;
+              options.useZopfli = this.zipalign.config.Zopfli;
             }
-            if (this.advancedSetting) {
-              if (!this.api.auto.min) {
-                script += ` --min-sdk-version ${this.api.min}`;
-              }
-              if (!this.api.auto.max) {
-                script += ` --max-sdk-version ${this.api.max}`;
-              }
-              if (!this.signplan.auto) {
-                script += ` --v1-signing-enabled ${this.signplan.plans.includes(
-                  "V1",
-                )}`;
-                script += ` --v2-signing-enabled ${this.signplan.plans.includes(
-                  "V2",
-                )}`;
-                script += ` --v3-signing-enabled ${this.signplan.plans.includes(
-                  "V3",
-                )}`;
-                script += ` --v4-signing-enabled ${this.signplan.plans.includes(
-                  "V4",
-                )}`;
-              }
-              if (this.zipalign.status) {
-                const zipalign = window.electronAPI.config.get("zipalign");
-                if (!zipalign) {
-                  ElMessage({
-                    message: this.i18n.noZipalignLocation,
-                    type: "error",
-                    plain: true,
-                  });
-                  this.sign = false;
-                  return;
-                }
-                script += ` ${result}_zipalign.apk`;
-                console.log(
-                  `${zipalign} -v -P ${this.zipalign.config.P} -f ${
-                    this.zipalign.config.Zopfli ? "-z" : ""
-                  } 4 ${result} ${result}_zipalign.apk && ${script}`,
-                );
-                this.shell(
-                  `${zipalign} -v -P ${this.zipalign.config.P} -f ${
-                    this.zipalign.config.Zopfli ? "-z" : ""
-                  } 4 ${result} ${result}_zipalign.apk && ${script}`,
-                );
-                return;
-              } else {
-                script += ` ${result}`;
-                this.shell(`${script}`);
-              }
-            } else {
-              script += ` ${result}`;
-              this.shell(`${script}`);
-            }
-          });
+          }
+
+          // 6. Call signing service
+          window.electronAPI
+            .SignAPK(options)
+            .then((stdout) => {
+              this.stdout += stdout;
+              this.sign = false;
+              ElMessage({
+                message: this.i18n.signSuccess,
+                type: "success",
+                plain: true,
+              });
+            })
+            .catch((error) => {
+              this.stdout += error;
+              this.sign = false;
+              ElMessage({
+                message: this.i18n.signFailed,
+                type: "error",
+                plain: true,
+              });
+            });
         });
-      }
+      });
     },
   },
   async created() {

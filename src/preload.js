@@ -55,6 +55,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
       keysize,
       sigalg,
     ),
+  SignAPK: (options) => ipcRenderer.invoke("app:signAPK", options),
   config: {
     get: (key) => ipcRenderer.sendSync("config:get", key),
     set: (key, value) => ipcRenderer.sendSync("config:set", key, value),

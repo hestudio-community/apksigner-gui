@@ -11,6 +11,7 @@ import path from "node:path";
 import started from "electron-squirrel-startup";
 import { spawn } from "node:child_process";
 import { CheckJavaPath, CreateKey } from "./utils/CreateKey";
+import { SignAPK } from "./utils/sign";
 import { Config, Storage, importConfigHandler } from "./utils/storage";
 import fs from "node:fs";
 import { warn, error } from "./utils/alert";
@@ -611,6 +612,14 @@ ${i18n.geti18n("copyright")}: Copyright © 2025 heStudio Community
       });
     },
   );
+
+  ipcMain.handle("app:signAPK", (event, options) => {
+    return new Promise((resolve, reject) => {
+      SignAPK(options)
+        .then((stdout) => resolve(stdout))
+        .catch((error) => reject(error));
+    });
+  });
 
   logger.log("createWindow");
   createWindow();
