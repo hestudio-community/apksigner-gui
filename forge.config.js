@@ -33,7 +33,7 @@ const baseversion = String(
 ).split("-")[0];
 let appversion;
 
-if (branchName === "main") {
+if (branchName === "main" || branchName === "HEAD") {
   appversion = baseversion;
 } else {
   appversion = baseversion + `-${branchName}+${shortCommitId}`;
