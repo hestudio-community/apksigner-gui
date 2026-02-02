@@ -59,7 +59,7 @@
             >
               <el-dropdown trigger="contextmenu" placement="bottom-end">
                 <el-button
-                  @click="openSign = item"
+                  @click="changeKey(item)"
                   tag="div"
                   text
                   bg
@@ -114,7 +114,7 @@
               >
                 <el-icon
                   ><span
-                    class="material-symbols-outlined"
+                    class="material-symbols-rounded"
                     style="font-size: 18px"
                   >
                     remove
@@ -130,7 +130,7 @@
               >
                 <el-icon
                   ><span
-                    class="material-symbols-outlined"
+                    class="material-symbols-rounded"
                     style="font-size: 18px"
                   >
                     collapse_content
@@ -146,7 +146,7 @@
               >
                 <el-icon
                   ><span
-                    class="material-symbols-outlined"
+                    class="material-symbols-rounded"
                     style="font-size: 18px"
                   >
                     expand_content
@@ -161,7 +161,7 @@
               >
                 <el-icon
                   ><span
-                    class="material-symbols-outlined"
+                    class="material-symbols-rounded"
                     style="font-size: 18px"
                   >
                     close
@@ -178,14 +178,18 @@
             :with-header="false"
             size="350"
           >
-            <SettingPage />
+            <SettingPage @advanced-setting="checkAdvancedSetting" />
           </el-drawer>
         </el-header>
         <div class="main">
           <el-scrollbar style="max-height: calc(100vh - 46px)">
             <div style="padding: 20px">
               <el-empty v-if="!openSign" :description="i18n.noKeyTip" />
-              <Sign v-else :keyname="openSign" />
+              <Sign
+                v-else
+                :keyname="openSign"
+                :advanced-setting="advancedSetting"
+              />
             </div>
           </el-scrollbar>
         </div>
@@ -343,8 +347,9 @@ export default {
       keyList: [],
       keyLoading: true,
       openSign: "",
-      sidebarWidth: 30, // 相对百分比，0%=128px，100%=50%页面宽度
+      sidebarWidth: 30,
       isResizing: false,
+      advancedSetting: false,
       i18n: {
         noKeyTip: undefined,
         confirm: undefined,
@@ -357,22 +362,18 @@ export default {
     };
   },
   computed: {
-    // 将相对百分比转换为实际像素值
     actualSidebarWidth() {
-      const minWidth = 128; // 最小宽度128px (对应0%)
-      const maxWidth = Math.min(window.innerWidth * 0.5, window.innerWidth); // 最大宽度50%页面宽度 (对应100%)
+      const minWidth = 128;
+      const maxWidth = Math.min(window.innerWidth * 0.5, window.innerWidth);
       const range = maxWidth - minWidth;
 
-      // 确保范围有效
       if (range <= 0) {
         return minWidth;
       }
 
-      // 验证sidebarWidth在0-100范围内
       const validatedPercent = Math.max(0, Math.min(100, this.sidebarWidth));
       const calculatedWidth = minWidth + (validatedPercent / 100) * range;
 
-      // 再次验证结果在合理范围内
       return Math.max(minWidth, Math.min(maxWidth, calculatedWidth));
     },
 
@@ -388,17 +389,23 @@ export default {
     },
   },
   methods: {
+    checkAdvancedSetting() {
+      const advancedSetting = window.electronAPI.config.get("advancedSetting");
+      if (advancedSetting) {
+        this.advancedSetting = advancedSetting;
+      } else {
+        this.advancedSetting = false;
+      }
+    },
     startResize(direction, event) {
       this.isResizing = true;
       this.startX = event.clientX;
 
-      // 记录当前的窗口宽度和范围，防止窗口大小改变后的瞬移
       const minWidth = 128;
       const maxWidth = Math.min(window.innerWidth * 0.5, window.innerWidth);
       this.resizeRange = Math.max(0, maxWidth - minWidth);
       this.resizeMinWidth = minWidth;
 
-      // 计算当前实际像素宽度对应的百分比
       const currentActualWidth = this.actualSidebarWidth;
       if (this.resizeRange > 0) {
         this.startWidthPercent =
@@ -418,20 +425,16 @@ export default {
 
       const deltaX = event.clientX - this.startX;
 
-      // 使用在startResize时记录的固定范围
       const deltaPercent = (deltaX / this.resizeRange) * 100;
       let newWidthPercent;
 
       newWidthPercent = this.startWidthPercent + deltaPercent;
 
-      // 限制相对百分比范围：0% 到 100%
       newWidthPercent = Math.max(0, Math.min(100, newWidthPercent));
 
-      // 计算对应的实际像素宽度
       const newActualWidth =
         this.resizeMinWidth + (newWidthPercent / 100) * this.resizeRange;
 
-      // 重新计算在当前窗口尺寸下的百分比
       const currentMinWidth = 128;
       const currentMaxWidth = Math.min(
         window.innerWidth * 0.5,
@@ -439,13 +442,11 @@ export default {
       );
       const currentRange = currentMaxWidth - currentMinWidth;
 
-      // 确保实际宽度在当前窗口的合理范围内
       const clampedActualWidth = Math.max(
         currentMinWidth,
         Math.min(currentMaxWidth, newActualWidth),
       );
 
-      // 更新sidebarWidth为在当前窗口尺寸下的百分比
       if (currentRange > 0) {
         this.sidebarWidth =
           ((clampedActualWidth - currentMinWidth) / currentRange) * 100;
@@ -453,15 +454,12 @@ export default {
         this.sidebarWidth = 0;
       }
 
-      // 延迟更新文字宽度，确保DOM已更新
       this.$nextTick(() => {
         this.updateKeyTextWidth();
       });
     },
 
     updateKeyTextWidth() {
-      // 由于使用了百分比布局，文字宽度会自动跟随侧边栏调整
-      // 这个方法现在主要用于强制重新渲染，确保样式同步
       this.$forceUpdate();
     },
 
@@ -473,7 +471,6 @@ export default {
       document.body.style.cursor = "";
       document.body.style.userSelect = "";
 
-      // 保存侧边栏宽度到配置
       window.electronAPI.config.set("sidebarWidth", this.sidebarWidth);
     },
 
@@ -529,6 +526,10 @@ export default {
     },
     WindowsMaximize() {
       window.electronAPI.WindowsMaximize();
+    },
+    changeKey(keyname) {
+      this.openSign = keyname;
+      window.electronAPI.config.set("lastUseKey", keyname);
     },
   },
   async created() {
@@ -646,12 +647,7 @@ export default {
         this.updateKeyTextWidth();
       });
     });
-
-    setInterval(async () => {
-      if (this.keyList.includes(this.openSign)) {
-        window.electronAPI.config.set("lastUseKey", this.openSign);
-      }
-    }, 100);
+    this.checkAdvancedSetting();
   },
 };
 </script>

@@ -2,10 +2,13 @@ import path from "node:path";
 import fs from "node:fs";
 import { app, dialog, ipcMain } from "electron";
 import { warn } from "./alert";
+import { _log } from "./log";
+
+const logger = new _log("storage");
 
 function compareVersions(v1, v2) {
-  const parts1 = v1.split(".").map(Number);
-  const parts2 = v2.split(".").map(Number);
+  const parts1 = v1.split("-")[0].split(".").map(Number);
+  const parts2 = v2.split("-")[0].split(".").map(Number);
 
   for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
     const part1 = parts1[i] || 0;
@@ -19,6 +22,7 @@ function compareVersions(v1, v2) {
 
 export class Storage {
   constructor() {
+    logger.startload("storage");
     if (process.platform == "win32") {
       this.tmp = path.join(process.env.TEMP, "APKSignerGUI");
       this.appdata = path.join(process.env.APPDATA, "APKSignerGUI");
@@ -33,24 +37,22 @@ export class Storage {
         "APKSignerGUI",
       );
     }
-
-    if (!fs.existsSync(this.tmp)) {
-      fs.mkdirSync(this.tmp, { recursive: true });
-    }
-    if (!fs.existsSync(this.appdata)) {
-      fs.mkdirSync(this.appdata, { recursive: true });
-    }
+    logger.endload("storage");
   }
 
   clearTmpDir() {
+    logger.startload("clearTmpDir");
     fs.rmSync(this.tmp, { recursive: true, force: true });
     fs.mkdirSync(this.tmp);
+    logger.endload("clearTmpDir");
   }
 
   copyToTmp(filePath) {
+    logger.startload("copyToTmp");
     const fileName = path.basename(filePath);
     const tmpFilePath = path.join(this.tmp, fileName);
     fs.copyFileSync(filePath, tmpFilePath);
+    logger.endload("copyToTmp");
     return tmpFilePath;
   }
 }
@@ -63,6 +65,7 @@ export class Storage {
  */
 export class Config extends Storage {
   constructor() {
+    logger.startload("Config");
     super();
     this.configPath = path.join(this.appdata, "config.json");
     this.defaults = {
@@ -79,6 +82,7 @@ export class Config extends Storage {
       };
       fs.writeFileSync(this.configPath, JSON.stringify(defaultConfig));
     }
+    logger.log("Loading config from database.");
     try {
       this.config = JSON.parse(fs.readFileSync(this.configPath, "utf-8"));
     } catch (error) {
@@ -89,6 +93,7 @@ export class Config extends Storage {
       fs.writeFileSync(this.configPath, JSON.stringify(defaultConfig));
       this.config = JSON.parse(fs.readFileSync(this.configPath, "utf-8"));
     }
+    logger.endload("Config");
   }
 
   /**
@@ -96,6 +101,7 @@ export class Config extends Storage {
    * @returns {Promise<boolean>}
    */
   async checkVersionCompatibility() {
+    logger.log("Checking config version.");
     const currentVersion = app.getVersion();
     const configVersion = this.config.version;
 
@@ -108,6 +114,9 @@ export class Config extends Storage {
     const versionComparison = compareVersions(currentVersion, configVersion);
 
     if (versionComparison < 0) {
+      logger.warn(
+        `Current application version (${currentVersion}) is lower than configuration file version (${configVersion}). This may cause compatibility issues.`,
+      );
       const result = await dialog.showMessageBoxSync({
         type: "error",
         title: "Version Compatibility Warning",
@@ -134,6 +143,7 @@ export class Config extends Storage {
    * @returns {*}
    */
   get(key) {
+    logger.info(`GET CONFIG: ${key}`);
     return this.config[key];
   }
   /**
@@ -142,7 +152,9 @@ export class Config extends Storage {
    * @param {*} value
    */
   set(key, value) {
+    logger.info(`SET CONFIG: ${key}`);
     this.config[key] = value;
+    logger.log(`Sync database.`);
     fs.writeFileSync(this.configPath, JSON.stringify(this.config));
   }
   /**
@@ -150,7 +162,9 @@ export class Config extends Storage {
    * @param {string} key
    */
   del(key) {
+    logger.info(`DEL CONFIG: ${key}`);
     delete this.config[key];
+    logger.log(`Sync database.`);
     fs.writeFileSync(this.configPath, JSON.stringify(this.config));
   }
   /**
@@ -158,6 +172,7 @@ export class Config extends Storage {
    * @param {string} path
    */
   backup(path) {
+    logger.info(`Backup database to ${path}`);
     const backupPath = path;
     fs.copyFileSync(this.configPath, backupPath);
   }
@@ -166,6 +181,7 @@ export class Config extends Storage {
    * @param {string} path
    */
   async restore(path) {
+    logger.info(`Restore database from ${path}`);
     if (fs.existsSync(path)) {
       try {
         // First, read and validate the backup file
@@ -229,6 +245,7 @@ export class Config extends Storage {
 }
 
 export function importConfigHandler() {
+  logger.startload("importConfigHandler");
   const config = new Config();
 
   ipcMain.on("config:get", (event, key) => {
@@ -304,4 +321,5 @@ export function importConfigHandler() {
       }
     });
   });
+  logger.endload("importConfigHandler");
 }

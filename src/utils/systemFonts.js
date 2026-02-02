@@ -1,6 +1,9 @@
 import { exec } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
+import { _log } from "./log";
+
+const logger = new _log("systemFonts");
 
 const FONT_EXTENSIONS = new Set([
   ".ttf",
@@ -33,6 +36,7 @@ function execAsync(command) {
 }
 
 function cleanupFamilyValue(value) {
+  logger.log(`cleanupFamilyValue: ${value}`);
   if (!value) {
     return null;
   }
@@ -47,6 +51,7 @@ function cleanupFamilyValue(value) {
 }
 
 function formatFontLabel(value) {
+  logger.log(`formatFontLabel: ${value}`);
   const cleaned = cleanupFamilyValue(value);
   if (!cleaned) {
     return null;
@@ -73,6 +78,7 @@ function formatFontLabel(value) {
 }
 
 function normalizeFontIdentifier(value) {
+  logger.log(`normalizeFontIdentifier: ${value}`);
   const cleaned = cleanupFamilyValue(value);
   if (!cleaned) {
     return null;
@@ -81,6 +87,7 @@ function normalizeFontIdentifier(value) {
 }
 
 function buildFontEntries(fonts) {
+  logger.startload("buildFontEntries");
   const dedupe = new Map();
   for (const item of fonts) {
     let rawValue = null;
@@ -119,16 +126,18 @@ function buildFontEntries(fonts) {
     }
     dedupe.set(key, { value, label });
   }
+  logger.endload("buildFontEntries");
   return Array.from(dedupe.values()).sort((a, b) =>
     a.label.localeCompare(b.label, undefined, { sensitivity: "base" }),
   );
 }
 
 async function listWindowsFonts() {
+  logger.startload("listWindowsFonts");
   const fonts = new Set();
   try {
     const { stdout } = await execAsync(
-      'powershell -NoProfile -Command "Add-Type -AssemblyName System.Drawing; [System.Drawing.Text.InstalledFontCollection]::new().Families | ForEach-Object { $_.Name }"',
+      'powershell -NoProfile -Command "[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; Add-Type -AssemblyName System.Drawing; [System.Drawing.Text.InstalledFontCollection]::new().Families | ForEach-Object { $_.Name }"',
     );
     stdout
       .split(/\r?\n/)
@@ -137,23 +146,24 @@ async function listWindowsFonts() {
       .forEach((name) => fonts.add(name));
   } catch (error) {
     const regSources = [
-      '"HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts"',
-      '"HKCU\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts"',
+      "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts",
+      "HKCU:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts",
     ];
     for (const source of regSources) {
       try {
-        const { stdout } = await execAsync(`reg query ${source}`);
+        const psCommand =
+          "powershell -NoProfile -Command \"[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; $props = Get-ItemProperty -Path '" +
+          source +
+          "'; $props.PSObject.Properties | Where-Object { $_.MemberType -eq 'NoteProperty' } | ForEach-Object { $_.Name }\"";
+        const { stdout } = await execAsync(psCommand);
         stdout
           .split(/\r?\n/)
           .map((line) => line.trim())
           .filter(Boolean)
           .forEach((line) => {
-            const parts = line.split(/\s{2,}/);
-            if (parts.length >= 1) {
-              const family = cleanupFamilyValue(parts[0]);
-              if (family) {
-                fonts.add(family);
-              }
+            const family = cleanupFamilyValue(line);
+            if (family) {
+              fonts.add(family);
             }
           });
       } catch (regError) {
@@ -161,10 +171,12 @@ async function listWindowsFonts() {
       }
     }
   }
+  logger.endload("listWindowsFonts");
   return Array.from(fonts);
 }
 
 async function listMacFonts() {
+  logger.startload("listMacFonts");
   try {
     const swiftScript = `
 import AppKit
@@ -270,10 +282,12 @@ for family in manager.availableFontFamilies.sorted() {
     "/Library/Fonts",
     process.env.HOME ? path.join(process.env.HOME, "Library/Fonts") : null,
   ].filter(Boolean);
+  logger.endload("listMacFonts");
   return listFontsFromDirectories(fallbackDirs);
 }
 
 async function listLinuxFonts() {
+  logger.startload("listLinuxFonts");
   try {
     const { stdout } = await execAsync('fc-list --format "%{family}\\n"');
     const result = new Set();
@@ -300,18 +314,22 @@ async function listLinuxFonts() {
     home ? path.join(home, ".fonts") : null,
     home ? path.join(home, ".local/share/fonts") : null,
   ].filter(Boolean);
+  logger.endload("listLinuxFonts");
   return listFontsFromDirectories(fallbackDirs);
 }
 
 async function listFontsFromDirectories(directories) {
+  logger.startload("listFontsFromDirectories");
   const fonts = new Set();
   for (const directory of directories) {
     await collectFonts(directory, fonts);
   }
+  logger.endload("listFontsFromDirectories");
   return Array.from(fonts);
 }
 
 async function collectFonts(directory, fonts) {
+  logger.startload("collectFonts");
   if (!directory) {
     return;
   }
@@ -338,9 +356,11 @@ async function collectFonts(directory, fonts) {
       }
     }
   } catch (error) {}
+  logger.endload("collectFonts");
 }
 
 export async function getSystemFonts() {
+  logger.startload("getSystemFonts");
   if (cachedFonts && Date.now() - cacheTimestamp < CACHE_DURATION) {
     if (
       Array.isArray(cachedFonts) &&
@@ -349,8 +369,10 @@ export async function getSystemFonts() {
     ) {
       const normalized = buildFontEntries(cachedFonts);
       cachedFonts = normalized;
+      logger.endload("getSystemFonts");
       return normalized;
     }
+    logger.endload("getSystemFonts");
     return cachedFonts;
   }
   let fonts = [];
@@ -364,5 +386,6 @@ export async function getSystemFonts() {
   const entries = buildFontEntries(fonts);
   cachedFonts = entries;
   cacheTimestamp = Date.now();
+  logger.endload("getSystemFonts");
   return entries;
 }

@@ -9,12 +9,12 @@
             style="height: 32px; width: 32px"
             @click="open_devtools"
             v-if="isDevMode"
-            ><span class="material-symbols-outlined" style="font-size: 20px">
+            ><span class="material-symbols-rounded" style="font-size: 20px">
               code
             </span></el-button
           >
           <el-button text style="height: 32px; width: 32px" @click="open_about">
-            <span class="material-symbols-outlined" style="font-size: 20px">
+            <span class="material-symbols-rounded" style="font-size: 20px">
               info
             </span></el-button
           >
@@ -251,6 +251,7 @@ import { supportLangList } from "../utils/i18nServices/config.js";
 
 <script>
 export default {
+  emits: ["advancedSetting"],
   data() {
     return {
       apksigner: "",
@@ -503,7 +504,7 @@ export default {
       ) {
         return trimmed;
       }
-      const escaped = trimmed.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+      const escaped = trimmed.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
       if (/\s/.test(escaped) || escaped.includes("'")) {
         return `"${escaped}"`;
       }
@@ -598,9 +599,11 @@ export default {
         ).then(() => {
           this.advancedSetting = true;
           window.electronAPI.config.set("advancedSetting", true);
+          this.$emit("advancedSetting");
         });
       } else {
         window.electronAPI.config.set("advancedSetting", false);
+        this.$emit("advancedSetting");
       }
     },
     clearTmpDir() {

@@ -1,0 +1,7 @@
+onlyBuiltDependencies:
+  - "@bitdisaster/exe-icon-extractor"
+  - electron
+  - esbuild
+  - fs-xattr
+  - macos-alias
+  - vue-demi

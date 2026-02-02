@@ -4,6 +4,9 @@
  */
 
 import { app, dialog } from "electron";
+import { _log } from "./log";
+
+const logger = new _log("alert");
 
 /**
  *
@@ -11,6 +14,7 @@ import { app, dialog } from "electron";
  * @param {string} msg
  */
 function warn(title = "APKSignerGUI", msg) {
+  logger.warn(`[${title}] ${msg}`);
   dialog.showMessageBox({
     type: "warning",
     title: title,
@@ -29,6 +33,7 @@ function warn(title = "APKSignerGUI", msg) {
  * @param {string} msg
  */
 function error(title = "APKSignerGUI", msg) {
+  logger.error(`[${title}] ${msg}`);
   const result = dialog.showMessageBoxSync({
     type: "warning",
     title: title,

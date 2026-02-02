@@ -9,60 +9,78 @@
 @use "element-plus/theme-chalk/src/index.scss" as *;
 @use "element-plus/theme-chalk/src/dark/css-vars.scss" as *;
 
+.el-message {
+  border-radius: 15px !important;
+  backdrop-filter: blur(4px);
+  background: color-mix(
+    in srgb,
+    var(--el-bg-color-overlay) 75%,
+    transparent
+  ) !important;
+}
+
+.el-loading-mask {
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.el-overlay {
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
 .el-card {
   border-radius: 15px !important;
-  margin: 10px;
+  margin: 15px;
 }
 
 .el-input__wrapper {
-  border-radius: 10px;
+  border-radius: 15px;
 }
 
 .el-input-group__append {
-  border-top-right-radius: 10px !important;
-  border-bottom-right-radius: 10px !important;
+  border-top-right-radius: 15px !important;
+  border-bottom-right-radius: 15px !important;
 }
 
 .el-input-number__decrease {
-  border-top-left-radius: 10px !important;
-  border-bottom-left-radius: 10px !important;
+  border-top-left-radius: 15px !important;
+  border-bottom-left-radius: 15px !important;
   margin-top: 5.5px;
 }
 
 .el-input-number__increase {
-  border-top-right-radius: 10px !important;
-  border-bottom-right-radius: 10px !important;
+  border-top-right-radius: 15px !important;
+  border-bottom-right-radius: 15px !important;
   margin-top: 5.5px;
 }
 
 .el-button {
-  border-radius: 10px !important;
-}
-
-.el-message {
   border-radius: 15px !important;
-}
-
-.el-overlay {
-  -webkit-backdrop-filter: blur(6.18px);
-  backdrop-filter: blur(6.18px);
 }
 
 .el-message-box {
   border-radius: 15px !important;
+  backdrop-filter: blur(4px);
+  background: color-mix(
+    in srgb,
+    var(--el-bg-color) 85%,
+    transparent
+  ) !important;
 }
 
 .el-dialog {
   border-radius: 15px !important;
-}
-
-.element-rotate {
-  transition: transform 0.618s ease;
-  transform: rotate(360deg);
+  backdrop-filter: blur(4px);
+  background: color-mix(
+    in srgb,
+    var(--el-bg-color) 85%,
+    transparent
+  ) !important;
 }
 
 .el-select__wrapper {
-  border-radius: 10px !important;
+  border-radius: 15px !important;
 }
 
 .el-scrollbar__view {
@@ -77,10 +95,117 @@
   border-radius: 15px !important;
 }
 
+.el-dropdown-menu {
+  border-radius: 15px !important;
+  min-width: 150px;
+  background: transparent !important;
+}
+
 .el-popper__arrow {
-  left: 80% !important;
+  display: none;
 }
 
 .el-select-dropdown__item {
-  border-radius: 10px !important;
+  border-radius: 15px !important;
+}
+
+.el-page-header__left .el-divider {
+  --el-border-style: none !important;
+}
+
+.el-page-header__title {
+  display: none;
+}
+
+.el-dropdown {
+  outline: none;
+}
+
+.el-popper {
+  border-radius: 15px !important;
+  backdrop-filter: blur(4px);
+  background: color-mix(
+    in srgb,
+    var(--el-bg-color-overlay) 75%,
+    transparent
+  ) !important;
+}
+
+.el-card {
+  backdrop-filter: blur(4px);
+  background: color-mix(
+    in srgb,
+    var(--el-card-bg-color) 75%,
+    transparent
+  ) !important;
+  border-radius: 15px;
+}
+
+.el-notification {
+  backdrop-filter: blur(4px);
+  background: color-mix(
+    in srgb,
+    var(--el-bg-color-overlay) 75%,
+    transparent
+  ) !important;
+  border-radius: 15px;
+}
+
+.el-drawer {
+  background: color-mix(
+    in srgb,
+    var(--el-drawer-bg-color) 85%,
+    transparent
+  ) !important;
+}
+
+.hide-color-picker-clear .el-color-dropdown__link-btn {
+  display: none !important;
+}
+
+.hide-color-picker-clear .el-color-dropdown__btns .el-button--text {
+  display: none !important;
+}
+
+.circular-color-picker .el-color-picker__trigger {
+  border-radius: 50% !important;
+  width: 24px !important;
+  height: 24px !important;
+  padding: 2px !important;
+  border: 1px solid var(--el-border-color) !important;
+}
+
+.circular-color-picker .el-color-picker__color {
+  border-radius: 50% !important;
+  border: none !important;
+}
+
+.circular-color-picker .el-color-picker__color-inner {
+  border-radius: 50% !important;
+}
+
+.circular-color-picker .el-color-picker__icon {
+  display: none !important;
+}
+
+.color-trigger-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--el-border-color);
+  cursor: pointer;
+  display: inline-block;
+  box-sizing: border-box;
+}
+
+.color-popover-custom {
+  padding: 0 !important;
+  min-width: unset !important;
+  width: auto !important;
+}
+
+.color-popover-custom .el-color-picker-panel {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
 }

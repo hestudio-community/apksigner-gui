@@ -1,7 +1,7 @@
 {
   "name": "com.hestudio.apksigner",
   "productName": "APKSignerGUI",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "Simple but complete APK signing tool.",
   "main": ".vite/build/main.js",
   "scripts": {
@@ -9,37 +9,38 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "make-appx": "electron-forge make --targets=@electron-forge/maker-appx",
-    "lint": "prettier . --write"
+    "format": "prettier . --write"
   },
   "keywords": [],
   "author": {
     "name": "undefined",
-    "email": "zihengdie@hestudio.net"
+    "email": "hestudio@hestudio.net"
   },
   "license": "Apache-2.0",
   "devDependencies": {
-    "@electron-forge/cli": "7.10.2",
-    "@electron-forge/maker-appx": "7.10.2",
-    "@electron-forge/maker-deb": "7.10.2",
-    "@electron-forge/maker-dmg": "7.10.2",
-    "@electron-forge/maker-wix": "7.10.2",
-    "@electron-forge/maker-zip": "7.10.2",
-    "@electron-forge/plugin-auto-unpack-natives": "7.10.2",
-    "@electron-forge/plugin-fuses": "7.10.2",
-    "@electron-forge/plugin-vite": "7.10.2",
-    "@electron/fuses": "1.8.0",
-    "electron": "38.3.0",
-    "prettier": "3.6.2",
-    "vite": "7.1.10",
-    "@vitejs/plugin-vue": "6.0.1",
-    "electron-squirrel-startup": "^1.0.1"
+    "@electron-forge/cli": "7.11.1",
+    "@electron-forge/maker-appx": "7.11.1",
+    "@electron-forge/maker-deb": "7.11.1",
+    "@electron-forge/maker-dmg": "7.11.1",
+    "@electron-forge/maker-wix": "7.11.1",
+    "@electron-forge/maker-zip": "7.11.1",
+    "@electron-forge/plugin-auto-unpack-natives": "7.11.1",
+    "@electron-forge/plugin-fuses": "7.11.1",
+    "@electron-forge/plugin-vite": "7.11.1",
+    "@electron/fuses": "2.0.0",
+    "@vitejs/plugin-vue": "6.0.4",
+    "electron": "40.1.0",
+    "electron-squirrel-startup": "^1.0.1",
+    "prettier": "3.8.1",
+    "vite": "7.3.1"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
-    "commander": "^14.0.1",
-    "sass-embedded": "1.93.2",
-    "element-plus": "^2.11.4",
+    "commander": "^14.0.3",
+    "dayjs": "^1.11.19",
+    "element-plus": "^2.13.2",
     "fix-path": "^5.0.0",
-    "vue": "^3.5.22"
+    "sass-embedded": "1.97.3",
+    "vue": "^3.5.27"
   }
 }

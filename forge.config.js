@@ -1,8 +1,52 @@
 const { FusesPlugin } = require("@electron-forge/plugin-fuses");
 const { FuseV1Options, FuseVersion } = require("@electron/fuses");
+const fs = require("node:fs");
+const { execSync } = require("child_process");
 
-// 检查是否在CI环境中
 const isCI = process.env.CI === "true" || process.env.GITHUB_ACTIONS === "true";
+
+// generate version code
+function run(cmd) {
+  return execSync(cmd, { encoding: "utf8" }).trim();
+}
+function getBranchName() {
+  return run("git rev-parse --abbrev-ref HEAD");
+}
+function getShortCommitId() {
+  return run("git rev-parse --short HEAD");
+}
+function getGitStatus() {
+  const status = run("git status --porcelain")
+    .replaceAll("M package.json", "")
+    .replaceAll("M pnpm-lock.yaml", "")
+    .trim();
+  console.log(status);
+  return status === "" ? null : "dirty";
+}
+
+const branchName = getBranchName();
+const shortCommitId = getShortCommitId();
+const gitStatus = getGitStatus();
+
+const baseversion = String(
+  JSON.parse(fs.readFileSync("package.json")).version,
+).split("-")[0];
+let appversion;
+
+if (branchName === "main") {
+  appversion = baseversion;
+} else {
+  appversion = baseversion + `-${branchName}+${shortCommitId}`;
+  if (gitStatus !== null) {
+    appversion = appversion + ".dirty";
+  }
+}
+
+if (isCI) {
+  const package = JSON.parse(fs.readFileSync("package.json"));
+  package.version = appversion;
+  fs.writeFileSync("package.json", JSON.stringify(package));
+}
 
 module.exports = {
   packagerConfig: {
@@ -10,6 +54,8 @@ module.exports = {
     icon: "./icons/icon",
     appBundleId: "com.hestudio.apksigner",
     executableName: "APKSignerGUI",
+    appVersion: appversion.split("-")[0],
+    buildVersion: appversion.split("-")[0],
   },
   rebuildConfig: {},
   makers: [
