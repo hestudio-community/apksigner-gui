@@ -114,7 +114,7 @@ function executeZipalign(options) {
 
     logger.info(`Executing zipalign: ${options.zipalignPath} ${args.join(" ")}`);
 
-    const zipalignProcess = spawn(options.zipalignPath, args);
+    const zipalignProcess = spawnTool(options.zipalignPath, args);
     let stdout = "";
     let stderr = "";
 
@@ -156,7 +156,7 @@ function executeApksigner(options) {
 
     logger.info(`Executing apksigner: ${options.apksignerPath} ${maskSensitiveArgs(args)}`);
 
-    const apksignerProcess = spawn(options.apksignerPath, args);
+    const apksignerProcess = spawnTool(options.apksignerPath, args);
     let stdout = "";
     let stderr = "";
 
@@ -259,4 +259,22 @@ function maskSensitiveArgs(args) {
   }
 
   return masked.join(" ");
+}
+
+/**
+ * Spawn a tool with Windows .bat/.cmd support.
+ * @param {string} toolPath
+ * @param {Array<string>} args
+ * @returns {import("node:child_process").ChildProcess}
+ */
+function spawnTool(toolPath, args) {
+  const ext = path.extname(toolPath).toLowerCase();
+  if (process.platform === "win32" && (ext === ".bat" || ext === ".cmd")) {
+    // Use cmd.exe for batch files to avoid EINVAL from spawn
+    return spawn("cmd.exe", ["/c", toolPath, ...args], {
+      windowsHide: true,
+    });
+  }
+
+  return spawn(toolPath, args);
 }
