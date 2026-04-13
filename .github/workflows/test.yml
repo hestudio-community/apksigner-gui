@@ -92,7 +92,14 @@ jobs:
           echo "C:\wix" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Build application
+        if: matrix.platform != 'win32'
         run: pnpm run make
+        env:
+          ELECTRON_BUILDER_ARCH: ${{ matrix.arch }}
+
+      - name: Build application (Windows only)
+        if: matrix.platform == 'win32'
+        run: pnpm run make-wix
         env:
           ELECTRON_BUILDER_ARCH: ${{ matrix.arch }}
 
