@@ -67,7 +67,12 @@ jobs:
         uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
+        if: matrix.platform != 'win32'
         run: bun install
+
+      - name: Install dependencies (Windows only)
+        if: matrix.platform == 'win32'
+        run: bun install 2>nul
 
       - name: Install WiX Toolset (Windows only)
         if: matrix.platform == 'win32'
