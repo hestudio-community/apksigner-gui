@@ -14,7 +14,7 @@ jobs:
       version: ${{ steps.get_version.outputs.version }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Get version from package.json
         id: get_version
         run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
@@ -38,11 +38,6 @@ jobs:
             platform_name: windows
 
           # macOS builds
-          - os: macos-15-intel
-            platform: darwin
-            arch: x64
-            name: macOS Intel
-            platform_name: macos
           - os: macos-latest
             platform: darwin
             arch: arm64
@@ -66,15 +61,15 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup PNPM
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
         with:
           version: 10
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "24"
           cache: "pnpm"
@@ -109,4 +104,4 @@ jobs:
           name: apksignergui_${{ needs.get-version.outputs.version }}_${{ matrix.arch == 'x64' && 'amd64' || matrix.arch }}_${{ matrix.platform }}
           path: |
             ./out/*
-          retention-days: 30
+          retention-days: 7
