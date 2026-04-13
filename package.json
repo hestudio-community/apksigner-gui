@@ -1,13 +1,14 @@
 {
   "name": "com.hestudio.apksigner",
   "productName": "APKSignerGUI",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "Simple but complete APK signing tool.",
   "main": ".vite/build/main.js",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
+    "make-wix": "electron-forge make --targets=@electron-forge/maker-wix",
     "make-appx": "electron-forge make --targets=@electron-forge/maker-appx",
     "format": "prettier . --write"
   },
@@ -27,20 +28,21 @@
     "@electron-forge/plugin-auto-unpack-natives": "7.11.1",
     "@electron-forge/plugin-fuses": "7.11.1",
     "@electron-forge/plugin-vite": "7.11.1",
-    "@electron/fuses": "2.0.0",
-    "@vitejs/plugin-vue": "6.0.4",
-    "electron": "40.1.0",
+    "@electron/fuses": "2.1.1",
+    "@vitejs/plugin-vue": "6.0.5",
+    "electron": "41.2.0",
     "electron-squirrel-startup": "^1.0.1",
-    "prettier": "3.8.1",
-    "vite": "7.3.1"
+    "prettier": "3.8.2",
+    "vite": "8.0.8"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
     "commander": "^14.0.3",
-    "dayjs": "^1.11.19",
-    "element-plus": "^2.13.2",
+    "dayjs": "^1.11.20",
+    "element-plus": "^2.13.7",
     "fix-path": "^5.0.0",
-    "sass-embedded": "1.97.3",
-    "vue": "^3.5.27"
+    "javascript-obfuscator": "^5.4.1",
+    "sass-embedded": "1.99.0",
+    "vue": "^3.5.32"
   }
 }

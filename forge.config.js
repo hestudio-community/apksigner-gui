@@ -1,6 +1,7 @@
 const { FusesPlugin } = require("@electron-forge/plugin-fuses");
 const { FuseV1Options, FuseVersion } = require("@electron/fuses");
 const fs = require("node:fs");
+const path = require("node:path");
 const { execSync } = require("child_process");
 
 const isCI = process.env.CI === "true" || process.env.GITHUB_ACTIONS === "true";
@@ -98,33 +99,43 @@ module.exports = {
       config: {
         appUserModelId: "com.hestudio.apksigner",
         description: "Simple but complete APK signing tool.",
-        icon: "./icons/icon.ico",
-        language: 2052,
+        icon: path.join(__dirname, "icons", "icon.ico"),
+        language: 1033,
         manufacturer: "heStudio Community",
         name: "APKSignerGUI",
         upgradeCode: "01956ab5-b521-74ae-9066-695e7dbe0999",
+        ui: {
+          enabled: true,
+          chooseDirectory: true,
+        },
+        beforeCreate: async (msiCreator) => {
+          msiCreator.wixTemplate = msiCreator.wixTemplate.replaceAll(
+            " (Machine - MSI)",
+            "",
+          );
+          msiCreator.wixTemplate = msiCreator.wixTemplate.replaceAll(
+            " (Machine)",
+            "",
+          );
+        },
       },
       platforms: ["win32"],
     },
-    // 只在非CI环境下包含appx maker
-    ...(isCI
-      ? []
-      : [
-          {
-            name: "@electron-forge/maker-appx",
-            config: {
-              assets: "./icons/assets",
-              publisher: "CN=73AC1CCD-0F7C-48FE-A64D-F404735487C1",
-              packageDescription: "Simple but complete APK signing tool.",
-              manifest: `${
-                process.arch === "arm64"
-                  ? "./appxmanifests/AppXManifest_arm64.xml"
-                  : "./appxmanifests/AppXManifest_x86_64.xml"
-              }`,
-            },
-            platforms: ["win32"],
-          },
-        ]),
+
+    {
+      name: "@electron-forge/maker-appx",
+      config: {
+        assets: "./icons/assets",
+        publisher: "CN=73AC1CCD-0F7C-48FE-A64D-F404735487C1",
+        packageDescription: "Simple but complete APK signing tool.",
+        manifest: `${
+          process.arch === "arm64"
+            ? "./appxmanifests/AppXManifest_arm64.xml"
+            : "./appxmanifests/AppXManifest_x86_64.xml"
+        }`,
+      },
+      platforms: ["win32"],
+    },
   ],
   plugins: [
     {

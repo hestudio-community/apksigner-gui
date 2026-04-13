@@ -98,12 +98,7 @@ function executeZipalign(options) {
   return new Promise((resolve, reject) => {
     const zipalignedPath = `${options.apkPath}_zipalign.apk`;
 
-    const args = [
-      "-v",
-      "-P",
-      options.pageSize.toString(),
-      "-f",
-    ];
+    const args = ["-v", "-P", options.pageSize.toString(), "-f"];
 
     // Add Zopfli compression flag if enabled
     if (options.useZopfli) {
@@ -112,7 +107,9 @@ function executeZipalign(options) {
 
     args.push("4", options.apkPath, zipalignedPath);
 
-    logger.info(`Executing zipalign: ${options.zipalignPath} ${args.join(" ")}`);
+    logger.info(
+      `Executing zipalign: ${options.zipalignPath} ${args.join(" ")}`,
+    );
 
     const zipalignProcess = spawnTool(options.zipalignPath, args);
     let stdout = "";
@@ -136,7 +133,9 @@ function executeZipalign(options) {
 
     zipalignProcess.on("close", (code) => {
       if (code !== 0) {
-        reject(`Zipalign process exited with code ${code}: ${stderr || stdout}`);
+        reject(
+          `Zipalign process exited with code ${code}: ${stderr || stdout}`,
+        );
       } else {
         logger.info(`Zipalign completed successfully`);
         resolve(zipalignedPath);
@@ -154,7 +153,9 @@ function executeApksigner(options) {
   return new Promise((resolve, reject) => {
     const args = buildApksignerCommand(options);
 
-    logger.info(`Executing apksigner: ${options.apksignerPath} ${maskSensitiveArgs(args)}`);
+    logger.info(
+      `Executing apksigner: ${options.apksignerPath} ${maskSensitiveArgs(args)}`,
+    );
 
     const apksignerProcess = spawnTool(options.apksignerPath, args);
     let stdout = "";
@@ -178,7 +179,9 @@ function executeApksigner(options) {
 
     apksignerProcess.on("close", (code) => {
       if (code !== 0) {
-        reject(`Apksigner process exited with code ${code}: ${stderr || stdout}`);
+        reject(
+          `Apksigner process exited with code ${code}: ${stderr || stdout}`,
+        );
       } else {
         logger.info(`Apksigner completed successfully`);
         resolve(stdout + stderr);
