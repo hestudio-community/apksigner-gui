@@ -63,19 +63,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Setup PNPM
-        uses: pnpm/action-setup@v6
-        with:
-          version: 10
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-          cache: "pnpm"
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
-        run: pnpm install
+        run: bun install
 
       - name: Install WiX Toolset (Windows only)
         if: matrix.platform == 'win32'
@@ -88,13 +80,13 @@ jobs:
 
       - name: Build application
         if: matrix.platform != 'win32'
-        run: pnpm run make
+        run: bun run make
         env:
           ELECTRON_BUILDER_ARCH: ${{ matrix.arch }}
 
       - name: Build application (Windows only)
         if: matrix.platform == 'win32'
-        run: pnpm run make-wix
+        run: bun run make-wix
         env:
           ELECTRON_BUILDER_ARCH: ${{ matrix.arch }}
 

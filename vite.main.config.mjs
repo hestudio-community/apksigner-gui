@@ -3,7 +3,7 @@ import JavaScriptObfuscator from "javascript-obfuscator";
 
 function createObfuscationPlugin() {
   return {
-    name: "pdfreader-obfuscate-main",
+    name: "obfuscate-main",
     apply: "build",
     enforce: "post",
     renderChunk(code, chunk) {

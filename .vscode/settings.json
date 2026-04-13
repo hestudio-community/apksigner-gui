@@ -8,5 +8,6 @@
     "Sign",
     "Service",
     "i18n"
-  ]
+  ],
+  "npm.packageManager": "bun"
 }

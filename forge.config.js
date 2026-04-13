@@ -109,11 +109,11 @@ module.exports = {
           chooseDirectory: true,
         },
         beforeCreate: async (msiCreator) => {
-          msiCreator.wixTemplate = msiCreator.wixTemplate.replace(
+          msiCreator.wixTemplate = msiCreator.wixTemplate.replaceAll(
             " (Machine - MSI)",
             "",
           );
-          msiCreator.wixTemplate = msiCreator.wixTemplate.replace(
+          msiCreator.wixTemplate = msiCreator.wixTemplate.replaceAll(
             " (Machine)",
             "",
           );
@@ -121,24 +121,21 @@ module.exports = {
       },
       platforms: ["win32"],
     },
-    ...(isCI
-      ? []
-      : [
-          {
-            name: "@electron-forge/maker-appx",
-            config: {
-              assets: "./icons/assets",
-              publisher: "CN=73AC1CCD-0F7C-48FE-A64D-F404735487C1",
-              packageDescription: "Simple but complete APK signing tool.",
-              manifest: `${
-                process.arch === "arm64"
-                  ? "./appxmanifests/AppXManifest_arm64.xml"
-                  : "./appxmanifests/AppXManifest_x86_64.xml"
-              }`,
-            },
-            platforms: ["win32"],
-          },
-        ]),
+
+    {
+      name: "@electron-forge/maker-appx",
+      config: {
+        assets: "./icons/assets",
+        publisher: "CN=73AC1CCD-0F7C-48FE-A64D-F404735487C1",
+        packageDescription: "Simple but complete APK signing tool.",
+        manifest: `${
+          process.arch === "arm64"
+            ? "./appxmanifests/AppXManifest_arm64.xml"
+            : "./appxmanifests/AppXManifest_x86_64.xml"
+        }`,
+      },
+      platforms: ["win32"],
+    },
   ],
   plugins: [
     {
