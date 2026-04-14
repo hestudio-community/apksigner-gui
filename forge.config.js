@@ -127,6 +127,7 @@ module.exports = {
         assets: "./icons/assets",
         publisher: "CN=73AC1CCD-0F7C-48FE-A64D-F404735487C1",
         packageDescription: "Simple but complete APK signing tool.",
+        makeVersionWinStoreCompatible: true,
         devCert: path.join("C:", "cert.pfx"),
         certPass: process.env.CERTPASS,
         manifest: `${

@@ -10,6 +10,7 @@ permissions:
 jobs:
   prebuild:
     runs-on: ubuntu-latest
+    name: Prebuild
     outputs:
       version: ${{ steps.get_version.outputs.version }}
       certpass: ${{ steps.gen_certpass.outputs.certpass }}
