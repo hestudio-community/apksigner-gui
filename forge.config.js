@@ -121,13 +121,15 @@ module.exports = {
       },
       platforms: ["win32"],
     },
-
     {
       name: "@electron-forge/maker-appx",
       config: {
         assets: "./icons/assets",
         publisher: "CN=73AC1CCD-0F7C-48FE-A64D-F404735487C1",
         packageDescription: "Simple but complete APK signing tool.",
+        makeVersionWinStoreCompatible: true,
+        devCert: path.join("C:", "cert.pfx"),
+        certPass: process.env.CERTPASS,
         manifest: `${
           process.arch === "arm64"
             ? "./appxmanifests/AppXManifest_arm64.xml"
