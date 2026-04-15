@@ -28,7 +28,7 @@
 2. Windows 用户可以使用 [WinGet](https://learn.microsoft.com/zh-cn/windows/package-manager/winget/) 安装。
 
    ```powershell
-   winget install "heStudioCommunity.APKSignerGUI(Machine-MSI)"
+   winget install heStudioCommunity.APKSignerGUI
    ```
 
    当然，你也可以通过 Microsoft Store 下载。
@@ -36,6 +36,9 @@
    <a href="https://apps.microsoft.com/detail/9n3q8bk8dp86?mode=direct">
    <img src="https://get.microsoft.com/images/zh-cn%20dark.svg" width="200"/>
    </a>
+
+> [!IMPORTANT]
+> 我们已从 MSI 构建包中移除了与“(Machine-MSI)”相关的标记。这些标记由 electron packager 提供，目前我们已将其移除。
 
 3. 参考文末方式构建。
 
