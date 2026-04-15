@@ -31,14 +31,15 @@
    winget install heStudioCommunity.APKSignerGUI
    ```
 
-   > [!IMPORTANT]
-   > We have removed the "(Machine - MSI)" related markers from the MSI build package. These markers were provided by the electron packager, and we have now removed them.
-
    Alternatively, download it from the Microsoft Store:
 
-      <a href="https://apps.microsoft.com/detail/9n3q8bk8dp86?mode=direct">
-      <img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200"/>
-      </a>
+   <a href="https://apps.microsoft.com/detail/9n3q8bk8dp86?mode=direct">
+   <img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200"/>
+   </a>
+
+> [!IMPORTANT]
+> We have removed the "(Machine - MSI)" related markers from the MSI build package. These markers were provided by the electron packager, and we have now removed them.
+
 
 3. Or build it yourself as described below.
 
