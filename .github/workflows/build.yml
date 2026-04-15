@@ -1,7 +1,7 @@
 name: Build for Publish
 
 on:
-  pull_request:
+  push:
     branches: [main]
 
 permissions:
