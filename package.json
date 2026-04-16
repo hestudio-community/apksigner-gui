@@ -29,10 +29,10 @@
     "@electron-forge/plugin-fuses": "7.11.1",
     "@electron-forge/plugin-vite": "7.11.1",
     "@electron/fuses": "2.1.1",
-    "@vitejs/plugin-vue": "6.0.5",
+    "@vitejs/plugin-vue": "6.0.6",
     "electron": "41.2.0",
     "electron-squirrel-startup": "^1.0.1",
-    "prettier": "3.8.2",
+    "prettier": "3.8.3",
     "vite": "8.0.8"
   },
   "dependencies": {
