@@ -8,9 +8,6 @@ import path from "node:path";
 import fs from "node:fs";
 import init from "./init";
 
-if (!process.env.APKSIGNERGUI_STARTINFO)
-  process.env.APKSIGNERGUI_STARTINFO = `${Date.now()}-${app.getVersion()}${!app.isPackaged ? "-develop" : ""}-${process.platform}-${process.arch}`;
-
 export class _log {
   /**
    *
