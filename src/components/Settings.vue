@@ -149,23 +149,25 @@
               >
             </div>
           </div>
-          <br />
-          <div
-            style="
-              display: flex;
-              flex-direction: row;
-              justify-content: space-between;
-              align-items: center;
-            "
-          >
-            <div>
-              <text>{{ i18n.openAutoCheckUpdate }}</text>
-            </div>
-            <div>
-              <el-switch
-                v-model="AutoCheckUpdate"
-                @change="ChangeAutoCheckUpdate"
-              />
+          <div v-if="!CheckAppStore">
+            <br />
+            <div
+              style="
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+              "
+            >
+              <div>
+                <text>{{ i18n.openAutoCheckUpdate }}</text>
+              </div>
+              <div>
+                <el-switch
+                  v-model="AutoCheckUpdate"
+                  @change="ChangeAutoCheckUpdate"
+                />
+              </div>
             </div>
           </div>
         </el-card>
@@ -306,7 +308,8 @@ export default {
         restoreError: undefined,
         backupError: undefined,
       },
-      AutoCheckUpdate: true,
+      AutoCheckUpdate: false,
+      CheckAppStore: false,
       isDevMode: false,
     };
   },
@@ -728,7 +731,10 @@ export default {
     this.advancedSetting = window.electronAPI.config.get("advancedSetting");
     this.lang.chooseLang = window.electronAPI.config.get("lang");
     this.lang.langlist = Object.values(supportLangList);
-    this.AutoCheckUpdate = window.electronAPI.config.get("checkUpdate");
+    this.CheckAppStore = window.electronAPI.AppCheckAppStore();
+    if (!this.CheckAppStore) {
+      this.AutoCheckUpdate = window.electronAPI.config.get("checkUpdate");
+    }
     const savedFont = window.electronAPI.config.get("fontFamily");
     if (savedFont && typeof savedFont === "string" && savedFont.trim()) {
       this.font.selected = savedFont;

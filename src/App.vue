@@ -577,12 +577,14 @@ export default {
       window.electronAPI.config.set("sidebarWidth", defaultSidebarWidth);
     }
 
-    const checkUpdate = window.electronAPI.config.get("checkUpdate");
-    if (checkUpdate == null) {
-      window.electronAPI.config.set("checkUpdate", true);
-      window.electronAPI.AppCheckUpdate(false);
-    } else if (checkUpdate) {
-      window.electronAPI.AppCheckUpdate(false);
+    if (!window.electronAPI.AppCheckAppStore()) {
+      const checkUpdate = window.electronAPI.config.get("checkUpdate");
+      if (checkUpdate == null) {
+        window.electronAPI.config.set("checkUpdate", true);
+        window.electronAPI.AppCheckUpdate(false);
+      } else if (checkUpdate) {
+        window.electronAPI.AppCheckUpdate(false);
+      }
     }
 
     setInterval(async () => {

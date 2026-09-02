@@ -1,11 +1,13 @@
 import { app, dialog } from "electron";
 import { _log } from "./log";
 import { internationalization } from "./i18nServices/server";
+import { CheckAppStore } from "./CheckAppStore";
 
 const logger = new _log("CheckUpdate");
 const i18n = new internationalization();
 
 export function CheckUpdate(forceShow) {
+  if (CheckAppStore()) return;
   logger.startload("CheckUpdate");
   logger.info(
     `[fetch] GET https://api.github.com/repos/hestudio-community/apksigner-gui/releases/latest`,

@@ -22,6 +22,7 @@ import { Command } from "commander";
 import { _log } from "./utils/log";
 import { CheckUpdate } from "./utils/CheckUpdate";
 import init from "./utils/init";
+import { CheckAppStore } from "./utils/CheckAppStore";
 
 init();
 const logger = new _log("main");
@@ -202,13 +203,13 @@ ${i18n.geti18n("version")}: ${app.getVersion()}
 ${i18n.geti18n("platform")}: ${process.platform}
 ${i18n.geti18n("architecture")}: ${process.arch}
 ${i18n.geti18n("workStatus")}: ${app.isPackaged ? "Product" : "Develop"} ${app.isPackaged & allowDevtools ? "with DevTools" : ""}
-${i18n.geti18n("copyright")}: Copyright © 2025 heStudio Community
+${i18n.geti18n("copyright")}: Copyright © 2026 heStudio Community
     `,
         type: "none",
         icon: path.join(__dirname, "../icon.png"),
         buttons: [
           process.platform == "win32" ? "Cancel" : i18n.geti18n("cancel"),
-          i18n.geti18n("checkUpdate"),
+          ...(CheckAppStore() ? [] : [i18n.geti18n("checkUpdate")]),
           i18n.geti18n("viewInGithub"),
         ],
         cancelId: 0,
@@ -237,12 +238,16 @@ ${i18n.geti18n("copyright")}: Copyright © 2025 heStudio Community
                 AboutPanel();
               },
             },
-            {
-              label: i18n.geti18n("checkUpdate"),
-              click: () => {
-                CheckUpdate(true);
-              },
-            },
+            ...(CheckAppStore()
+              ? []
+              : [
+                  {
+                    label: i18n.geti18n("checkUpdate"),
+                    click: () => {
+                      CheckUpdate(true);
+                    },
+                  },
+                ]),
             { type: "separator" },
             { role: "services" },
             { type: "separator" },
@@ -316,12 +321,16 @@ ${i18n.geti18n("copyright")}: Copyright © 2025 heStudio Community
                   AboutPanel();
                 },
               },
-              {
-                label: i18n.geti18n("checkUpdate"),
-                click: () => {
-                  CheckUpdate(true);
-                },
-              },
+              ...(CheckAppStore()
+                ? []
+                : [
+                    {
+                      label: i18n.geti18n("checkUpdate"),
+                      click: () => {
+                        CheckUpdate(true);
+                      },
+                    },
+                  ]),
               { type: "separator" },
               { role: "services" },
               { type: "separator" },
@@ -431,6 +440,11 @@ ${i18n.geti18n("copyright")}: Copyright © 2025 heStudio Community
     logger.debug("Check allowDevtools.");
     return allowDevtools;
   });
+
+  ipcMain.on(
+    "app:checkappstore",
+    (event) => (event.returnValue = CheckAppStore()),
+  );
 
   // Windows control handlers
   if (process.platform != "darwin") {
