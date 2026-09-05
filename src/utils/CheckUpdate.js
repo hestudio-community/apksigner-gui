@@ -1,7 +1,8 @@
-import { app, dialog } from "electron";
+import { app, dialog, shell } from "electron";
 import { _log } from "./log";
 import { internationalization } from "./i18nServices/server";
 import { CheckAppStore } from "./CheckAppStore";
+import { warn } from "./alert";
 
 const logger = new _log("CheckUpdate");
 const i18n = new internationalization();
