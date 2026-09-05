@@ -245,7 +245,9 @@ for family in manager.availableFontFamilies.sorted() {
         })
         .filter(Boolean);
     }
-  } catch (error) {}
+  } catch (error) {
+    logger.error(error);
+  }
   try {
     const { stdout } = await execAsync("system_profiler SPFontsDataType -json");
     const parsed = JSON.parse(stdout);
@@ -276,7 +278,9 @@ for family in manager.availableFontFamilies.sorted() {
     if (result.size > 0) {
       return Array.from(result);
     }
-  } catch (error) {}
+  } catch (error) {
+    logger.error(error);
+  }
   const fallbackDirs = [
     "/System/Library/Fonts",
     "/Library/Fonts",
@@ -306,7 +310,9 @@ async function listLinuxFonts() {
     if (result.size > 0) {
       return Array.from(result);
     }
-  } catch (error) {}
+  } catch (error) {
+    logger.error(error);
+  }
   const home = process.env.HOME;
   const fallbackDirs = [
     "/usr/share/fonts",
@@ -355,7 +361,9 @@ async function collectFonts(directory, fonts) {
         }
       }
     }
-  } catch (error) {}
+  } catch (error) {
+    logger.error(error);
+  }
   logger.endload("collectFonts");
 }
 
@@ -375,6 +383,7 @@ export async function getSystemFonts() {
     logger.endload("getSystemFonts");
     return cachedFonts;
   }
+  // eslint-disable-next-line no-useless-assignment
   let fonts = [];
   if (process.platform === "win32") {
     fonts = await listWindowsFonts();
