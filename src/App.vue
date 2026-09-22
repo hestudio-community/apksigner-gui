@@ -301,6 +301,19 @@
   -webkit-app-region: no-drag;
 }
 
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.refresh.spinning {
+  animation: spin 0.6s linear;
+}
+
 @media (prefers-color-scheme: dark) {
   .header {
     color: #e5eaf3;
@@ -476,10 +489,10 @@ export default {
 
     async RefreshKey() {
       this.keyLoading = true;
-      document.querySelector(".refresh").classList.add("element-rotate");
+      document.querySelector(".refresh").classList.add("spinning");
       setTimeout(() => {
-        document.querySelector(".refresh").classList.remove("element-rotate");
-      }, 618);
+        document.querySelector(".refresh").classList.remove("spinning");
+      }, 1000);
       this.keyList = [];
       const keys = window.electronAPI.config.get("keys");
       if (keys) {
