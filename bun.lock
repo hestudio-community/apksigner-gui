@@ -41,6 +41,9 @@
       },
     },
   },
+  "patchedDependencies": {
+    "@electron-forge/maker-wix@8.0.1": "patches/@electron-forge%2Fmaker-wix@8.0.1.patch",
+  },
   "packages": {
     "@alcalzone/ansi-tokenize": ["@alcalzone/ansi-tokenize@0.3.1", "", { "dependencies": { "ansi-styles": "^6.2.1", "is-fullwidth-code-point": "^5.0.0" } }, "sha512-cUD0PT0YX+rImRhfn7BfMRduP/tX/Zqt/N0dHlAyn2RlcJssCb5KsCJkhln61eh9vuJDkH8wKn3L8zJzzWXPFg=="],
 

@@ -52,5 +52,8 @@
     "fix-path": "^5.0.0",
     "sass-embedded": "1.106.1",
     "vue": "^3.5.44"
+  },
+  "patchedDependencies": {
+    "@electron-forge/maker-wix@8.0.1": "patches/@electron-forge%2Fmaker-wix@8.0.1.patch"
   }
 }
