@@ -7,6 +7,55 @@ import { warn } from "./alert";
 const logger = new _log("CheckUpdate");
 const i18n = new internationalization();
 
+const UPDATE_API =
+  "https://api.github.com/repos/hestudio-community/apksigner-gui/releases/latest";
+const REPO_URL = "https://github.com/hestudio-community/apksigner-gui";
+
+function UpdateDialog(latestVersion) {
+  dialog
+    .showMessageBox({
+      title: "APKSignerGUI",
+      message: "APKSignerGUI",
+      detail: i18n.geti18n("newVersionAvailable")(latestVersion),
+      type: "info",
+      buttons: [
+        process.platform == "win32" ? "Cancel" : i18n.geti18n("cancel"),
+        ...(process.platform == "darwin" || process.platform == "win32"
+          ? [i18n.geti18n("downloadNOW")]
+          : []),
+        i18n.geti18n("viewInGithub"),
+      ],
+      cancelId: 0,
+    })
+    .then((response) => {
+      if (response.response == 1) {
+        if (process.platform == "darwin" && process.arch == "arm64") {
+          shell.openExternal(
+            `${REPO_URL}/releases/download/${
+              latestVersion
+            }/apksignergui_${String(latestVersion).replace("v", "")}_arm64.dmg`,
+          );
+        } else if (process.platform == "win32" && process.arch == "x64") {
+          shell.openExternal(
+            `${REPO_URL}/releases/download/${
+              latestVersion
+            }/apksignergui_${String(latestVersion).replace("v", "")}_amd64.msi`,
+          );
+        } else if (process.platform == "win32" && process.arch == "arm64") {
+          shell.openExternal(
+            `${REPO_URL}/releases/download/${
+              latestVersion
+            }/apksignergui_${String(latestVersion).replace("v", "")}_arm64.msi`,
+          );
+        } else {
+          shell.openExternal(`${REPO_URL}/releases/latest`);
+        }
+      } else if (response.response == 2) {
+        shell.openExternal(`${REPO_URL}/releases/latest`);
+      }
+    });
+}
+
 export function CheckUpdate(forceShow) {
   if (app.runningUnderARM64Translation) {
     dialog
@@ -23,26 +72,22 @@ export function CheckUpdate(forceShow) {
       })
       .then((response) => {
         if (response.response == 1) {
-          shell.openExternal(
-            "https://github.com/hestudio-community/apksigner-gui/releases/latest",
-          );
+          shell.openExternal(`${REPO_URL}/releases/latest`);
         }
       });
   }
 
   if (CheckAppStore()) return;
   logger.startload("CheckUpdate");
-  logger.info(
-    `[fetch] GET https://api.github.com/repos/hestudio-community/apksigner-gui/releases/latest`,
-  );
-  fetch(
-    "https://api.github.com/repos/hestudio-community/apksigner-gui/releases/latest",
-  )
+  logger.info(`[fetch] GET ${UPDATE_API}`);
+  fetch(UPDATE_API)
     .then(async (response) => {
       let data = await response.text();
       logger.log(`[fetch] Response: ${data}`);
       data = JSON.parse(data);
-      if (data.name == `v${app.getVersion()}`) {
+      const latestVersion = String(data.name);
+
+      if (latestVersion == `v${app.getVersion()}`) {
         if (forceShow) {
           dialog
             .showMessageBox({
@@ -58,13 +103,17 @@ export function CheckUpdate(forceShow) {
             })
             .then((response) => {
               if (response.response == 1) {
-                shell.openExternal(
-                  "https://github.com/hestudio-community/apksigner-gui/releases/latest",
-                );
+                shell.openExternal(`${REPO_URL}/releases/latest`);
               }
             });
         }
       } else {
+        if (latestVersion == "undefined") {
+          if (forceShow) {
+            warn(undefined, i18n.geti18n("checkUpdateFailed"));
+          }
+          return
+        }
         if (!forceShow) {
           if (!/^\d+(\.\d+)*$/.test(app.getVersion()) | !app.isPackaged) {
             logger.debug(
@@ -73,76 +122,7 @@ export function CheckUpdate(forceShow) {
             return;
           }
         }
-        dialog
-          .showMessageBox({
-            title: "APKSignerGUI",
-            message: "APKSignerGUI",
-            detail: i18n.geti18n("newVersionAvailable")(data.name),
-            type: "info",
-            buttons: [
-              process.platform == "win32" ? "Cancel" : i18n.geti18n("cancel"),
-              ...(process.platform == "darwin" || process.platform == "win32"
-                ? [i18n.geti18n("downloadNOW")]
-                : []),
-              i18n.geti18n("viewInGithub"),
-            ],
-            cancelId: 0,
-          })
-          .then((response) => {
-            if (response.response == 1) {
-              if (process.platform == "darwin" && process.arch == "arm64") {
-                shell.openExternal(
-                  `https://github.com/hestudio-community/apksigner-gui/releases/download/${
-                    data.name
-                  }/apksignergui_${String(data.name).replace(
-                    "v",
-                    "",
-                  )}_arm64.dmg`,
-                );
-              } else if (
-                process.platform == "darwin" &&
-                process.arch == "amd64"
-              ) {
-                shell.openExternal(
-                  `https://github.com/hestudio-community/apksigner-gui/releases/download/${
-                    data.name
-                  }/apksignergui_${String(data.name).replace(
-                    "v",
-                    "",
-                  )}_amd64.dmg`,
-                );
-              } else if (process.platform == "win32" && process.arch == "x64") {
-                shell.openExternal(
-                  `https://github.com/hestudio-community/apksigner-gui/releases/download/${
-                    data.name
-                  }/apksignergui_${String(data.name).replace(
-                    "v",
-                    "",
-                  )}_amd64.msi`,
-                );
-              } else if (
-                process.platform == "win32" &&
-                process.arch == "arm64"
-              ) {
-                shell.openExternal(
-                  `https://github.com/hestudio-community/apksigner-gui/releases/download/${
-                    data.name
-                  }/apksignergui_${String(data.name).replace(
-                    "v",
-                    "",
-                  )}_arm64.msi`,
-                );
-              } else {
-                shell.openExternal(
-                  "https://github.com/hestudio-community/apksigner-gui/releases/latest",
-                );
-              }
-            } else if (response.response == 2) {
-              shell.openExternal(
-                "https://github.com/hestudio-community/apksigner-gui/releases/latest",
-              );
-            }
-          });
+        UpdateDialog(latestVersion);
       }
     })
     .catch((e) => {
