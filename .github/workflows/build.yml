@@ -115,6 +115,7 @@ jobs:
         env:
           ELECTRON_BUILDER_ARCH: ${{ matrix.arch }}
           CERTPASS: ${{ needs.prebuild.outputs.certpass }}
+          APKSIGNERGUI_VERSION: ${{ needs.prebuild.outputs.version }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
