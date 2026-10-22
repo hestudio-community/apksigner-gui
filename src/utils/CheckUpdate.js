@@ -8,6 +8,28 @@ const logger = new _log("CheckUpdate");
 const i18n = new internationalization();
 
 export function CheckUpdate(forceShow) {
+  if (app.runningUnderARM64Translation) {
+    dialog
+      .showMessageBox({
+        title: "APKSignerGUI",
+        message: "APKSignerGUI",
+        detail: i18n.geti18n("warnInARM64WithX86Program"),
+        type: "warning",
+        buttons: [
+          process.platform == "win32" ? "Cancel" : i18n.geti18n("cancel"),
+          i18n.geti18n("viewInGithub"),
+        ],
+        cancelId: 0,
+      })
+      .then((response) => {
+        if (response.response == 1) {
+          shell.openExternal(
+            "https://github.com/hestudio-community/apksigner-gui/releases/latest",
+          );
+        }
+      });
+  }
+
   if (CheckAppStore()) return;
   logger.startload("CheckUpdate");
   logger.info(
@@ -129,27 +151,5 @@ export function CheckUpdate(forceShow) {
         warn(undefined, i18n.geti18n("checkUpdateFailed"));
       }
     });
-
-  if (app.runningUnderARM64Translation) {
-    dialog
-      .showMessageBox({
-        title: "APKSignerGUI",
-        message: "APKSignerGUI",
-        detail: i18n.geti18n("warnInARM64WithX86Program"),
-        type: "warning",
-        buttons: [
-          process.platform == "win32" ? "Cancel" : i18n.geti18n("cancel"),
-          i18n.geti18n("viewInGithub"),
-        ],
-        cancelId: 0,
-      })
-      .then((response) => {
-        if (response.response == 1) {
-          shell.openExternal(
-            "https://github.com/hestudio-community/apksigner-gui/releases/latest",
-          );
-        }
-      });
-  }
   logger.endload("CheckUpdate");
 }
