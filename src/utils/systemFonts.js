@@ -1,5 +1,7 @@
-import { exec } from "node:child_process";
+import { exec, execFile } from "node:child_process";
+import crypto from "node:crypto";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { _log } from "./log";
 
@@ -24,6 +26,23 @@ function execAsync(command) {
     exec(
       command,
       { maxBuffer: 32 * 1024 * 1024, windowsHide: true },
+      (error, stdout, stderr) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        resolve({ stdout, stderr });
+      },
+    );
+  });
+}
+
+function execFileAsync(file, args, options) {
+  return new Promise((resolve, reject) => {
+    execFile(
+      file,
+      args,
+      { maxBuffer: 32 * 1024 * 1024, windowsHide: true, ...options },
       (error, stdout, stderr) => {
         if (error) {
           reject(error);
@@ -201,9 +220,22 @@ for family in manager.availableFontFamilies.sorted() {
   }
 }
 `;
-    const { stdout } = await execAsync(
-      `swift -e ${JSON.stringify(swiftScript)}`,
-    );
+    const { stdout } = await (async () => {
+      // swift writes compiler module caches to a location that may be
+      // unwritable in sandboxed environments; point it at a private temp dir.
+      const cacheDir = path.join(
+        os.tmpdir(),
+        `apksigner-gui-swift-cache-${crypto.randomUUID()}`,
+      );
+      fs.mkdirSync(cacheDir, { recursive: true });
+      try {
+        return await execFileAsync("swift", ["-e", swiftScript], {
+          env: { ...process.env, CLANG_MODULE_CACHE_PATH: cacheDir },
+        });
+      } finally {
+        fs.rmSync(cacheDir, { recursive: true, force: true });
+      }
+    })();
     const swiftFonts = stdout
       .split(/\r?\n/)
       .map((line) => line.trim())
@@ -245,7 +277,9 @@ for family in manager.availableFontFamilies.sorted() {
         })
         .filter(Boolean);
     }
-  } catch (error) {}
+  } catch (error) {
+    logger.error(error);
+  }
   try {
     const { stdout } = await execAsync("system_profiler SPFontsDataType -json");
     const parsed = JSON.parse(stdout);
@@ -276,7 +310,9 @@ for family in manager.availableFontFamilies.sorted() {
     if (result.size > 0) {
       return Array.from(result);
     }
-  } catch (error) {}
+  } catch (error) {
+    logger.error(error);
+  }
   const fallbackDirs = [
     "/System/Library/Fonts",
     "/Library/Fonts",
@@ -306,7 +342,9 @@ async function listLinuxFonts() {
     if (result.size > 0) {
       return Array.from(result);
     }
-  } catch (error) {}
+  } catch (error) {
+    logger.error(error);
+  }
   const home = process.env.HOME;
   const fallbackDirs = [
     "/usr/share/fonts",
@@ -355,7 +393,9 @@ async function collectFonts(directory, fonts) {
         }
       }
     }
-  } catch (error) {}
+  } catch (error) {
+    logger.error(error);
+  }
   logger.endload("collectFonts");
 }
 
@@ -375,6 +415,7 @@ export async function getSystemFonts() {
     logger.endload("getSystemFonts");
     return cachedFonts;
   }
+  // eslint-disable-next-line no-useless-assignment
   let fonts = [];
   if (process.platform === "win32") {
     fonts = await listWindowsFonts();

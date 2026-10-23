@@ -8,8 +8,8 @@
 ---
 
 <div align="center">
-   <a href="../../README.md">English</a> | 
-   <a href="./README_CN.md">简体中文</a> | 
+   <a href="../../README.md">English</a> |
+   <a href="./README_CN.md">简体中文</a> |
    <a href="./README_HK.md">繁體中文</a>
 </div>
 
@@ -37,9 +37,6 @@
    <img src="https://get.microsoft.com/images/zh-tw%20dark.svg" width="200"/>
    </a>
 
-> [!IMPORTANT]
-> 我們已從 MSI 建置套件中移除了「(Machine-MSI)」相關標記。這些標記是由 electron packager 提供的，目前我們已將其移除。
-
 3. 參考文末方式建構。
 
 ### macOS 安裝可能遇到的問題
@@ -48,9 +45,11 @@
 
 1. 下載並拖動到 Application 目錄。
 2. 打開你的終端機，然後運行。
+
    ```shell
    xattr -d com.apple.quarantine /Applications/APKSignerGUI.app
    ```
+
 3. 打開應用程式並開始使用。
 
 ### 關於相容性
@@ -97,66 +96,3 @@
 我們的語言代碼遵循 [ISO 639-1](https://zh.wikipedia.org/wiki/ISO_639-1)，國家/地區代碼則依據 [ISO 3166-1](https://zh.wikipedia.org/wiki/ISO_3166-1)。
 
 感謝 [Crowdin](https://crowdin.com/) 提供開源授權。
-
-### 如何建構？
-
-#### 不打包
-
-1. 安裝 [NodeJS 22 LTS](https://nodejs.org/)
-2. 使用 `npm install` 安裝依賴。
-3. 使用 `npm run package` 建構。
-4. 在 `./out/` 目錄中取得建構物。
-
-#### macOS
-
-1. 安裝 [NodeJS 22 LTS](https://nodejs.org/)
-2. 使用 `npm install` 安裝依賴。
-3. 使用 `npm run make` 建構。
-4. 在 `./out/make` 目錄中取得建構物。
-
-#### Windows
-
-##### ZIP 打包（推薦）
-
-1. 安裝 [NodeJS 22 LTS](https://nodejs.org/)
-2. 使用 `npm install` 安裝依賴。
-3. 編輯 `forge.config.js`。
-   將
-
-   ```javascript
-   {
-      name: "@electron-forge/maker-wix",
-      config: {
-        // ...
-      },
-      platform: ["win32"],
-   },
-   ```
-
-   更換為
-
-   ```javascript
-   {
-     name: "@electron-forge/maker-zip",
-     platform: ["win32"],
-   }
-   ```
-
-4. 使用 `npm run make` 建構。
-5. 在 `./out/make` 目錄中取得建構物。
-
-##### MSI 打包
-
-1. 安裝 [NodeJS 22 LTS](https://nodejs.org/)
-2. 使用 `npm install` 安裝依賴。
-3. 安裝 [WiX Toolset v3](https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314-binaries.zip)。
-4. 將其路徑加入系統 `PATH` 環境變數。
-5. 使用 `npm run make` 建構。
-6. 在 `./out/make` 目錄中取得建構物。
-
-#### Linux（Debian 及其衍生系統）
-
-1. 安裝 [NodeJS 22 LTS](https://nodejs.org/)
-2. 使用 `npm install` 安裝依賴。
-3. 使用 `npm run make` 建構。
-4. 在 `./out/make` 目錄中取得建構物。

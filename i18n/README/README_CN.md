@@ -8,8 +8,8 @@
 ---
 
 <div align="center">
-   <a href="../../README.md">English</a> | 
-   <a href="./README_CN.md">简体中文</a> | 
+   <a href="../../README.md">English</a> |
+   <a href="./README_CN.md">简体中文</a> |
    <a href="./README_HK.md">繁體中文</a>
 </div>
 
@@ -37,9 +37,6 @@
    <img src="https://get.microsoft.com/images/zh-cn%20dark.svg" width="200"/>
    </a>
 
-> [!IMPORTANT]
-> 我们已从 MSI 构建包中移除了与“(Machine-MSI)”相关的标记。这些标记由 electron packager 提供，目前我们已将其移除。
-
 3. 参考文末方式构建。
 
 ### macOS 安装可能遇到的问题
@@ -48,9 +45,11 @@
 
 1. 下载并拖动到 Application 目录。
 2. 打开你的终端，然后运行。
+
    ```shell
    xattr -d com.apple.quarantine /Applications/APKSignerGUI.app
    ```
+
 3. 打开应用程序并开始使用。
 
 ### 关于兼容性
@@ -97,66 +96,3 @@
 我们要求的语言代码以 [ISO 639-1](https://en.wikipedia.org/wiki/ISO_639-1) 为标准，国家或地区代码以 [ISO 3166-1](https://en.wikipedia.org/wiki/ISO_3166-1) 为标准。
 
 感谢 [Crowdin](https://crowdin.com/) 为本项目提供的开源许可证。
-
-### 如何构建？
-
-#### 不打包
-
-1. 安装 [NodeJS 22 LTS](https://nodejs.org/)
-2. 使用 `npm install` 安装依赖。
-3. 使用 `npm run package` 构建。
-4. 在 `./out/` 目录中取得构建物。
-
-#### macOS
-
-1. 安装 [NodeJS 22 LTS](https://nodejs.org/)
-2. 使用 `npm install` 安装依赖。
-3. 使用 `npm run make` 构建。
-4. 在 `./out/make` 目录中取得构建物。
-
-#### Windows
-
-##### ZIP 打包 (推荐)
-
-1. 安装 [NodeJS 22 LTS](https://nodejs.org/)
-2. 使用 `npm install` 安装依赖。
-3. 编辑 `forge.config.js`.
-   将
-
-   ```javascript
-   {
-      name: "@electron-forge/maker-wix",
-      config: {
-        // ...
-      },
-      platform: ["win32"],
-   },
-   ```
-
-   更换为
-
-   ```javascript
-   {
-     name: "@electron-forge/maker-zip",
-     platform: ["win32"],
-   }
-   ```
-
-4. 使用 `npm run make` 构建。
-5. 在 `./out/make` 目录中取得构建物。
-
-##### MSI 打包
-
-1. 安装 [NodeJS 22 LTS](https://nodejs.org/)
-2. 使用 `npm install` 安装依赖。
-3. 安装 [WiX Toolset v3](https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314-binaries.zip).
-4. 配置环境变量到`PATH`.
-5. 使用 `npm run make` 构建。
-6. 在 `./out/make` 目录中取得构建物。
-
-#### Linux (Debian 及其衍生系统)
-
-1. 安装 [NodeJS 22 LTS](https://nodejs.org/)
-2. 使用 `npm install` 安装依赖。
-3. 使用 `npm run make` 构建。
-4. 在 `./out/make` 目录中取得构建物。

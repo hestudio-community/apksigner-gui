@@ -8,8 +8,8 @@
 ---
 
 <div align="center">
-   <a href="./README.md">English</a> | 
-   <a href="./i18n/README/README_CN.md">简体中文</a> | 
+   <a href="./README.md">English</a> |
+   <a href="./i18n/README/README_CN.md">简体中文</a> |
    <a href="./i18n/README/README_HK.md">繁體中文</a>
 </div>
 
@@ -37,10 +37,6 @@
    <img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200"/>
    </a>
 
-> [!IMPORTANT]
-> We have removed the "(Machine - MSI)" related markers from the MSI build package. These markers were provided by the electron packager, and we have now removed them.
-
-
 3. Or build it yourself as described below.
 
 ### macOS Installation Issues
@@ -49,9 +45,11 @@ When installing on macOS, you may encounter the error `“APKSignerGUI.app” is
 
 1. Download and move the app to your Applications folder.
 2. Open Terminal and run:
+
    ```shell
    xattr -d com.apple.quarantine /Applications/APKSignerGUI.app
    ```
+
 3. Open the application and start using it.
 
 ### Compatibility
@@ -98,67 +96,3 @@ Didn't find your language? Add it using either method:
 Use [ISO 639-1](https://en.wikipedia.org/wiki/ISO_639-1) for language codes and [ISO 3166-1](https://en.wikipedia.org/wiki/ISO_3166-1) for region codes.
 
 Thanks to [Crowdin](https://crowdin.com/) for providing an open-source license.
-
-### How to Build?
-
-#### Without Packaging
-
-1. Install [NodeJS 22 LTS](https://nodejs.org/)
-2. Run `npm install` to install dependencies.
-3. Run `npm run package` to build.
-4. Find the output in `./out/`.
-
-#### macOS
-
-1. Install [NodeJS 22 LTS](https://nodejs.org/)
-2. Run `npm install` to install dependencies.
-3. Run `npm run make` to build.
-4. Find the output in `./out/make`.
-
-#### Windows
-
-##### ZIP Packaging (Recommended)
-
-1. Install [NodeJS 22 LTS](https://nodejs.org/)
-2. Run `npm install` to install dependencies.
-3. Edit `forge.config.js`:
-
-   Replace:
-
-   ```javascript
-   {
-      name: "@electron-forge/maker-wix",
-      config: {
-        // ...
-      },
-      platform: ["win32"],
-   },
-   ```
-
-   With:
-
-   ```javascript
-   {
-     name: "@electron-forge/maker-zip",
-     platform: ["win32"],
-   }
-   ```
-
-4. Run `npm run make` to build.
-5. Find the output in `./out/make`.
-
-##### MSI Packaging
-
-1. Install [NodeJS 22 LTS](https://nodejs.org/)
-2. Run `npm install` to install dependencies.
-3. Install [WiX Toolset v3](https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314-binaries.zip).
-4. Add WiX binaries to your `PATH` environment variable.
-5. Run `npm run make` to build.
-6. Find the output in `./out/make`.
-
-#### Linux (Debian and Derivatives)
-
-1. Install [NodeJS 22 LTS](https://nodejs.org/)
-2. Run `npm install` to install dependencies.
-3. Run `npm run make` to build.
-4. Find the output in `./out/make`.

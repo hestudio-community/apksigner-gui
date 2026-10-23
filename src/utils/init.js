@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { app } from "electron";
 
 export default function () {
   // create data dir
@@ -22,4 +23,7 @@ export default function () {
 
   if (!fs.existsSync(tmp)) fs.mkdirSync(tmp, { recursive: true });
   if (!fs.existsSync(appdata)) fs.mkdirSync(appdata, { recursive: true });
+
+  if (!process.env.APKSIGNERGUI_STARTINFO)
+    process.env.APKSIGNERGUI_STARTINFO = `${Date.now()}-${app.getVersion()}${!app.isPackaged ? "-develop" : ""}-${process.platform}-${process.arch}`;
 }

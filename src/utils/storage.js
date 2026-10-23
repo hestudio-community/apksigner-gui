@@ -277,9 +277,9 @@ export function importConfigHandler() {
   });
 
   ipcMain.handle("config:backup", async (event) => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       try {
-        const { canceled, filePath } = await dialog.showSaveDialog({
+        const { canceled, filePath } = dialog.showSaveDialog({
           title: "Backup Configuration",
           defaultPath: `config-backup-${new Date().toISOString().split("T")[0]}.json`,
           filters: [
@@ -300,9 +300,9 @@ export function importConfigHandler() {
   });
 
   ipcMain.handle("config:restore", async (event) => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       try {
-        const { canceled, filePaths } = await dialog.showOpenDialog({
+        const { canceled, filePaths } = dialog.showOpenDialog({
           title: "Restore Configuration",
           properties: ["openFile"],
           filters: [
@@ -311,7 +311,7 @@ export function importConfigHandler() {
           ],
         });
         if (!canceled && filePaths.length > 0) {
-          const success = await config.restore(filePaths[0]);
+          const success = config.restore(filePaths[0]);
           resolve(success);
         } else {
           resolve(false);

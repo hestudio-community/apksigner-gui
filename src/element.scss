@@ -27,6 +27,7 @@
 .el-overlay {
   -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
+  -webkit-app-region: no-drag !important;
 }
 
 .el-card {
@@ -157,6 +158,7 @@
     var(--el-drawer-bg-color) 85%,
     transparent
   ) !important;
+  -webkit-app-region: no-drag !important;
 }
 
 .hide-color-picker-clear .el-color-dropdown__link-btn {

@@ -1,0 +1,13 @@
+diff --git a/dist/MakerWix.js b/dist/MakerWix.js
+index ad30bb626e7763415ee595d90f376c9961ce8cdb..81aaddf5c67aa4ae2ae78a82af4ea8960f396341 100644
+--- a/dist/MakerWix.js
++++ b/dist/MakerWix.js
+@@ -5,7 +5,7 @@ import { MakerBase } from '@electron-forge/maker-base';
+ import { MSICreator } from 'electron-wix-msi';
+ import semver from 'semver';
+ function isValidWixArch(arch) {
+-    return ['x64', 'ia64', 'x86'].includes(arch);
++    return ['x64', 'ia64', 'x86', 'arm64'].includes(arch);
+ }
+ export default class MakerWix extends MakerBase {
+     name = 'wix';
