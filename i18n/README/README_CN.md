@@ -37,10 +37,7 @@
    <img src="https://get.microsoft.com/images/zh-cn%20dark.svg" width="200"/>
    </a>
 
-> [!IMPORTANT]
-> 我们已从 MSI 构建包中移除了与“(Machine-MSI)”相关的标记。这些标记由 electron packager 提供，目前我们已将其移除。
-
-1. 参考文末方式构建。
+3. 参考文末方式构建。
 
 ### macOS 安装可能遇到的问题
 

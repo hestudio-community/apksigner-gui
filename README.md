@@ -37,10 +37,7 @@
    <img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200"/>
    </a>
 
-> [!IMPORTANT]
-> We have removed the "(Machine - MSI)" related markers from the MSI build package. These markers were provided by the electron packager, and we have now removed them.
-
-1. Or build it yourself as described below.
+3. Or build it yourself as described below.
 
 ### macOS Installation Issues
 
